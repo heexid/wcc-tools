@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useId, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
@@ -81,7 +81,7 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
       {editor ? (
         // Global header [Type=Editor] (Bookings 03): the page portals its save status · divider · Cancel / Save
         // into this slot (<EditorActions>), gap inset.
-        <div ref={onSlot} className="flex items-center gap-inset" />
+        <div ref={onSlot} className="motion-page flex items-center gap-inset" />
       ) : (
         <div className="flex items-center gap-inset">
           {/* Language: English only in this release (existing CIR shell, INTERACTIONS 6.1) */}
@@ -112,14 +112,19 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
 }
 
 /** Route guard: no session → /login?next=<this page>. Renders nothing until checked (client-only session). */
+const subscribeSession = (cb: () => void) => {
+  window.addEventListener("storage", cb);
+  return () => window.removeEventListener("storage", cb);
+};
+
 function useSessionGate() {
   const router = useRouter();
   const path = usePathname();
-  const [ok, setOk] = useState(false);
+  // Read synchronously: a client navigation remounts the shell, and an effect-set flag would commit one blank frame
+  // (header gone) on every route change. Hydration uses the server snapshot (false) for one pass, then re-renders.
+  const ok = useSyncExternalStore(subscribeSession, hasSession, () => false);
   useEffect(() => {
-    if (hasSession())
-      setOk(true); // eslint-disable-line react-hooks/set-state-in-effect -- session lives in localStorage
-    else router.replace(`/login?next=${encodeURIComponent(path + window.location.search)}`);
+    if (!hasSession()) router.replace(`/login?next=${encodeURIComponent(path + window.location.search)}`);
   }, [router, path]);
   return ok;
 }
@@ -193,9 +198,9 @@ export function AppShell({ module, page, standalone, editor, children }: { modul
           <EditorSlot.Provider value={slot}>
             {standalone ? (
               // Standalone screen (Account settings, Figma AC2): no module workspace — the page sits on surface/subtle.
-              <div className="flex flex-1 flex-col bg-surface-subtle">{children}</div>
+              <div className="motion-page flex flex-1 flex-col bg-surface-subtle">{children}</div>
             ) : (
-              <div className="flex flex-1 flex-col rounded-t-card border border-border-default bg-surface-default">{children}</div>
+              <div className="motion-page flex flex-1 flex-col rounded-t-card border border-border-default bg-surface-default">{children}</div>
             )}
           </EditorSlot.Provider>
         </CrumbSetter.Provider>

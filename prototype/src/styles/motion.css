@@ -34,6 +34,7 @@
   --toast-from-y: -100%; /* toasts sit top-centre and drop in from above */
   --sheet-from-x: 100%;
   --list-from-y: var(--spacing-8); /* stagger rise, from the animate recipe */
+  --page-from-y: var(--spacing-4); /* route-change content rise — tiny: page changes are tens/day */
 }
 
 @theme {
@@ -278,6 +279,23 @@
   }
 }
 
+/* Page (route change) — the shell (header, workspace card) stays still; only the incoming workspace content arrives:
+   a short rise (--page-from-y, 4px) + fade on the signature curve, 250ms. Tens/day, so the distance stays tiny and there
+   is no direction, slide or stagger. Entry only. `.fixed` children (ToastRegion) are skipped: they carry their own
+   .motion-toast travel. Settled state declares no transform, so fixed popovers inside the page aren't re-anchored once
+   it lands. Reduced motion → --page-from-y 0, fade only. */
+.motion-page > :not(.fixed) {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-modal);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .motion-page > :not(.fixed) {
+    opacity: 0;
+    transform: translateY(var(--page-from-y));
+  }
+}
+
 /* Reduced motion = fewer and gentler, not zero (animate §7).
    Movement and scale are neutralised, so every entrance becomes a pure opacity fade
    on the same duration/curve; colour and opacity transitions stay — they aid comprehension. */
@@ -290,6 +308,7 @@
     --toast-from-y: 0;
     --sheet-from-x: 0;
     --list-from-y: 0;
+    --page-from-y: 0;
     --stagger-step: 0ms;
   }
   html:focus-within {

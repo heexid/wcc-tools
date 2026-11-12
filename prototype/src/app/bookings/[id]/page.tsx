@@ -29,10 +29,10 @@ function FullPage() {
   const b = state?.id === id ? state.b : null;
   // ‹ / Esc → back to Bookings with the detail sheet closed (H5 note).
   const back = useCallback(() => router.push("/bookings"), [router]);
-  if (!b) return <div className="min-h-screen bg-surface-header" aria-busy="true" />;
+  // The shell renders while the booking loads, so the header stays put through the check / redirect.
   return (
-    <AppShell module="booking" page={b.ref} editor>
-      <BookingReadOnly key={b.id} b={b} onBack={back} />
+    <AppShell module="booking" page={b?.ref} editor>
+      {b ? <BookingReadOnly key={b.id} b={b} onBack={back} /> : <div className="flex-1" aria-busy="true" />}
     </AppShell>
   );
 }
