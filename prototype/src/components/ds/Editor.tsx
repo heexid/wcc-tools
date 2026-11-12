@@ -138,8 +138,8 @@ export function CrewChip({ name, initials, onRemove, className }: { name: string
 }
 
 /** Crew chip [Read-only] as a button (detail panel Crew row, INTERACTIONS 4.8): opens the crew's schedule.
- *  Hover / open = "Read-only hover" (Figma 27): 1px INSIDE border/accent — counted in layout like Figma's
- *  (121×28 → 123×30) — and an underlined name. */
+ *  Hover / open = "Read-only hover" (Figma 31:76092): 1px OUTSIDE stroke border/accent — drawn as an outline, so the
+ *  chip stays 121×28 (no layout shift); the name is not underlined. */
 export const CrewChipButton = forwardRef<HTMLButtonElement, { name: string; initials: string; open?: boolean; onClick: () => void }>(function CrewChipButton(
   { name, initials, open, onClick },
   ref,
@@ -154,12 +154,12 @@ export const CrewChipButton = forwardRef<HTMLButtonElement, { name: string; init
       onClick={onClick}
       data-open={open || undefined}
       className={cn(
-        "group/chip flex shrink-0 cursor-pointer items-center gap-tight rounded-pill border-border-accent bg-surface-accent py-2 pl-2 pr-[calc(var(--spacing-12)-var(--spacing-2))] text-caption text-text-primary outline-none",
-        "hover:border data-open:border focus-visible:shadow-focus-ring",
+        "flex h-[calc(var(--spacing-24)+var(--spacing-4))] shrink-0 cursor-pointer items-center gap-tight rounded-pill bg-surface-accent py-2 pl-2 pr-[calc(var(--spacing-12)-var(--spacing-2))] text-caption text-text-primary outline-0 outline-border-accent outline-none",
+        "hover:outline-1 hover:outline-solid data-open:outline-1 data-open:outline-solid focus-visible:shadow-focus-ring",
       )}
     >
       <Avatar size={24} initials={initials} />
-      <Txt className="group-hover/chip:underline group-data-open/chip:underline">{name}</Txt>
+      <Txt>{name}</Txt>
     </button>
   );
 });

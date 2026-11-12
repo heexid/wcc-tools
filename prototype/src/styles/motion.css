@@ -23,6 +23,7 @@
   --dur-sheet: 500ms; /* right side sheet travels its own width */
   --dur-collapse: 200ms; /* accordions, progressive disclosure, inline errors */
   --dur-indicator: 250ms; /* tab / segmented-control indicator */
+  --dur-swap: 150ms; /* in-place view swap (Calendar ↔ Table, Month / Week / Day) — tens/day, so near-imperceptible */
   --stagger-step: 50ms; /* group entrances (rare surfaces only) */
 
   /* Movement — the ONLY place transform distances live. Components must use these
@@ -293,6 +294,35 @@
   .motion-page > :not(.fixed) {
     opacity: 0;
     transform: translateY(var(--page-from-y));
+  }
+}
+
+/* Tab indicator (TabList) — one 2px bar per tab list slides to the active tab (state indication). Placed by JS
+   (translateX + width of the active tab); the transition only arms after the first placement (data-ready) so the
+   bar never slides in on load, and keyboard changes (← → Home End, data-instant) move it at once. transform only.
+   Reduced motion → no slide, the bar snaps. */
+.motion-tab-indicator[data-ready]:not([data-instant]) {
+  transition-property: transform;
+  transition-duration: var(--dur-indicator);
+  transition-timing-function: var(--ease-in-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-tab-indicator[data-ready] {
+    transition-duration: 0ms;
+  }
+}
+
+/* View swap (Calendar ↔ Table, Month / Week / Day) — the incoming body fades in, entry only, no movement. Applied only
+   to elements that are new when the view / range changes, so ‹ › / filters / pagination never replay it. Opacity only →
+   unchanged under reduced motion. */
+.motion-swap {
+  transition-property: opacity;
+  transition-duration: var(--dur-swap);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .motion-swap {
+    opacity: 0;
   }
 }
 

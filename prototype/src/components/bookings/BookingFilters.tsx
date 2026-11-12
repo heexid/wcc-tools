@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ds/Checkbox";
 import { Icon } from "@/components/ds/Icon";
 import { SearchField } from "@/components/ds/SearchField";
 import { SelectField } from "@/components/ds/InputField";
-import { Tab } from "@/components/ds/Tabs";
+import { Tab, TabList } from "@/components/ds/Tabs";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
@@ -356,14 +356,14 @@ export function BookingToolbar({
   const pkgName = (id: string) => packages.find((p) => p.id === id)?.name ?? id;
   return (
     <div className="flex flex-col gap-base">
-      <div role="tablist" aria-label="View" className="flex border-b border-border-default">
+      <TabList label="View" className="flex border-b border-border-default">
         <Tab active={view === "calendar"} onClick={() => onView("calendar")}>
           Calendar
         </Tab>
         <Tab active={view === "table"} onClick={() => onView("table")}>
           Table
         </Tab>
-      </div>
+      </TabList>
       <div className="flex items-center gap-compact">
         <DebouncedSearch value={filters.q} onChange={(q) => update({ q })} className={w.search} />
         {view === "table" && <DateRangeMenu filters={filters} today={today} width={W.table.range} onApply={(r) => update(r)} />}

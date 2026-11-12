@@ -97,7 +97,7 @@ export function BookingTable({
 }) {
   const first = (page - 1) * size + 1;
   return (
-    <section aria-label="Bookings table" className="flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default">
+    <section aria-label="Bookings table" className="motion-swap flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default">
       <div role="table" aria-label="Bookings" aria-rowcount={total + 1} className="flex flex-col">
         <BookingTableHeader sort={sort} onSort={onSort} />
         {rows.map((b) => (

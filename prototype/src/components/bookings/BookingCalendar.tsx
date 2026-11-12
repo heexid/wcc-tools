@@ -80,7 +80,7 @@ export function BookingCalendar({
   };
 
   return (
-    <section aria-label="Calendar" className="flex flex-col rounded-card border border-border-default bg-surface-default">
+    <section aria-label="Calendar" className="motion-swap flex flex-col rounded-card border border-border-default bg-surface-default">
       <CalendarHeader
         title={head.title}
         unit={head.unit}
@@ -90,13 +90,16 @@ export function BookingCalendar({
         onNext={() => setAnchor(head.step(anchor, 1))}
         onToday={() => setAnchor(today)}
       />
-      {range === "month" ? (
-        <MonthCalendar rows={rows} today={today} anchor={anchor} onAnchor={setAnchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
-      ) : range === "week" ? (
-        <WeekCalendar rows={rows} crew={crew} today={today} anchor={anchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
-      ) : (
-        <DayCalendar rows={rows} crew={crew} date={anchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} />
-      )}
+      {/* Keyed by range: a new body (Month / Week / Day) fades in; ‹ › keep the same element, so they never replay it. */}
+      <div key={range} className="motion-swap">
+        {range === "month" ? (
+          <MonthCalendar rows={rows} today={today} anchor={anchor} onAnchor={setAnchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
+        ) : range === "week" ? (
+          <WeekCalendar rows={rows} crew={crew} today={today} anchor={anchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
+        ) : (
+          <DayCalendar rows={rows} crew={crew} date={anchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} />
+        )}
+      </div>
     </section>
   );
 }

@@ -9,7 +9,7 @@ import { InputField } from "@/components/ds/InputField";
 import { Pagination } from "@/components/ds/Pagination";
 import { SearchField } from "@/components/ds/SearchField";
 import { StatusPill } from "@/components/ds/Badges";
-import { Tab } from "@/components/ds/Tabs";
+import { Tab, TabList } from "@/components/ds/Tabs";
 import { TextArea } from "@/components/ds/TextArea";
 import { Txt } from "@/components/ds/Txt";
 import { usePresence } from "@/components/ds/usePresence";
@@ -241,14 +241,14 @@ function PackageLibrary() {
       </div>
 
       <div className="flex items-center gap-compact">
-        <div role="tablist" aria-label="Package status" className="flex">
+        <TabList label="Package status" className="flex">
           <Tab active={tab === "active"} onClick={() => (setTab("active"), setPage(1))}>
             Active ({counts.active})
           </Tab>
           <Tab active={tab === "archived"} onClick={() => (setTab("archived"), setPage(1))}>
             Archived ({counts.archived})
           </Tab>
-        </div>
+        </TabList>
         <span className="flex-1" />
         <SearchField
           aria-label="Search package"
