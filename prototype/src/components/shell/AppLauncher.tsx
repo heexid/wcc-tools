@@ -24,7 +24,8 @@ const TILES = [
   { id: "bookmark" as const, label: "Coming Soon", href: null, art: "lock", name: "Bookmark — coming soon" },
 ];
 
-export function AppLauncher({ current }: { current: ModuleId }) {
+/** `current` is the module the page belongs to; leave it out on a standalone screen (Account settings) so no tile is current. */
+export function AppLauncher({ current }: { current?: ModuleId }) {
   const [open, setOpen] = useState(false);
   const { mounted, presence } = usePresence(open);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -34,11 +35,11 @@ export function AppLauncher({ current }: { current: ModuleId }) {
   const close = useCallback(() => setOpen(false), []);
   useDismiss(open, close, { panel, trigger });
 
-  // Focus the current module's tile when the launcher opens (keyboard users land inside the dialog).
+  // Focus the current module's tile (or the first tile on a standalone screen) when the launcher opens (keyboard users land inside the dialog).
   // Cancelled on close, so an Esc pressed before the frame can't have focus stolen back to a tile.
   useEffect(() => {
     if (!open) return;
-    const id = requestAnimationFrame(() => tiles.current[TILES.findIndex((t) => t.id === current)]?.focus({ preventScroll: true }));
+    const id = requestAnimationFrame(() => tiles.current[Math.max(0, TILES.findIndex((t) => t.id === current))]?.focus({ preventScroll: true }));
     return () => cancelAnimationFrame(id);
   }, [open, current]);
 
@@ -66,7 +67,18 @@ export function AppLauncher({ current }: { current: ModuleId }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-24 cursor-pointer items-center gap-tight rounded-small text-text-primary outline-none transition-[background-color,transform] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-default focus-visible:shadow-focus-ring active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out)" /* open state has no fill (Figma L2) */
+        // Figma DS "App launcher trigger" (98:119238): a state layer 6px past each side (so the breadcrumb doesn't move),
+        // radius small. Hover → surface/default · Active (pressed or open) → surface/accent + icon/label text/accent ·
+        // Focus → surface/default + 1px accent/primary + Effect/Focus Ring (keyboard: instant). No press scale (read as a shake).
+        className={cn(
+          "relative isolate flex h-24 cursor-pointer items-center gap-tight text-text-primary outline-none",
+          "transition-[color] duration-(--dur-hover) ease-(--ease-hover)",
+          "before:absolute before:inset-y-0 before:-inset-x-tight before:-z-1 before:rounded-small before:border before:border-transparent before:content-['']",
+          "before:transition-[background-color,border-color,box-shadow] before:duration-(--dur-hover) before:ease-(--ease-hover)",
+          "hover:before:bg-surface-default",
+          "focus-visible:duration-0 focus-visible:before:duration-0 focus-visible:before:bg-surface-default focus-visible:before:border-accent-primary focus-visible:before:shadow-focus-ring",
+          "active:text-text-accent active:before:bg-surface-accent aria-expanded:text-text-accent aria-expanded:before:bg-surface-accent",
+        )}
       >
         <Icon name="grid" className="size-icon-md" />
         {/* "Menu" label (Figma Breadcrumb › App launcher: Text/Body text/primary, gap tight) — names the module switcher. */}

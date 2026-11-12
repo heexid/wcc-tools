@@ -233,6 +233,51 @@
   }
 }
 
+/* Entrance (login, a rare surface) — the card rises + fades in on page load; its content follows in a short
+   stagger so the page assembles instead of popping in one frame. @starting-style only: nothing waits on JS,
+   typing works at once. Children opt out with .motion-collapse (their own transition must not inherit a delay).
+   Reduced motion → fade only (--list-from-y 0, --stagger-step 0ms). */
+.motion-enter,
+.motion-stagger > :not(.motion-collapse) {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-modal);
+  transition-timing-function: var(--ease-out);
+}
+.motion-stagger > :nth-child(2) { transition-delay: calc(var(--stagger-step) * 1); }
+.motion-stagger > :nth-child(3) { transition-delay: calc(var(--stagger-step) * 2); }
+.motion-stagger > :nth-child(4) { transition-delay: calc(var(--stagger-step) * 3); }
+.motion-stagger > :nth-child(5) { transition-delay: calc(var(--stagger-step) * 4); }
+.motion-stagger > :nth-child(6) { transition-delay: calc(var(--stagger-step) * 5); }
+.motion-stagger > :nth-child(n + 7) { transition-delay: calc(var(--stagger-step) * 6); }
+@starting-style {
+  .motion-enter,
+  .motion-stagger > :not(.motion-collapse) {
+    opacity: 0;
+    transform: translateY(var(--list-from-y));
+  }
+}
+
+/* Collapse (login notice) — content that appears inside a column opens its own row (0fr → 1fr) so what sits
+   below slides down instead of jumping. The child must be `min-h-0 overflow-hidden`. Height is the one layout
+   property tolerated here (accordion rule: no transform equivalent). Reduced motion → no slide, rows snap. */
+.motion-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition-property: grid-template-rows;
+  transition-duration: var(--dur-collapse);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .motion-collapse {
+    grid-template-rows: 0fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-collapse {
+    transition-duration: 0ms;
+  }
+}
+
 /* Reduced motion = fewer and gentler, not zero (animate §7).
    Movement and scale are neutralised, so every entrance becomes a pure opacity fade
    on the same duration/curve; colour and opacity transitions stay — they aid comprehension. */

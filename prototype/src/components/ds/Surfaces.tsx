@@ -157,7 +157,8 @@ export function MenuItem({
       data-force={forceState}
       className={cn(
         "flex h-control-height w-full cursor-pointer items-center gap-compact rounded-control px-compact py-micro text-body outline-none",
-        "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-subtle focus-visible:bg-surface-subtle data-[force=hover]:bg-surface-subtle",
+        // Hover fades; arrow-key focus moves the highlight at once (keyboard never waits on motion).
+        "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) focus-visible:duration-0 hover:bg-surface-subtle focus-visible:bg-surface-subtle data-[force=hover]:bg-surface-subtle",
         "text-text-primary", // Danger tone colours the icon only (Figma)
         className,
       )}

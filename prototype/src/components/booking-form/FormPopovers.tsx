@@ -303,9 +303,10 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
       <div ref={box} className="relative w-full">
         <div
           className={cn(
-            "flex min-h-[calc(var(--spacing-32)+var(--spacing-6))] w-full items-center gap-tight rounded-control border bg-surface-default px-compact py-micro",
+            "flex min-h-[calc(var(--spacing-32)+var(--spacing-4))] w-full items-center gap-tight rounded-control border bg-surface-default px-compact py-micro",
             "transition-[border-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover)",
-            // Rest border/default · hover border/hover (~6:1, WCAG 1.4.11) · open accent + focus ring (Figma Crew select).
+            // Figma Crew select (31:60504): min h 36, pad micro/compact · rest border/default · hover border/hover (~6:1) ·
+            // open border/accent + focus ring.
             open ? "border-border-accent shadow-focus-ring" : "border-border-default hover:border-border-hover",
           )}
         >
@@ -315,7 +316,7 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
             {picked.map((c) => (
               <CrewChip key={c.id} className={initial.has(c.id) ? undefined : "motion-chip"} name={c.name} initials={initials(c.name)} onRemove={() => onChange(value.filter((x) => x !== c.id))} />
             ))}
-            {!picked.length && <span className="flex h-[calc(var(--spacing-24)+var(--spacing-4))] items-center px-micro text-ui-input text-text-placeholder">Select crew</span>}
+            {!picked.length && <span className="flex items-center text-ui-input text-text-placeholder">Select crew for this booking</span>}
           </span>
           <button
             id={id}
@@ -329,7 +330,8 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
             }}
             className="flex cursor-pointer self-stretch items-center text-text-secondary outline-none after:absolute after:inset-0 after:content-['']"
           >
-            <Icon name="chevron-down" className="size-icon-sm" />
+            {/* Figma Crew select Open: chevron points left (chevron-down turned 90°). */}
+            <Icon name="chevron-down" className={cn("size-icon-sm transition-transform duration-(--dur-hover) ease-(--ease-hover)", open && "rotate-90")} />
           </button>
         </div>
         {mounted && (

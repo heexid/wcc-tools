@@ -30,10 +30,10 @@ function Divider() {
   return <span aria-hidden className="h-[calc(var(--spacing-20)+var(--spacing-2))] w-px shrink-0 bg-border-control" />;
 }
 
-function Header({ module, page, standalone, editor, onSlot }: { module: ModuleId; page?: string; standalone?: boolean; editor?: boolean; onSlot: (el: HTMLDivElement | null) => void }) {
+function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleId; page?: string; standalone?: boolean; editor?: boolean; onSlot: (el: HTMLDivElement | null) => void }) {
   const { navigate, confirmLeave } = useLeaveGuard();
   const router = useRouter();
-  const m = MODULES[module];
+  const m = module ? MODULES[module] : undefined;
   const [profile, setProfile] = useState(() => getDb().profile);
   // The name updates in place after "Save name" on Account settings (US-13, 6.8).
   useEffect(() => {
@@ -48,7 +48,7 @@ function Header({ module, page, standalone, editor, onSlot }: { module: ModuleId
         <AppLauncher current={module} />
         <Divider />
         {/* A standalone screen outside any module (Account settings) shows only its own name. */}
-        {!standalone && (
+        {!standalone && m && (
           <a
             href={m.href}
             onClick={(e) => {
@@ -179,8 +179,8 @@ export function EditorActions({ children }: { children: ReactNode }) {
  *  way to the page's own save status and buttons, rendered through <EditorActions>.
  *  `page` is the child screen's crumb (Booking › New booking); leave it out on a module's root screen
  *  (Bookings, Package library). `standalone`: a screen outside the modules (Account settings) — the
- *  breadcrumb is just `page`. */
-export function AppShell({ module, page, standalone, editor, children }: { module: ModuleId; page?: string; standalone?: boolean; editor?: boolean; children: ReactNode }) {
+ *  breadcrumb is just `page`, and without `module` no App launcher tile is current. */
+export function AppShell({ module, page, standalone, editor, children }: { module?: ModuleId; page?: string; standalone?: boolean; editor?: boolean; children: ReactNode }) {
   const [slot, setSlot] = useState<HTMLDivElement | null>(null);
   const [crumb, setCrumb] = useState<string | null>(null);
   const ok = useSessionGate();

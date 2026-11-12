@@ -7,6 +7,7 @@ import { Alert, Toast, ToastRegion } from "@/components/ds/Feedback";
 import { usePresence } from "@/components/ds/usePresence";
 import { InputField } from "@/components/ds/InputField";
 import { Txt } from "@/components/ds/Txt";
+import { GrainyBackground } from "@/components/login/GrainyBackground";
 import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 
 // Figma: Login page — P1 empty · P2 filled · P3 logging in · E1 required · E2 email format ·
@@ -15,6 +16,8 @@ import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 // Card: 420 wide, popover/inset, surface/header, radius card, Shadow/Floating. Header "Login"
 // (Heading/Module, pad base/group). Panel: surface/default + Gradient/Login Glow, 1px border,
 // radius control, pad section/group, gap base, items centred.
+// Motion: the card rises in on load and the panel content follows in a 50ms stagger (rare surface, CSS only —
+// typing works at once); a notice opens its own row so the fields slide down instead of jumping.
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -80,10 +83,12 @@ function LoginForm() {
   const n = notice ? NOTICES[notice] : null;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-surface-default">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-surface-default">
+      {/* Page background: animated grainy gradient in DS colours (styles/grainy.css). */}
+      <GrainyBackground />
       <section
         aria-labelledby="login-title"
-        className="flex w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] flex-col overflow-hidden rounded-card bg-surface-header p-popover-inset shadow-floating"
+        className="flex w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] flex-col overflow-hidden rounded-card bg-surface-header p-popover-inset shadow-floating motion-enter"
       >
         <header className="flex px-group py-base">
           <h1 id="login-title" className="text-heading-module text-text-primary">
@@ -94,7 +99,7 @@ function LoginForm() {
           ref={form}
           noValidate
           onSubmit={submit}
-          className="flex flex-col items-center gap-base overflow-hidden rounded-control border border-border-default bg-surface-default bg-(image:--gradient-login-glow) px-group py-section"
+          className="flex flex-col items-center gap-base overflow-hidden rounded-control border border-border-default bg-surface-default bg-(image:--gradient-login-glow) px-group py-section motion-stagger"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/mascot-64.png" srcSet="/assets/mascot-64.png 1x, /assets/mascot-64@2x.png 2x" alt="" className="block size-64" />
@@ -105,9 +110,17 @@ function LoginForm() {
             <p className="text-center text-body text-text-secondary">Glad to see you again, use your credential to access your account</p>
           </div>
           {n && (
-            <Alert key={notice} tone={n.tone} title={n.title} className="motion-notice">
-              {n.message}
-            </Alert>
+            // Opens its own row (motion-collapse) so the fields below slide down; -mt-base + pt-base keeps the
+            // column gap inside the collapsing row, so the gap doesn't jump in ahead of the slide.
+            <div className="motion-collapse -mt-base w-full">
+              <div className="min-h-0 overflow-hidden">
+                <div className="pt-base">
+                  <Alert key={notice} tone={n.tone} title={n.title} className="motion-notice">
+                    {n.message}
+                  </Alert>
+                </div>
+              </div>
+            </div>
           )}
           <InputField
             label="Email"
@@ -153,9 +166,12 @@ function LoginForm() {
               Forgot password?
             </button>
           </div>
-          <Button type="submit" loading={pending} className="w-full">
-            {pending ? "Logging in…" : notice === "network" ? "Try again" : "Login"}
-          </Button>
+          {/* Wrapper takes the stagger entrance, so the Button's own press transition keeps its timing. */}
+          <div className="flex w-full">
+            <Button type="submit" loading={pending} className="w-full">
+              {pending ? "Logging in…" : notice === "network" ? "Try again" : "Login"}
+            </Button>
+          </div>
         </form>
       </section>
       {toast.mounted && (

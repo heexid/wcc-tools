@@ -14,6 +14,12 @@
     /* The global header is sticky: focus / scrollIntoView land below it, not underneath. */
     scroll-padding-top: calc(var(--spacing-layout-header-height) + var(--spacing-base));
   }
+
+  /* Scrollbars: transparent track, light see-through thumb (not the browser's default black) — every scroller. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-text-primary) 20%, transparent) transparent;
+  }
 }
 
 /* /dev/components renders on a transparent page so element screenshots match Figma's transparent PNGs. */

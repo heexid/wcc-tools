@@ -45,20 +45,28 @@ export function SectionHeader({ title, meta, required, id }: { title: string; me
   );
 }
 
-/** Inline input (Line item row cell): h 36, pad 0/control, gap tight, hairline border, radius control, UI/Input; optional
- *  "Rp" prefix in text/tertiary. Error → border status/danger. Focus → border accent + focus ring. */
-export function InlineInput({ prefix, error, className, ...rest }: InputHTMLAttributes<HTMLInputElement> & { prefix?: string; error?: boolean }) {
+/** Inline input (Line item row cell, Figma 26:5037): h 36, pad 0/control, gap tight, hairline border, radius control, UI/Input;
+ *  optional "Rp" prefix in text/tertiary. Error → border status/danger. Focus → border border/accent + focus ring.
+ *  Read-only → surface/header, value text/secondary, no focus ring. */
+export function InlineInput({ prefix, error, className, readOnly, ...rest }: InputHTMLAttributes<HTMLInputElement> & { prefix?: string; error?: boolean }) {
   return (
     <label
       className={cn(
-        "flex h-[calc(var(--spacing-32)+var(--spacing-4))] min-w-0 items-center gap-tight rounded-control border bg-surface-default px-control",
-        "transition-[border-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover) focus-within:shadow-focus-ring",
-        error ? "border-status-danger" : "border-border-default focus-within:border-border-accent",
+        "flex h-[calc(var(--spacing-32)+var(--spacing-4))] min-w-0 items-center gap-tight rounded-control border px-control",
+        "transition-[border-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover)",
+        readOnly
+          ? "bg-surface-header border-border-default"
+          : cn("bg-surface-default focus-within:shadow-focus-ring", error ? "border-status-danger" : "border-border-default focus-within:border-border-accent"),
         className,
       )}
     >
       {prefix && <Txt className="text-ui-input text-text-tertiary">{prefix}</Txt>}
-      <input aria-invalid={error || undefined} className="min-w-0 flex-1 bg-transparent text-ui-input text-text-primary outline-none placeholder:text-text-placeholder" {...rest} />
+      <input
+        readOnly={readOnly}
+        aria-invalid={error || undefined}
+        className={cn("min-w-0 flex-1 bg-transparent text-ui-input outline-none placeholder:text-text-placeholder", readOnly ? "text-text-secondary" : "text-text-primary")}
+        {...rest}
+      />
     </label>
   );
 }

@@ -8,7 +8,7 @@ import { cn } from "./cn";
 // Field: column, gap micro (4). Label row: UI/Field Label text/secondary + "*" text/danger, gap micro.
 // Box: h input/height (36), 1px border INSIDE, pad 0/control (12), gap tight (6), radius control,
 // value UI/Input (13/22) centred vertically. Helper: Text/Caption.
-// States: Hover → border border/hover, ~6:1 (enabled, not focused, not in error) · Focus → border accent/primary · Error → border status/danger + helper text/danger ·
+// States: Hover → border border/hover, ~6:1 (enabled, not focused, not in error) · Focus → border accent/primary + Effect/Focus Ring · Error → border status/danger + helper text/danger ·
 // Disabled → surface/disabled, value text/placeholder.
 
 export type FieldState = "default" | "focus" | "error" | "disabled";
@@ -58,14 +58,14 @@ export function FieldBox({
       data-force={forceFocus ? "focus" : forceHover ? "hover" : undefined}
       className={cn(
         "flex h-input-height w-full items-center gap-tight overflow-hidden rounded-control border px-control",
-        "transition-[border-color] duration-(--dur-hover) ease-(--ease-hover)",
+        "transition-[border-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover)",
         disabled ? "bg-surface-disabled border-border-default" : "bg-surface-default",
         // Rest border/default (Figma) · hover border/hover (~6:1, WCAG 1.4.11 — the state change is clearly visible) ·
-        // focus accent/primary. Hover only while not focused.
+        // focus accent/primary + focus ring (Figma Input field Focus). Hover only while not focused.
         !disabled &&
           (error
             ? "border-status-danger"
-            : "border-border-default hover:not-focus-within:border-border-hover data-[force=hover]:border-border-hover focus-within:border-accent-primary data-[force=focus]:border-accent-primary"),
+            : "border-border-default hover:not-focus-within:border-border-hover data-[force=hover]:border-border-hover focus-within:border-accent-primary focus-within:shadow-focus-ring data-[force=focus]:border-accent-primary data-[force=focus]:shadow-focus-ring"),
         className,
       )}
     >
