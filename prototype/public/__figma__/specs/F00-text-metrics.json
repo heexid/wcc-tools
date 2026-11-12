@@ -1,0 +1,95 @@
+{
+  "source": "Bookings 01 (26:5325)",
+  "specs": [
+    {
+      "style": "Heading/Module",
+      "text": "Booking",
+      "w": 60,
+      "h": 20
+    },
+    {
+      "style": "Text/Caption",
+      "text": "Bookings",
+      "w": 53,
+      "h": 20
+    },
+    {
+      "style": "Text/Body Strong",
+      "text": "English",
+      "w": 50,
+      "h": 22
+    },
+    {
+      "style": "Heading/Page",
+      "text": "Bookings",
+      "w": 108,
+      "h": 32
+    },
+    {
+      "style": "UI/Button",
+      "text": "Package library",
+      "w": 89,
+      "h": 20
+    },
+    {
+      "style": "Text/Metric Label",
+      "text": "Bookings this month",
+      "w": 145,
+      "h": 22
+    },
+    {
+      "style": "Display/Metric",
+      "text": "Rp 48.750.000",
+      "w": 191,
+      "h": 36
+    },
+    {
+      "style": "Text/Micro",
+      "text": "4.6%",
+      "w": 26,
+      "h": 16
+    },
+    {
+      "style": "UI/Tab Active",
+      "text": "Calendar",
+      "w": 57,
+      "h": 20
+    },
+    {
+      "style": "UI/Tab",
+      "text": "Table",
+      "w": 34,
+      "h": 20
+    },
+    {
+      "style": "UI/Field Label",
+      "text": "Label",
+      "w": 31,
+      "h": 22
+    },
+    {
+      "style": "Heading/Section",
+      "text": "November 2026",
+      "w": 125,
+      "h": 24
+    },
+    {
+      "style": "Text/Timestamp",
+      "text": "+1 more",
+      "w": 39,
+      "h": 14
+    },
+    {
+      "style": "Text/Caption Strong",
+      "text": "Rp 1.750.000 due",
+      "w": 102,
+      "h": 20
+    },
+    {
+      "style": "Heading/Subsection",
+      "text": "Needs attention",
+      "w": 101,
+      "h": 20
+    }
+  ]
+}

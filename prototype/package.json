@@ -1,0 +1,44 @@
+{
+  "name": "prototype",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "tokens": "node scripts/build-tokens.mjs",
+    "figma:receiver": "node scripts/figma-receiver.mjs",
+    "g1": "node scripts/check-g1.mjs",
+    "test": "vitest run",
+    "e2e": "playwright test tests/e2e",
+    "visual": "playwright test tests/visual",
+    "gates": "npm run g1 && npm run test && npm run visual",
+    "icons": "node scripts/build-icons.mjs"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^7.0.5",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.91.0",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/turbopack": "4.3.3",
+    "@types/node": "^24.19.2",
+    "@types/pngjs": "^6.0.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  }
+}

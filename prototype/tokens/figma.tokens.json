@@ -1,0 +1,3396 @@
+{
+  "$extensions": {
+    "figma-console-mcp": {
+      "exportedAt": "2026-11-11T01:28:10.389Z",
+      "figmaFileKey": "TFiwbjBZC0sfpLRknSkKqV",
+      "mcpVersion": "1.46.0"
+    }
+  },
+  "breakpoint": {
+    "$extensions": {
+      "figma-console-mcp": {
+        "figmaCollectionId": "VariableCollectionId:20:7613",
+        "originalName": "Breakpoint"
+      }
+    },
+    "desktop": {
+      "columns": {
+        "$description": "Column count",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 12
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7616"
+          }
+        },
+        "$type": "dimension",
+        "$value": 12
+      },
+      "control-height": {
+        "$description": "Buttons & icon buttons (44 = touch target)",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 32
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7619"
+          }
+        },
+        "$type": "dimension",
+        "$value": 32
+      },
+      "gutter": {
+        "$description": "Column gutter",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 24
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7618"
+          }
+        },
+        "$type": "dimension",
+        "$value": 24
+      },
+      "header-height": {
+        "$description": "Global header / top bar",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 78
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7621"
+          }
+        },
+        "$type": "dimension",
+        "$value": 78
+      },
+      "input-font-size": {
+        "$description": "16 on mobile prevents iOS focus zoom",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 13
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "FONT_SIZE"
+            ],
+            "variableId": "VariableID:20:7623"
+          }
+        },
+        "$type": "dimension",
+        "$value": 13
+      },
+      "input-height": {
+        "$description": "Inputs, selects, search",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 36
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7620"
+          }
+        },
+        "$type": "dimension",
+        "$value": 36
+      },
+      "margin": {
+        "$description": "Outer margin",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 32
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7617"
+          }
+        },
+        "$type": "dimension",
+        "$value": 32
+      },
+      "min-width": {
+        "$description": "Media query lower bound",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 1280
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7615"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1280
+      },
+      "rail-width": {
+        "$description": "Insights rail: full · collapsed · bottom sheet",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 352
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7622"
+          }
+        },
+        "$type": "dimension",
+        "$value": 352
+      },
+      "safe-area-bottom": {
+        "$description": "Home-indicator inset for sticky bottom bars",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT",
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7624"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "width": {
+        "$description": "Reference frame width",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 1440
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7614"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1440
+      }
+    },
+    "mobile": {
+      "columns": {
+        "$description": "Column count",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 4
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7638"
+          }
+        },
+        "$type": "dimension",
+        "$value": 4
+      },
+      "control-height": {
+        "$description": "Buttons & icon buttons (44 = touch target)",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 44
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7641"
+          }
+        },
+        "$type": "dimension",
+        "$value": 44
+      },
+      "gutter": {
+        "$description": "Column gutter",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 12
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7640"
+          }
+        },
+        "$type": "dimension",
+        "$value": 12
+      },
+      "header-height": {
+        "$description": "Global header / top bar",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.389Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 56
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7643"
+          }
+        },
+        "$type": "dimension",
+        "$value": 56
+      },
+      "input-font-size": {
+        "$description": "16 on mobile prevents iOS focus zoom",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.389Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 16
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "FONT_SIZE"
+            ],
+            "variableId": "VariableID:20:7645"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "input-height": {
+        "$description": "Inputs, selects, search",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 44
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7642"
+          }
+        },
+        "$type": "dimension",
+        "$value": 44
+      },
+      "margin": {
+        "$description": "Outer margin",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 16
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7639"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "min-width": {
+        "$description": "Media query lower bound",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7637"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "rail-width": {
+        "$description": "Insights rail: full · collapsed · bottom sheet",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.389Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7644"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "safe-area-bottom": {
+        "$description": "Home-indicator inset for sticky bottom bars",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.389Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 34
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT",
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7646"
+          }
+        },
+        "$type": "dimension",
+        "$value": 34
+      },
+      "width": {
+        "$description": "Reference frame width",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 390
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7636"
+          }
+        },
+        "$type": "dimension",
+        "$value": 390
+      }
+    },
+    "tablet": {
+      "columns": {
+        "$description": "Column count",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 8
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7627"
+          }
+        },
+        "$type": "dimension",
+        "$value": 8
+      },
+      "control-height": {
+        "$description": "Buttons & icon buttons (44 = touch target)",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 36
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7630"
+          }
+        },
+        "$type": "dimension",
+        "$value": 36
+      },
+      "gutter": {
+        "$description": "Column gutter",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 16
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7629"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "header-height": {
+        "$description": "Global header / top bar",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 64
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7632"
+          }
+        },
+        "$type": "dimension",
+        "$value": 64
+      },
+      "input-font-size": {
+        "$description": "16 on mobile prevents iOS focus zoom",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 14
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "FONT_SIZE"
+            ],
+            "variableId": "VariableID:20:7634"
+          }
+        },
+        "$type": "dimension",
+        "$value": 14
+      },
+      "input-height": {
+        "$description": "Inputs, selects, search",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 40
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7631"
+          }
+        },
+        "$type": "dimension",
+        "$value": 40
+      },
+      "margin": {
+        "$description": "Outer margin",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 24
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7628"
+          }
+        },
+        "$type": "dimension",
+        "$value": 24
+      },
+      "min-width": {
+        "$description": "Media query lower bound",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 768
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:7626"
+          }
+        },
+        "$type": "dimension",
+        "$value": 768
+      },
+      "rail-width": {
+        "$description": "Insights rail: full · collapsed · bottom sheet",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 72
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7633"
+          }
+        },
+        "$type": "dimension",
+        "$value": 72
+      },
+      "safe-area-bottom": {
+        "$description": "Home-indicator inset for sticky bottom bars",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT",
+              "GAP"
+            ],
+            "variableId": "VariableID:20:7635"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "width": {
+        "$description": "Reference frame width",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:7613",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 768
+              }
+            },
+            "primaryMode": "Value",
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:7625"
+          }
+        },
+        "$type": "dimension",
+        "$value": 768
+      }
+    }
+  },
+  "component": {
+    "$extensions": {
+      "figma-console-mcp": {
+        "figmaCollectionId": "VariableCollectionId:20:808",
+        "originalName": "Component"
+      }
+    },
+    "border": {
+      "width": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 1
+              }
+            },
+            "scopes": [
+              "STROKE_FLOAT"
+            ],
+            "variableId": "VariableID:20:816"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1
+      }
+    },
+    "control": {
+      "height": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 32
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:809"
+          }
+        },
+        "$type": "dimension",
+        "$value": 32
+      }
+    },
+    "icon": {
+      "lg": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 24
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:815"
+          }
+        },
+        "$type": "dimension",
+        "$value": 24
+      },
+      "md": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 20
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:814"
+          }
+        },
+        "$type": "dimension",
+        "$value": 20
+      },
+      "sm": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 16
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:813"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "stroke": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 1.5
+              }
+            },
+            "scopes": [
+              "STROKE_FLOAT"
+            ],
+            "variableId": "VariableID:20:817"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1.5
+      }
+    },
+    "input": {
+      "height": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 36
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:810"
+          }
+        },
+        "$type": "dimension",
+        "$value": 36
+      }
+    },
+    "launcher": {
+      "tile": {
+        "$description": "Launcher tile",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 124
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4372"
+          }
+        },
+        "$type": "dimension",
+        "$value": 124
+      }
+    },
+    "layout": {
+      "column-gap": {
+        "$description": "Content ↔ rail gap",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 24
+              }
+            },
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:4366"
+          }
+        },
+        "$type": "dimension",
+        "$value": 24
+      },
+      "content-width": {
+        "$description": "Main column at 1440 (flexible)",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 1000
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4367"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1000
+      },
+      "editor-form-width": {
+        "$description": "Editor form column",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 624
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4368"
+          }
+        },
+        "$type": "dimension",
+        "$value": 624
+      },
+      "gutter": {
+        "$description": "Page side gutter & column gap",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 32
+              }
+            },
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:4365"
+          }
+        },
+        "$type": "dimension",
+        "$value": 32
+      },
+      "header-height": {
+        "$description": "Global header",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 78
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4363"
+          }
+        },
+        "$type": "dimension",
+        "$value": 78
+      },
+      "page-header-height": {
+        "$description": "Page header band",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 77
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4364"
+          }
+        },
+        "$type": "dimension",
+        "$value": 77
+      },
+      "page-width": {
+        "$description": "Desktop canvas",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 1440
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4362"
+          }
+        },
+        "$type": "dimension",
+        "$value": 1440
+      },
+      "rail-width": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 352
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:818"
+          }
+        },
+        "$type": "dimension",
+        "$value": 352
+      }
+    },
+    "popover": {
+      "inset": {
+        "$description": "Shell padding around inner panel",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 6
+              }
+            },
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:4369"
+          }
+        },
+        "$type": "dimension",
+        "$value": 6
+      },
+      "launcher-width": {
+        "$description": "App launcher",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 448
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4370"
+          }
+        },
+        "$type": "dimension",
+        "$value": 448
+      },
+      "menu-width": {
+        "$description": "Account menu",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 183
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4371"
+          }
+        },
+        "$type": "dimension",
+        "$value": 183
+      }
+    },
+    "search": {
+      "height": {
+        "$description": "Toolbar search",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 36
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4373"
+          }
+        },
+        "$type": "dimension",
+        "$value": 36
+      }
+    },
+    "table": {
+      "header-height": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 36
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:812"
+          }
+        },
+        "$type": "dimension",
+        "$value": 36
+      },
+      "row-height": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 62
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:811"
+          }
+        },
+        "$type": "dimension",
+        "$value": 62
+      }
+    },
+    "template": {
+      "thumb-width": {
+        "$description": "Template thumbnail",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:808",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Default": {
+                "literal": 180
+              }
+            },
+            "scopes": [
+              "WIDTH_HEIGHT"
+            ],
+            "variableId": "VariableID:20:4374"
+          }
+        },
+        "$type": "dimension",
+        "$value": 180
+      }
+    }
+  },
+  "primitives": {
+    "$extensions": {
+      "figma-console-mcp": {
+        "figmaCollectionId": "VariableCollectionId:20:708",
+        "originalName": "Primitives"
+      }
+    },
+    "color": {
+      "amber": {
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FFFBEE"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:735"
+            }
+          },
+          "$type": "color",
+          "$value": "#FFFBEE"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#D3A132"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:736"
+            }
+          },
+          "$type": "color",
+          "$value": "#D3A132"
+        }
+      },
+      "berry": {
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#B92E72"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:725"
+            }
+          },
+          "$type": "color",
+          "$value": "#B92E72"
+        }
+      },
+      "blue": {
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#E6F7FF"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:726"
+            }
+          },
+          "$type": "color",
+          "$value": "#E6F7FF"
+        },
+        "100": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#E2EFFF"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:727"
+            }
+          },
+          "$type": "color",
+          "$value": "#E2EFFF"
+        },
+        "200": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#A4CDF7"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:728"
+            }
+          },
+          "$type": "color",
+          "$value": "#A4CDF7"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#247FDF"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:729"
+            }
+          },
+          "$type": "color",
+          "$value": "#247FDF"
+        }
+      },
+      "neutral": {
+        "0": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.382Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FFFFFF"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:709"
+            }
+          },
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FAFBFC"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:710"
+            }
+          },
+          "$type": "color",
+          "$value": "#FAFBFC"
+        },
+        "100": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#F4F5F7"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:711"
+            }
+          },
+          "$type": "color",
+          "$value": "#F4F5F7"
+        },
+        "150": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#EBEEF5"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:1257"
+            }
+          },
+          "$type": "color",
+          "$value": "#EBEEF5"
+        },
+        "200": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#E8EAF0"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:712"
+            }
+          },
+          "$type": "color",
+          "$value": "#E8EAF0"
+        },
+        "300": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#DCDFE6"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:713"
+            }
+          },
+          "$type": "color",
+          "$value": "#DCDFE6"
+        },
+        "400": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#A4ABB6"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:714"
+            }
+          },
+          "$type": "color",
+          "$value": "#A4ABB6"
+        },
+        "450": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#A8ABB2"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:715"
+            }
+          },
+          "$type": "color",
+          "$value": "#A8ABB2"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#7C8492"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:716"
+            }
+          },
+          "$type": "color",
+          "$value": "#7C8492"
+        },
+        "600": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#606266"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:717"
+            }
+          },
+          "$type": "color",
+          "$value": "#606266"
+        },
+        "700": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.383Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#303133"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:718"
+            }
+          },
+          "$type": "color",
+          "$value": "#303133"
+        },
+        "900": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#202938"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:719"
+            }
+          },
+          "$type": "color",
+          "$value": "#202938"
+        }
+      },
+      "orange": {
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#EC8D61"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:737"
+            }
+          },
+          "$type": "color",
+          "$value": "#EC8D61"
+        }
+      },
+      "orchid": {
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FBF2FE"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:720"
+            }
+          },
+          "$type": "color",
+          "$value": "#FBF2FE"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#B23AD4"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:721"
+            }
+          },
+          "$type": "color",
+          "$value": "#B23AD4"
+        },
+        "600": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#8C03B3"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:722"
+            }
+          },
+          "$type": "color",
+          "$value": "#8C03B3"
+        },
+        "700": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#8200A6"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:723"
+            }
+          },
+          "$type": "color",
+          "$value": "#8200A6"
+        }
+      },
+      "pink": {
+        "200": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.384Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FDB5DF"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:724"
+            }
+          },
+          "$type": "color",
+          "$value": "#FDB5DF"
+        }
+      },
+      "red": {
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#FFF6F5"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:730"
+            }
+          },
+          "$type": "color",
+          "$value": "#FFF6F5"
+        },
+        "400": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#F56C6C"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:731"
+            }
+          },
+          "$type": "color",
+          "$value": "#F56C6C"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#EE6464"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:732"
+            }
+          },
+          "$type": "color",
+          "$value": "#EE6464"
+        }
+      },
+      "scrim": {
+        "90": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#202938E5"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:4359"
+            }
+          },
+          "$type": "color",
+          "$value": "#202938E5"
+        }
+      },
+      "teal": {
+        "50": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#EFFBFC"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:733"
+            }
+          },
+          "$type": "color",
+          "$value": "#EFFBFC"
+        },
+        "500": {
+          "$extensions": {
+            "figma-console-mcp": {
+              "collectionId": "VariableCollectionId:20:708",
+              "figmaResolvedType": "COLOR",
+              "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+              "lastSyncedValue": {
+                "Value": {
+                  "literal": "#41B7C4"
+                }
+              },
+              "primaryMode": "Value",
+              "variableId": "VariableID:20:734"
+            }
+          },
+          "$type": "color",
+          "$value": "#41B7C4"
+        }
+      }
+    },
+    "radius": {
+      "0": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:750"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "2": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 2
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:751"
+          }
+        },
+        "$type": "dimension",
+        "$value": 2
+      },
+      "4": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 4
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:752"
+          }
+        },
+        "$type": "dimension",
+        "$value": 4
+      },
+      "6": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 6
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:753"
+          }
+        },
+        "$type": "dimension",
+        "$value": 6
+      },
+      "8": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 8
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:754"
+          }
+        },
+        "$type": "dimension",
+        "$value": 8
+      },
+      "12": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 12
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:755"
+          }
+        },
+        "$type": "dimension",
+        "$value": 12
+      },
+      "16": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 16
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:756"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "full": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 999
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:757"
+          }
+        },
+        "$type": "dimension",
+        "$value": 999
+      }
+    },
+    "space": {
+      "0": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 0
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:738"
+          }
+        },
+        "$type": "dimension",
+        "$value": 0
+      },
+      "2": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 2
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:739"
+          }
+        },
+        "$type": "dimension",
+        "$value": 2
+      },
+      "4": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 4
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:740"
+          }
+        },
+        "$type": "dimension",
+        "$value": 4
+      },
+      "6": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 6
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:741"
+          }
+        },
+        "$type": "dimension",
+        "$value": 6
+      },
+      "8": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 8
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:742"
+          }
+        },
+        "$type": "dimension",
+        "$value": 8
+      },
+      "12": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 12
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:743"
+          }
+        },
+        "$type": "dimension",
+        "$value": 12
+      },
+      "16": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.385Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 16
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:744"
+          }
+        },
+        "$type": "dimension",
+        "$value": 16
+      },
+      "20": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 20
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:745"
+          }
+        },
+        "$type": "dimension",
+        "$value": 20
+      },
+      "24": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 24
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:746"
+          }
+        },
+        "$type": "dimension",
+        "$value": 24
+      },
+      "32": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 32
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:747"
+          }
+        },
+        "$type": "dimension",
+        "$value": 32
+      },
+      "48": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 48
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:748"
+          }
+        },
+        "$type": "dimension",
+        "$value": 48
+      },
+      "64": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:708",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.386Z",
+            "lastSyncedValue": {
+              "Value": {
+                "literal": 64
+              }
+            },
+            "primaryMode": "Value",
+            "variableId": "VariableID:20:749"
+          }
+        },
+        "$type": "dimension",
+        "$value": 64
+      }
+    }
+  },
+  "semantic": {
+    "$extensions": {
+      "figma-console-mcp": {
+        "figmaCollectionId": "VariableCollectionId:20:758",
+        "originalName": "Semantic"
+      }
+    },
+    "accent": {
+      "deep": {
+        "$description": "Primary gradient end",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.700}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:781"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.700}"
+      },
+      "primary": {
+        "$description": "AI, active tabs, selection",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:779"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.500}"
+      },
+      "strong": {
+        "$description": "Pressed accent",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.600}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:780"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.600}"
+      }
+    },
+    "border": {
+      "accent": {
+        "$description": "Primary button edge",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.600}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:771"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.600}"
+      },
+      "control": {
+        "$description": "Unchecked checkbox, vertical dividers",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.400}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:770"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.400}"
+      },
+      "default": {
+        "$description": "Dividers and control outlines",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.200}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:768"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.200}"
+      },
+      "strong": {
+        "$description": "Hovered control outline",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.300}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:769"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.300}"
+      },
+      "hover": {
+        "$description": "Hovered outline of text-entry controls — ~6:1 on surface/default (WCAG 1.4.11); rest stays border/default",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-12T00:00:00.000Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.600}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:74:115226"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.600}"
+      }
+    },
+    "brand": {
+      "avatar": {
+        "$description": "Workspace avatar",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.berry.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:791"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.berry.500}"
+      },
+      "glow": {
+        "$description": "Metric card gradient start",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.pink.200}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:792"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.pink.200}"
+      }
+    },
+    "data": {
+      "primary": {
+        "$description": "Issued invoice bars",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.blue.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:782"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.blue.500}"
+      },
+      "secondary": {
+        "$description": "Stacked chart segments",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.blue.200}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:783"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.blue.200}"
+      },
+      "tertiary": {
+        "$description": "Stacked chart top segment",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.blue.100}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:784"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.blue.100}"
+      },
+      "trend": {
+        "$description": "Overdue trend line",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orange.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:785"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orange.500}"
+      }
+    },
+    "radius": {
+      "card": {
+        "$description": "Metric and insight cards",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.12}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:806"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.12}"
+      },
+      "checkbox": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.2}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:803"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.2}"
+      },
+      "control": {
+        "$description": "Fields, tables",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.8}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:805"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.8}"
+      },
+      "pill": {
+        "$description": "Buttons, status badges, selectors",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.full}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:807"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.full}"
+      },
+      "sheet": {
+        "$description": "Mobile bottom sheet top corners",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.16}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:7723"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.16}"
+      },
+      "small": {
+        "$description": "Tiny badges, page numbers",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.radius.4}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "CORNER_RADIUS"
+            ],
+            "variableId": "VariableID:20:804"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.radius.4}"
+      }
+    },
+    "space": {
+      "base": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.16}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:797"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.16}"
+      },
+      "compact": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.8}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:795"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.8}"
+      },
+      "control": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.12}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:796"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.12}"
+      },
+      "document": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.64}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:802"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.64}"
+      },
+      "group": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.24}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:799"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.24}"
+      },
+      "inset": {
+        "$description": "Metric card inset",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.20}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:798"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.20}"
+      },
+      "micro": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.4}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "WIDTH_HEIGHT",
+              "GAP"
+            ],
+            "variableId": "VariableID:20:793"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.4}"
+      },
+      "region": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.48}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:801"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.48}"
+      },
+      "section": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.32}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:800"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.32}"
+      },
+      "tight": {
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "FLOAT",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.space.6}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "GAP"
+            ],
+            "variableId": "VariableID:20:794"
+          }
+        },
+        "$type": "dimension",
+        "$value": "{primitives.space.6}"
+      }
+    },
+    "status": {
+      "danger": {
+        "$description": "Overdue and risk",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.red.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:786"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.red.500}"
+      },
+      "info": {
+        "$description": "Open",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.blue.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:789"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.blue.500}"
+      },
+      "neutral": {
+        "$description": "Draft",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:790"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.500}"
+      },
+      "positive": {
+        "$description": "Paid, positive movement",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.teal.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:787"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.teal.500}"
+      },
+      "warning": {
+        "$description": "Review-needed",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.amber.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:788"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.amber.500}"
+      }
+    },
+    "surface": {
+      "accent": {
+        "$description": "Low-emphasis accent surface",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:763"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.50}"
+      },
+      "danger": {
+        "$description": "High-priority insight cards, overdue badge",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.red.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:764"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.red.50}"
+      },
+      "default": {
+        "$description": "Cards, tables, main workspace",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.0}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:759"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.0}"
+      },
+      "disabled": {
+        "$description": "Disabled field background",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.150}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:762"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.150}"
+      },
+      "header": {
+        "$description": "Global navigation, headers, table head",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.100}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:761"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.100}"
+      },
+      "info": {
+        "$description": "Open badge",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.blue.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:767"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.blue.50}"
+      },
+      "positive": {
+        "$description": "Paid badge, positive movement",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.teal.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:766"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.teal.50}"
+      },
+      "scrim": {
+        "$description": "Full-screen overlay backdrop (template picker)",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.scrim.90}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:4360"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.scrim.90}"
+      },
+      "subtle": {
+        "$description": "Quiet grouping and table rows",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:760"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.50}"
+      },
+      "warning": {
+        "$description": "Review insight cards",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.amber.50}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:20:765"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.amber.50}"
+      }
+    },
+    "text": {
+      "accent": {
+        "$description": "Ghost actions, links",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.orchid.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:777"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.orchid.500}"
+      },
+      "danger": {
+        "$description": "Field error message, required mark",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.red.400}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:778"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.red.400}"
+      },
+      "inverse": {
+        "$description": "Text on scrim",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.388Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.0}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:4361"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.0}"
+      },
+      "on-accent": {
+        "$description": "Text on primary button",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.0}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "ALL_FILLS",
+              "STROKE_COLOR"
+            ],
+            "variableId": "VariableID:20:776"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.0}"
+      },
+      "placeholder": {
+        "$description": "Input placeholder",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.450}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:775"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.450}"
+      },
+      "primary": {
+        "$description": "Titles and financial values",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.900}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:772"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.900}"
+      },
+      "secondary": {
+        "$description": "Metadata and chart axes",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.500}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:773"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.500}"
+      },
+      "tertiary": {
+        "$description": "Timestamps, disabled labels",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.400}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "TEXT_FILL"
+            ],
+            "variableId": "VariableID:20:774"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.400}"
+      }
+    }
+  }
+}

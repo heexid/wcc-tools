@@ -1,0 +1,43 @@
+{
+  "$source": "Figma 'bs internal tools' (TFiwbjBZC0sfpLRknSkKqV) — local text, effect and paint styles, copied from figma_get_text_styles / getLocalEffectStylesAsync / getLocalPaintStylesAsync on 2026-11-11. Do not edit by hand; re-pull from Figma.",
+  "text": [
+    { "name": "Display/Metric", "fontSize": 28, "fontStyle": "Medium", "lineHeight": 36, "letterSpacing": -0.6000000238418579 },
+    { "name": "Heading/Page", "fontSize": 24, "fontStyle": "Semi Bold", "lineHeight": 32, "letterSpacing": 0 },
+    { "name": "Heading/Panel", "fontSize": 20, "fontStyle": "Semi Bold", "lineHeight": 28, "letterSpacing": 0 },
+    { "name": "Heading/Section", "fontSize": 16, "fontStyle": "Semi Bold", "lineHeight": 24, "letterSpacing": 0 },
+    { "name": "Heading/Subsection", "fontSize": 13, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "Heading/Module", "fontSize": 15, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "Text/Label", "fontSize": 16, "fontStyle": "Medium", "lineHeight": 24, "letterSpacing": 0 },
+    { "name": "Text/Body", "fontSize": 14, "fontStyle": "Regular", "lineHeight": 22, "letterSpacing": 0 },
+    { "name": "Text/Body Strong", "fontSize": 14, "fontStyle": "Semi Bold", "lineHeight": 22, "letterSpacing": 0 },
+    { "name": "Text/Metric Label", "fontSize": 15, "fontStyle": "Regular", "lineHeight": 22, "letterSpacing": 0 },
+    { "name": "Text/Caption", "fontSize": 12, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "Text/Caption Strong", "fontSize": 12, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "Text/Micro", "fontSize": 11, "fontStyle": "Regular", "lineHeight": 16, "letterSpacing": 0 },
+    { "name": "Text/Timestamp", "fontSize": 10, "fontStyle": "Regular", "lineHeight": 14, "letterSpacing": 0 },
+    { "name": "UI/Button", "fontSize": 12, "fontStyle": "Medium", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "UI/Input", "fontSize": 13, "fontStyle": "Regular", "lineHeight": 22, "letterSpacing": 0 },
+    { "name": "UI/Field Label", "fontSize": 12, "fontStyle": "Regular", "lineHeight": 22, "letterSpacing": 0 },
+    { "name": "UI/Tab Active", "fontSize": 13, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "UI/Tab", "fontSize": 13, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0 },
+    { "name": "UI/Avatar", "fontSize": 12, "fontStyle": "Bold", "lineHeight": 16, "letterSpacing": 0 }
+  ],
+  "effects": [
+    { "name": "Shadow/Card", "type": "DROP_SHADOW", "x": 0, "y": 2, "blur": 8, "spread": 0, "color": { "r": 0.125490203499794, "g": 0.16078431904315948, "b": 0.21960784494876862, "a": 0.019999999552965164 } },
+    { "name": "Shadow/Floating", "type": "DROP_SHADOW", "x": 0, "y": 4, "blur": 12, "spread": 0, "color": { "r": 0.125490203499794, "g": 0.16078431904315948, "b": 0.21960784494876862, "a": 0.15000000596046448 } },
+    { "name": "Shadow/Navbar", "type": "DROP_SHADOW", "x": 0, "y": 4, "blur": 3, "spread": 0, "color": { "r": 0.13333334028720856, "g": 0.13333334028720856, "b": 0.13333334028720856, "a": 0.15000000596046448 } },
+    { "name": "Effect/Button Highlight", "type": "INNER_SHADOW", "x": 0, "y": 2, "blur": 1, "spread": 0, "color": { "r": 1, "g": 1, "b": 1, "a": 0.25 } },
+    { "name": "Effect/Focus Ring", "type": "DROP_SHADOW", "x": 0, "y": 0, "blur": 0.5, "spread": 3, "color": { "r": 0.6980000138282776, "g": 0.22699999809265137, "b": 0.8309999704360962, "a": 0.30000001192092896 } }
+  ],
+  "paints": [
+    { "name": "Gradient/Accent Primary", "angle": 180, "layers": [
+      { "opacity": 1, "stops": [ { "position": 0, "color": { "r": 0.6980392336845398, "g": 0.22745098173618317, "b": 0.8313725590705872, "a": 1 } }, { "position": 1, "color": { "r": 0.5098039507865906, "g": 0, "b": 0.6509804129600525, "a": 1 } } ] }
+    ] },
+    { "name": "Gradient/Metric Glow", "angle": 180, "base": { "r": 1, "g": 1, "b": 1 }, "layers": [
+      { "opacity": 0.15000000596046448, "stops": [ { "position": 0, "color": { "r": 0.9922000169754028, "g": 0.7098000049591064, "b": 0.8744999766349792, "a": 1 } }, { "position": 0.4519999921321869, "color": { "r": 1, "g": 1, "b": 1, "a": 1 } } ] }
+    ] },
+    { "name": "Gradient/Login Glow", "angle": 180, "layers": [
+      { "opacity": 1, "stops": [ { "position": 0, "color": { "r": 0.9921568632125854, "g": 0.7098039388656616, "b": 0.8745098114013672, "a": 0.25 } }, { "position": 1, "color": { "r": 1, "g": 1, "b": 1, "a": 0 } } ] }
+    ] }
+  ]
+}

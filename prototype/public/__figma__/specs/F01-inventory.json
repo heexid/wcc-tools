@@ -1,0 +1,3592 @@
+[
+ {
+  "id": "20:969",
+  "name": "Icon/search",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:969",
+    "name": "Icon/search",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:971",
+  "name": "Icon/chevron-down",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:971",
+    "name": "Icon/chevron-down",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:973",
+  "name": "Icon/chevron-left",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:973",
+    "name": "Icon/chevron-left",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:975",
+  "name": "Icon/chevron-right",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:975",
+    "name": "Icon/chevron-right",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:977",
+  "name": "Icon/circle-help",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:977",
+    "name": "Icon/circle-help",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:979",
+  "name": "Icon/mail",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:979",
+    "name": "Icon/mail",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:981",
+  "name": "Icon/info",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:981",
+    "name": "Icon/info",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:983",
+  "name": "Icon/chart-analytics",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:983",
+    "name": "Icon/chart-analytics",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:985",
+  "name": "Icon/files",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:985",
+    "name": "Icon/files",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:987",
+  "name": "Icon/chart-pie",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:987",
+    "name": "Icon/chart-pie",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:989",
+  "name": "Icon/sparkles",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:989",
+    "name": "Icon/sparkles",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:991",
+  "name": "Icon/arrow-up",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:991",
+    "name": "Icon/arrow-up",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:996",
+  "name": "Icon/plus",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:996",
+    "name": "Icon/plus",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:999",
+  "name": "Icon/minus",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:999",
+    "name": "Icon/minus",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1003",
+  "name": "Icon/x",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1003",
+    "name": "Icon/x",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1006",
+  "name": "Icon/check",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1006",
+    "name": "Icon/check",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1012",
+  "name": "Icon/calendar",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1012",
+    "name": "Icon/calendar",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1017",
+  "name": "Icon/circle-x",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1017",
+    "name": "Icon/circle-x",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1022",
+  "name": "Icon/trash",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1022",
+    "name": "Icon/trash",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1027",
+  "name": "Icon/download",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1027",
+    "name": "Icon/download",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1032",
+  "name": "Icon/share",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1032",
+    "name": "Icon/share",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1037",
+  "name": "Icon/triangle-alert",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1037",
+    "name": "Icon/triangle-alert",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1042",
+  "name": "Icon/globe",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1042",
+    "name": "Icon/globe",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1046",
+  "name": "Icon/arrow-up-right",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1046",
+    "name": "Icon/arrow-up-right",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1050",
+  "name": "Icon/arrow-down-right",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1050",
+    "name": "Icon/arrow-down-right",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1054",
+  "name": "Icon/chevrons-up-down",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1054",
+    "name": "Icon/chevrons-up-down",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1058",
+  "name": "Icon/panel-right",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1058",
+    "name": "Icon/panel-right",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1063",
+  "name": "Icon/history",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1063",
+    "name": "Icon/history",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1074",
+  "name": "Icon/grid",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1074",
+    "name": "Icon/grid",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1078",
+  "name": "Icon/arrow-left",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1078",
+    "name": "Icon/arrow-left",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1082",
+  "name": "Icon/settings",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1082",
+    "name": "Icon/settings",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1087",
+  "name": "Icon/log-out",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:1087",
+    "name": "Icon/log-out",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10831",
+  "name": "Icon/eye",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10831",
+    "name": "Icon/eye",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10837",
+  "name": "Icon/eye-off",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10837",
+    "name": "Icon/eye-off",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10841",
+  "name": "Icon/lock",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10841",
+    "name": "Icon/lock",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10850",
+  "name": "Icon/wifi-off",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10850",
+    "name": "Icon/wifi-off",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10853",
+  "name": "Icon/loader",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10853",
+    "name": "Icon/loader",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10856",
+  "name": "Icon/caps-lock",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10856",
+    "name": "Icon/caps-lock",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10860",
+  "name": "Icon/clock",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10860",
+    "name": "Icon/clock",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10864",
+  "name": "Icon/circle-check",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10864",
+    "name": "Icon/circle-check",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10870",
+  "name": "Icon/user-x",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "20:10870",
+    "name": "Icon/user-x",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62667",
+  "name": "Icon/pencil",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62667",
+    "name": "Icon/pencil",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62671",
+  "name": "Icon/user",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62671",
+    "name": "Icon/user",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62677",
+  "name": "Icon/users",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62677",
+    "name": "Icon/users",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62680",
+  "name": "Icon/phone",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62680",
+    "name": "Icon/phone",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62686",
+  "name": "Icon/package",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62686",
+    "name": "Icon/package",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62691",
+  "name": "Icon/receipt",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62691",
+    "name": "Icon/receipt",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62695",
+  "name": "Icon/wallet",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62695",
+    "name": "Icon/wallet",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62700",
+  "name": "Icon/archive",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62700",
+    "name": "Icon/archive",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:62705",
+  "name": "Icon/external-link",
+  "type": "COMPONENT",
+  "section": "Icons",
+  "variants": [
+   {
+    "id": "31:62705",
+    "name": "Icon/external-link",
+    "w": 20,
+    "h": 20
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1256",
+  "name": "Button",
+  "type": "COMPONENT_SET",
+  "section": "Button",
+  "variants": [
+   {
+    "id": "20:1091",
+    "name": "Variant=Primary, State=Default, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1093",
+    "name": "Variant=Primary, State=Default, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1098",
+    "name": "Variant=Primary, State=Default, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1102",
+    "name": "Variant=Primary, State=Hover, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1104",
+    "name": "Variant=Primary, State=Hover, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1109",
+    "name": "Variant=Primary, State=Hover, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1113",
+    "name": "Variant=Primary, State=Pressed, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1115",
+    "name": "Variant=Primary, State=Pressed, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1120",
+    "name": "Variant=Primary, State=Pressed, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1124",
+    "name": "Variant=Primary, State=Focus, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1126",
+    "name": "Variant=Primary, State=Focus, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1131",
+    "name": "Variant=Primary, State=Focus, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1135",
+    "name": "Variant=Primary, State=Disabled, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1137",
+    "name": "Variant=Primary, State=Disabled, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1142",
+    "name": "Variant=Primary, State=Disabled, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1146",
+    "name": "Variant=Secondary, State=Default, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1148",
+    "name": "Variant=Secondary, State=Default, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1153",
+    "name": "Variant=Secondary, State=Default, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1157",
+    "name": "Variant=Secondary, State=Hover, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1159",
+    "name": "Variant=Secondary, State=Hover, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1164",
+    "name": "Variant=Secondary, State=Hover, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1168",
+    "name": "Variant=Secondary, State=Pressed, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1170",
+    "name": "Variant=Secondary, State=Pressed, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1175",
+    "name": "Variant=Secondary, State=Pressed, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1179",
+    "name": "Variant=Secondary, State=Focus, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1181",
+    "name": "Variant=Secondary, State=Focus, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1186",
+    "name": "Variant=Secondary, State=Focus, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1190",
+    "name": "Variant=Secondary, State=Disabled, Content=Label",
+    "w": 73,
+    "h": 32
+   },
+   {
+    "id": "20:1192",
+    "name": "Variant=Secondary, State=Disabled, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   },
+   {
+    "id": "20:1197",
+    "name": "Variant=Secondary, State=Disabled, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1201",
+    "name": "Variant=Ghost, State=Default, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1203",
+    "name": "Variant=Ghost, State=Default, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1208",
+    "name": "Variant=Ghost, State=Default, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1212",
+    "name": "Variant=Ghost, State=Hover, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1214",
+    "name": "Variant=Ghost, State=Hover, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1219",
+    "name": "Variant=Ghost, State=Hover, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1223",
+    "name": "Variant=Ghost, State=Pressed, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1225",
+    "name": "Variant=Ghost, State=Pressed, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1230",
+    "name": "Variant=Ghost, State=Pressed, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1234",
+    "name": "Variant=Ghost, State=Focus, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1236",
+    "name": "Variant=Ghost, State=Focus, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1241",
+    "name": "Variant=Ghost, State=Focus, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1245",
+    "name": "Variant=Ghost, State=Disabled, Content=Label",
+    "w": 71,
+    "h": 32
+   },
+   {
+    "id": "20:1247",
+    "name": "Variant=Ghost, State=Disabled, Content=Leading icon",
+    "w": 91,
+    "h": 32
+   },
+   {
+    "id": "20:1252",
+    "name": "Variant=Ghost, State=Disabled, Content=Icon only",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:10923",
+    "name": "Variant=Primary, State=Loading, Content=Leading icon",
+    "w": 93,
+    "h": 32
+   }
+  ],
+  "props": {
+   "Label#20:0": "TEXT",
+   "Icon#20:46": "INSTANCE_SWAP",
+   "Variant": [
+    "Primary",
+    "Secondary",
+    "Ghost"
+   ],
+   "State": [
+    "Default",
+    "Hover",
+    "Pressed",
+    "Focus",
+    "Disabled",
+    "Loading"
+   ],
+   "Content": [
+    "Label",
+    "Leading icon",
+    "Icon only"
+   ]
+  }
+ },
+ {
+  "id": "20:1399",
+  "name": "Input field",
+  "type": "COMPONENT_SET",
+  "section": "Input field",
+  "variants": [
+   {
+    "id": "20:1259",
+    "name": "Type=Text, State=Default",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1266",
+    "name": "Type=Text, State=Filled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1273",
+    "name": "Type=Text, State=Focus",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1280",
+    "name": "Type=Text, State=Error",
+    "w": 304,
+    "h": 86
+   },
+   {
+    "id": "20:1287",
+    "name": "Type=Text, State=Disabled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1294",
+    "name": "Type=Select, State=Default",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1303",
+    "name": "Type=Select, State=Filled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1312",
+    "name": "Type=Select, State=Focus",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1321",
+    "name": "Type=Select, State=Error",
+    "w": 304,
+    "h": 86
+   },
+   {
+    "id": "20:1330",
+    "name": "Type=Select, State=Disabled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1339",
+    "name": "Type=Date, State=Default",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1351",
+    "name": "Type=Date, State=Filled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1363",
+    "name": "Type=Date, State=Focus",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:1375",
+    "name": "Type=Date, State=Error",
+    "w": 304,
+    "h": 86
+   },
+   {
+    "id": "20:1387",
+    "name": "Type=Date, State=Disabled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:10871",
+    "name": "Type=Password, State=Default",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:10881",
+    "name": "Type=Password, State=Filled",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:10891",
+    "name": "Type=Password, State=Focus",
+    "w": 304,
+    "h": 62
+   },
+   {
+    "id": "20:10903",
+    "name": "Type=Password, State=Error",
+    "w": 304,
+    "h": 86
+   },
+   {
+    "id": "20:10913",
+    "name": "Type=Password, State=Disabled",
+    "w": 304,
+    "h": 62
+   }
+  ],
+  "props": {
+   "Label#20:92": "TEXT",
+   "Value#20:108": "TEXT",
+   "Required#20:124": "BOOLEAN",
+   "Show helper#20:140": "BOOLEAN",
+   "Helper#20:156": "TEXT",
+   "Type": [
+    "Text",
+    "Select",
+    "Date",
+    "Password"
+   ],
+   "State": [
+    "Default",
+    "Filled",
+    "Focus",
+    "Error",
+    "Disabled"
+   ]
+  }
+ },
+ {
+  "id": "20:1409",
+  "name": "Checkbox",
+  "type": "COMPONENT_SET",
+  "section": "Selection & navigation",
+  "variants": [
+   {
+    "id": "20:1401",
+    "name": "State=Unchecked",
+    "w": 14,
+    "h": 14
+   },
+   {
+    "id": "20:1402",
+    "name": "State=Checked",
+    "w": 14,
+    "h": 14
+   },
+   {
+    "id": "20:1405",
+    "name": "State=Indeterminate",
+    "w": 14,
+    "h": 14
+   },
+   {
+    "id": "20:1408",
+    "name": "State=Disabled",
+    "w": 14,
+    "h": 14
+   }
+  ],
+  "props": {
+   "State": [
+    "Unchecked",
+    "Checked",
+    "Indeterminate",
+    "Disabled"
+   ]
+  }
+ },
+ {
+  "id": "20:1416",
+  "name": "Tab",
+  "type": "COMPONENT_SET",
+  "section": "Selection & navigation",
+  "variants": [
+   {
+    "id": "20:1410",
+    "name": "State=Active",
+    "w": 80,
+    "h": 52
+   },
+   {
+    "id": "20:1412",
+    "name": "State=Inactive",
+    "w": 80,
+    "h": 52
+   },
+   {
+    "id": "20:1414",
+    "name": "State=Hover",
+    "w": 80,
+    "h": 52
+   }
+  ],
+  "props": {
+   "Label#20:172": "TEXT",
+   "State": [
+    "Active",
+    "Inactive",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "20:1425",
+  "name": "Pagination item",
+  "type": "COMPONENT_SET",
+  "section": "Selection & navigation",
+  "variants": [
+   {
+    "id": "20:1417",
+    "name": "Type=Page, State=Default",
+    "w": 28,
+    "h": 28
+   },
+   {
+    "id": "20:1419",
+    "name": "Type=Page, State=Active",
+    "w": 28,
+    "h": 28
+   },
+   {
+    "id": "20:1421",
+    "name": "Type=Nav, State=Default",
+    "w": 52,
+    "h": 28
+   },
+   {
+    "id": "20:1423",
+    "name": "Type=Nav, State=Disabled",
+    "w": 84,
+    "h": 28
+   }
+  ],
+  "props": {
+   "Label#20:176": "TEXT",
+   "Type": [
+    "Page",
+    "Nav"
+   ],
+   "State": [
+    "Default",
+    "Active",
+    "Disabled"
+   ]
+  }
+ },
+ {
+  "id": "20:1442",
+  "name": "Status badge",
+  "type": "COMPONENT_SET",
+  "section": "Badges & avatar",
+  "variants": [
+   {
+    "id": "20:1427",
+    "name": "Status=Draft",
+    "w": 49,
+    "h": 24
+   },
+   {
+    "id": "20:1430",
+    "name": "Status=Open",
+    "w": 50,
+    "h": 24
+   },
+   {
+    "id": "20:1433",
+    "name": "Status=Paid",
+    "w": 45,
+    "h": 24
+   },
+   {
+    "id": "20:1436",
+    "name": "Status=Overdue",
+    "w": 67,
+    "h": 24
+   },
+   {
+    "id": "20:1439",
+    "name": "Status=Review",
+    "w": 60,
+    "h": 24
+   }
+  ],
+  "props": {
+   "Status": [
+    "Draft",
+    "Open",
+    "Paid",
+    "Overdue",
+    "Review"
+   ]
+  }
+ },
+ {
+  "id": "20:1463",
+  "name": "Trend badge",
+  "type": "COMPONENT_SET",
+  "section": "Badges & avatar",
+  "variants": [
+   {
+    "id": "20:1443",
+    "name": "Direction=Up, Tone=Negative",
+    "w": 54,
+    "h": 22
+   },
+   {
+    "id": "20:1448",
+    "name": "Direction=Down, Tone=Positive",
+    "w": 54,
+    "h": 22
+   },
+   {
+    "id": "20:1453",
+    "name": "Direction=Up, Tone=Positive",
+    "w": 54,
+    "h": 22
+   },
+   {
+    "id": "20:1458",
+    "name": "Direction=Down, Tone=Negative",
+    "w": 54,
+    "h": 22
+   }
+  ],
+  "props": {
+   "Value#20:181": "TEXT",
+   "Direction": [
+    "Up",
+    "Down"
+   ],
+   "Tone": [
+    "Negative",
+    "Positive"
+   ]
+  }
+ },
+ {
+  "id": "20:1470",
+  "name": "Avatar",
+  "type": "COMPONENT_SET",
+  "section": "Badges & avatar",
+  "variants": [
+   {
+    "id": "20:1464",
+    "name": "Size=24",
+    "w": 24,
+    "h": 24
+   },
+   {
+    "id": "20:1466",
+    "name": "Size=32",
+    "w": 32,
+    "h": 32
+   },
+   {
+    "id": "20:1468",
+    "name": "Size=38",
+    "w": 38,
+    "h": 38
+   }
+  ],
+  "props": {
+   "Initials#20:186": "TEXT",
+   "Size": [
+    "24",
+    "32",
+    "38"
+   ]
+  }
+ },
+ {
+  "id": "20:10958",
+  "name": "Alert",
+  "type": "COMPONENT_SET",
+  "section": "Badges & avatar",
+  "variants": [
+   {
+    "id": "20:10929",
+    "name": "Tone=Danger",
+    "w": 360,
+    "h": 70
+   },
+   {
+    "id": "20:10937",
+    "name": "Tone=Warning",
+    "w": 360,
+    "h": 70
+   },
+   {
+    "id": "20:10945",
+    "name": "Tone=Info",
+    "w": 360,
+    "h": 70
+   },
+   {
+    "id": "20:10951",
+    "name": "Tone=Success",
+    "w": 360,
+    "h": 70
+   }
+  ],
+  "props": {
+   "Title#20:306": "TEXT",
+   "Message#20:311": "TEXT",
+   "Show message#20:316": "BOOLEAN",
+   "Tone": [
+    "Danger",
+    "Warning",
+    "Info",
+    "Success"
+   ]
+  }
+ },
+ {
+  "id": "20:10968",
+  "name": "Toast",
+  "type": "COMPONENT_SET",
+  "section": "Badges & avatar",
+  "variants": [
+   {
+    "id": "20:10959",
+    "name": "Tone=Success",
+    "w": 245,
+    "h": 48
+   },
+   {
+    "id": "20:10964",
+    "name": "Tone=Info",
+    "w": 245,
+    "h": 48
+   }
+  ],
+  "props": {
+   "Message#20:321": "TEXT",
+   "Tone": [
+    "Success",
+    "Info"
+   ]
+  }
+ },
+ {
+  "id": "20:1472",
+  "name": "Metric card",
+  "type": "COMPONENT",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1472",
+    "name": "Metric card",
+    "w": 323,
+    "h": 156
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1511",
+  "name": "Insight card",
+  "type": "COMPONENT_SET",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1489",
+    "name": "Tone=Danger",
+    "w": 334,
+    "h": 140
+   },
+   {
+    "id": "20:1500",
+    "name": "Tone=Warning",
+    "w": 334,
+    "h": 140
+   }
+  ],
+  "props": {
+   "Title#20:194": "TEXT",
+   "Message#20:197": "TEXT",
+   "Time#20:200": "TEXT",
+   "Tone": [
+    "Danger",
+    "Warning"
+   ]
+  }
+ },
+ {
+  "id": "20:1512",
+  "name": "Table/Header",
+  "type": "COMPONENT",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1512",
+    "name": "Table/Header",
+    "w": 1000,
+    "h": 36
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1583",
+  "name": "Table/Row",
+  "type": "COMPONENT_SET",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1524",
+    "name": "State=Default",
+    "w": 1000,
+    "h": 62
+   },
+   {
+    "id": "20:1543",
+    "name": "State=Hover",
+    "w": 1000,
+    "h": 62
+   },
+   {
+    "id": "20:1562",
+    "name": "State=Selected",
+    "w": 1000,
+    "h": 62
+   }
+  ],
+  "props": {
+   "State": [
+    "Default",
+    "Hover",
+    "Selected"
+   ]
+  }
+ },
+ {
+  "id": "20:1584",
+  "name": "Modal",
+  "type": "COMPONENT",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1584",
+    "name": "Modal",
+    "w": 640,
+    "h": 277
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:1605",
+  "name": "Workspace selector",
+  "type": "COMPONENT",
+  "section": "Cards, table & overlays",
+  "variants": [
+   {
+    "id": "20:1605",
+    "name": "Workspace selector",
+    "w": 175,
+    "h": 54
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4376",
+  "name": "Asset/lock",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4376",
+    "name": "Asset/lock",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4377",
+  "name": "Asset/invoice",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4377",
+    "name": "Asset/invoice",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4378",
+  "name": "Asset/admin-role",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4378",
+    "name": "Asset/admin-role",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4379",
+  "name": "Asset/bookmark",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4379",
+    "name": "Asset/bookmark",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "32:88617",
+  "name": "Asset/bookings",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "32:88617",
+    "name": "Asset/bookings",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "33:90290",
+  "name": "Asset/package-lib",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "33:90290",
+    "name": "Asset/package-lib",
+    "w": 56,
+    "h": 56
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4380",
+  "name": "Asset/module-invoice",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4380",
+    "name": "Asset/module-invoice",
+    "w": 18,
+    "h": 18
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4381",
+  "name": "Asset/mascot",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4381",
+    "name": "Asset/mascot",
+    "w": 32,
+    "h": 32
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4382",
+  "name": "Asset/mascot-large",
+  "type": "COMPONENT",
+  "section": "Assets",
+  "variants": [
+   {
+    "id": "20:4382",
+    "name": "Asset/mascot-large",
+    "w": 80,
+    "h": 80
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4407",
+  "name": "Breadcrumb",
+  "type": "COMPONENT",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4407",
+    "name": "Breadcrumb",
+    "w": 245,
+    "h": 24
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4428",
+  "name": "Language selector",
+  "type": "COMPONENT",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4428",
+    "name": "Language selector",
+    "w": 74,
+    "h": 22
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4524",
+  "name": "Global header",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4434",
+    "name": "Type=Module",
+    "w": 1440,
+    "h": 78
+   },
+   {
+    "id": "20:4473",
+    "name": "Type=Editor",
+    "w": 1440,
+    "h": 78
+   }
+  ],
+  "props": {
+   "Type": [
+    "Module",
+    "Editor"
+   ]
+  }
+ },
+ {
+  "id": "20:4525",
+  "name": "Page header",
+  "type": "COMPONENT",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4525",
+    "name": "Page header",
+    "w": 1440,
+    "h": 82
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4550",
+  "name": "Shell/Popover",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4536",
+    "name": "Header=True",
+    "w": 420,
+    "h": 248
+   },
+   {
+    "id": "20:4546",
+    "name": "Header=False",
+    "w": 420,
+    "h": 192
+   }
+  ],
+  "props": {
+   "Title#20:218": "TEXT",
+   "Header": [
+    "True",
+    "False"
+   ]
+  }
+ },
+ {
+  "id": "20:4573",
+  "name": "Menu item",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4551",
+    "name": "Tone=Default, State=Default",
+    "w": 155,
+    "h": 32
+   },
+   {
+    "id": "20:4556",
+    "name": "Tone=Default, State=Hover",
+    "w": 155,
+    "h": 32
+   },
+   {
+    "id": "20:4561",
+    "name": "Tone=Danger, State=Default",
+    "w": 155,
+    "h": 32
+   },
+   {
+    "id": "20:4567",
+    "name": "Tone=Danger, State=Hover",
+    "w": 155,
+    "h": 32
+   }
+  ],
+  "props": {
+   "Label#20:221": "TEXT",
+   "Icon#20:226": "INSTANCE_SWAP",
+   "Tone": [
+    "Default",
+    "Danger"
+   ],
+   "State": [
+    "Default",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "20:4574",
+  "name": "Account menu",
+  "type": "COMPONENT",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4574",
+    "name": "Account menu",
+    "w": 187,
+    "h": 100
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4600",
+  "name": "Launcher tile",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4591",
+    "name": "Status=Available, State=Default",
+    "w": 124,
+    "h": 124
+   },
+   {
+    "id": "20:4594",
+    "name": "Status=Available, State=Hover",
+    "w": 124,
+    "h": 124
+   },
+   {
+    "id": "20:4597",
+    "name": "Status=Locked, State=Default",
+    "w": 124,
+    "h": 124
+   }
+  ],
+  "props": {
+   "Label#20:231": "TEXT",
+   "Illustration#20:235": "INSTANCE_SWAP",
+   "Status": [
+    "Available",
+    "Locked"
+   ],
+   "State": [
+    "Default",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "20:4603",
+  "name": "App launcher",
+  "type": "COMPONENT",
+  "section": "Pattern · Navigation",
+  "variants": [
+   {
+    "id": "20:4603",
+    "name": "App launcher",
+    "w": 448,
+    "h": 288
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4657",
+  "name": "Search field",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4633",
+    "name": "State=Default",
+    "w": 432,
+    "h": 36
+   },
+   {
+    "id": "20:4641",
+    "name": "State=Filled",
+    "w": 432,
+    "h": 36
+   },
+   {
+    "id": "20:4649",
+    "name": "State=Focus",
+    "w": 432,
+    "h": 36
+   }
+  ],
+  "props": {
+   "State": [
+    "Default",
+    "Filled",
+    "Focus"
+   ]
+  }
+ },
+ {
+  "id": "20:4658",
+  "name": "List toolbar",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4658",
+    "name": "List toolbar",
+    "w": 1000,
+    "h": 36
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4675",
+  "name": "Table/Toolbar",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4675",
+    "name": "Table/Toolbar",
+    "w": 1000,
+    "h": 52
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4694",
+  "name": "Table/Footer",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4694",
+    "name": "Table/Footer",
+    "w": 1000,
+    "h": 52
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4763",
+  "name": "Data table",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4763",
+    "name": "Data table",
+    "w": 1000,
+    "h": 390
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4897",
+  "name": "Section header",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4897",
+    "name": "Section header",
+    "w": 624,
+    "h": 24
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:4935",
+  "name": "Chart legend item",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4902",
+    "name": "Series=Open",
+    "w": 177,
+    "h": 48
+   },
+   {
+    "id": "20:4913",
+    "name": "Series=Paid",
+    "w": 172,
+    "h": 48
+   },
+   {
+    "id": "20:4924",
+    "name": "Series=Overdue",
+    "w": 174,
+    "h": 48
+   }
+  ],
+  "props": {
+   "Series": [
+    "Open",
+    "Paid",
+    "Overdue"
+   ]
+  }
+ },
+ {
+  "id": "20:4976",
+  "name": "Insights rail",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4936",
+    "name": "State=Expanded",
+    "w": 352,
+    "h": 514
+   },
+   {
+    "id": "20:4969",
+    "name": "State=Collapsed",
+    "w": 72,
+    "h": 180
+   }
+  ],
+  "props": {
+   "State": [
+    "Expanded",
+    "Collapsed"
+   ]
+  }
+ },
+ {
+  "id": "20:4977",
+  "name": "Loader",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:4977",
+    "name": "Loader",
+    "w": 100,
+    "h": 100
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5007",
+  "name": "Template thumbnail",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:5003",
+    "name": "State=Default",
+    "w": 180,
+    "h": 255
+   },
+   {
+    "id": "20:5005",
+    "name": "State=Selected",
+    "w": 180,
+    "h": 255
+   }
+  ],
+  "props": {
+   "Label#20:244": "TEXT",
+   "State": [
+    "Default",
+    "Selected"
+   ]
+  }
+ },
+ {
+  "id": "20:5008",
+  "name": "Overlay header",
+  "type": "COMPONENT",
+  "section": "Pattern · Data & content",
+  "variants": [
+   {
+    "id": "20:5008",
+    "name": "Overlay header",
+    "w": 1440,
+    "h": 80
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5019",
+  "name": "Layout/Dashboard",
+  "type": "COMPONENT",
+  "section": "Layouts",
+  "variants": [
+   {
+    "id": "20:5019",
+    "name": "Layout/Dashboard",
+    "w": 1440,
+    "h": 1263
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5327",
+  "name": "Layout/List",
+  "type": "COMPONENT",
+  "section": "Layouts",
+  "variants": [
+   {
+    "id": "20:5327",
+    "name": "Layout/List",
+    "w": 1440,
+    "h": 675
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5558",
+  "name": "Layout/Editor",
+  "type": "COMPONENT",
+  "section": "Layouts",
+  "variants": [
+   {
+    "id": "20:5558",
+    "name": "Layout/Editor",
+    "w": 1440,
+    "h": 1080
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5674",
+  "name": "Layout/Auth",
+  "type": "COMPONENT",
+  "section": "Layouts",
+  "variants": [
+   {
+    "id": "20:5674",
+    "name": "Layout/Auth",
+    "w": 1440,
+    "h": 1080
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:5699",
+  "name": "Layout/Fullscreen overlay",
+  "type": "COMPONENT",
+  "section": "Layouts",
+  "variants": [
+   {
+    "id": "20:5699",
+    "name": "Layout/Fullscreen overlay",
+    "w": 1440,
+    "h": 1140
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:7719",
+  "name": "Breakpoint",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7650",
+    "name": "Device=Desktop",
+    "w": 1440,
+    "h": 900
+   },
+   {
+    "id": "20:7681",
+    "name": "Device=Tablet",
+    "w": 768,
+    "h": 1024
+   },
+   {
+    "id": "20:7704",
+    "name": "Device=Mobile",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {
+   "Content#20:252": "SLOT",
+   "Device": [
+    "Desktop",
+    "Tablet",
+    "Mobile"
+   ]
+  }
+ },
+ {
+  "id": "20:7889",
+  "name": "Grid/KPI row",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7724",
+    "name": "Device=Desktop",
+    "w": 1000,
+    "h": 156
+   },
+   {
+    "id": "20:7779",
+    "name": "Device=Tablet",
+    "w": 720,
+    "h": 328
+   },
+   {
+    "id": "20:7834",
+    "name": "Device=Mobile",
+    "w": 358,
+    "h": 492
+   }
+  ],
+  "props": {
+   "Device": [
+    "Desktop",
+    "Tablet",
+    "Mobile"
+   ]
+  }
+ },
+ {
+  "id": "20:7922",
+  "name": "Mobile/Top bar",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7890",
+    "name": "Type=Module",
+    "w": 390,
+    "h": 56
+   },
+   {
+    "id": "20:7906",
+    "name": "Type=Child",
+    "w": 390,
+    "h": 56
+   }
+  ],
+  "props": {
+   "Title#20:253": "TEXT",
+   "Type": [
+    "Module",
+    "Child"
+   ]
+  }
+ },
+ {
+  "id": "20:7923",
+  "name": "Mobile/Bottom sheet",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7923",
+    "name": "Mobile/Bottom sheet",
+    "w": 390,
+    "h": 250
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:7961",
+  "name": "Mobile/Invoice list item",
+  "type": "COMPONENT_SET",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7937",
+    "name": "State=Default",
+    "w": 358,
+    "h": 104
+   },
+   {
+    "id": "20:7949",
+    "name": "State=Selected",
+    "w": 358,
+    "h": 104
+   }
+  ],
+  "props": {
+   "ID#20:258": "TEXT",
+   "Client#20:261": "TEXT",
+   "Amount#20:264": "TEXT",
+   "Due#20:267": "TEXT",
+   "Past due#20:270": "TEXT",
+   "Show past due#20:273": "BOOLEAN",
+   "State": [
+    "Default",
+    "Selected"
+   ]
+  }
+ },
+ {
+  "id": "20:7962",
+  "name": "Mobile/Action bar",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7962",
+    "name": "Mobile/Action bar",
+    "w": 390,
+    "h": 91
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:7979",
+  "name": "Mobile/Insights entry",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7979",
+    "name": "Mobile/Insights entry",
+    "w": 358,
+    "h": 88
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:7988",
+  "name": "Mobile/Dashboard",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:7988",
+    "name": "Mobile/Dashboard",
+    "w": 390,
+    "h": 1480
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8123",
+  "name": "Mobile/List",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8123",
+    "name": "Mobile/List",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8236",
+  "name": "Mobile/Editor",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8236",
+    "name": "Mobile/Editor",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8323",
+  "name": "Mobile/Share invoice",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8323",
+    "name": "Mobile/Share invoice",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8387",
+  "name": "Mobile/App launcher",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8387",
+    "name": "Mobile/App launcher",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8451",
+  "name": "Mobile/Insights",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8451",
+    "name": "Mobile/Insights",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8521",
+  "name": "Mobile/Account",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8521",
+    "name": "Mobile/Account",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8591",
+  "name": "Mobile/Login",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8591",
+    "name": "Mobile/Login",
+    "w": 390,
+    "h": 844
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:8615",
+  "name": "Tablet/Dashboard",
+  "type": "COMPONENT",
+  "section": "Pattern · Responsive",
+  "variants": [
+   {
+    "id": "20:8615",
+    "name": "Tablet/Dashboard",
+    "w": 768,
+    "h": 1024
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:10985",
+  "name": "Flow/Lane header",
+  "type": "COMPONENT_SET",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:10970",
+    "name": "Lane=Positive",
+    "w": 1200,
+    "h": 110
+   },
+   {
+    "id": "20:10975",
+    "name": "Lane=Negative",
+    "w": 1200,
+    "h": 110
+   },
+   {
+    "id": "20:10980",
+    "name": "Lane=Edge",
+    "w": 1200,
+    "h": 110
+   }
+  ],
+  "props": {
+   "Title#20:324": "TEXT",
+   "Description#20:328": "TEXT",
+   "Lane": [
+    "Positive",
+    "Negative",
+    "Edge"
+   ]
+  }
+ },
+ {
+  "id": "20:11004",
+  "name": "Flow/Step header",
+  "type": "COMPONENT_SET",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:10986",
+    "name": "Lane=Positive",
+    "w": 1440,
+    "h": 64
+   },
+   {
+    "id": "20:10992",
+    "name": "Lane=Negative",
+    "w": 1440,
+    "h": 64
+   },
+   {
+    "id": "20:10998",
+    "name": "Lane=Edge",
+    "w": 1440,
+    "h": 64
+   }
+  ],
+  "props": {
+   "Step id#20:332": "TEXT",
+   "Title#20:336": "TEXT",
+   "Description#20:340": "TEXT",
+   "Lane": [
+    "Positive",
+    "Negative",
+    "Edge"
+   ]
+  }
+ },
+ {
+  "id": "20:11005",
+  "name": "Flow/Decision",
+  "type": "COMPONENT",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:11005",
+    "name": "Flow/Decision",
+    "w": 280,
+    "h": 168
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "20:11019",
+  "name": "Flow/Terminal",
+  "type": "COMPONENT_SET",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:11009",
+    "name": "Type=Start",
+    "w": 201,
+    "h": 56
+   },
+   {
+    "id": "20:11014",
+    "name": "Type=End",
+    "w": 201,
+    "h": 56
+   }
+  ],
+  "props": {
+   "Label#20:345": "TEXT",
+   "Type": [
+    "Start",
+    "End"
+   ]
+  }
+ },
+ {
+  "id": "20:11028",
+  "name": "Flow/Arrow label",
+  "type": "COMPONENT_SET",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:11020",
+    "name": "Tone=Positive",
+    "w": 114,
+    "h": 37
+   },
+   {
+    "id": "20:11022",
+    "name": "Tone=Negative",
+    "w": 114,
+    "h": 37
+   },
+   {
+    "id": "20:11024",
+    "name": "Tone=Edge",
+    "w": 114,
+    "h": 37
+   },
+   {
+    "id": "20:11026",
+    "name": "Tone=Neutral",
+    "w": 114,
+    "h": 37
+   }
+  ],
+  "props": {
+   "Label#20:348": "TEXT",
+   "Tone": [
+    "Positive",
+    "Negative",
+    "Edge",
+    "Neutral"
+   ]
+  }
+ },
+ {
+  "id": "20:11029",
+  "name": "Flow/Reference",
+  "type": "COMPONENT",
+  "section": "Flow kit",
+  "variants": [
+   {
+    "id": "20:11029",
+    "name": "Flow/Reference",
+    "w": 272,
+    "h": 45
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "26:4846",
+  "name": "Payment status badge",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4834",
+    "name": "Status=Draft",
+    "w": 51,
+    "h": 24
+   },
+   {
+    "id": "26:4837",
+    "name": "Status=Partially paid",
+    "w": 92,
+    "h": 24
+   },
+   {
+    "id": "26:4840",
+    "name": "Status=Paid",
+    "w": 47,
+    "h": 24
+   },
+   {
+    "id": "33:98844",
+    "name": "Status=Canceled",
+    "w": 74,
+    "h": 24
+   }
+  ],
+  "props": {
+   "Status": [
+    "Draft",
+    "Partially paid",
+    "Paid",
+    "Canceled"
+   ]
+  }
+ },
+ {
+  "id": "26:4855",
+  "name": "Invoice type tag",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4847",
+    "name": "Type=DP",
+    "w": 29,
+    "h": 24
+   },
+   {
+    "id": "26:4849",
+    "name": "Type=Full",
+    "w": 33,
+    "h": 24
+   },
+   {
+    "id": "26:4851",
+    "name": "Type=Partial",
+    "w": 50,
+    "h": 24
+   },
+   {
+    "id": "26:4853",
+    "name": "Type=Paid",
+    "w": 38,
+    "h": 24
+   }
+  ],
+  "props": {
+   "Type": [
+    "DP",
+    "Full",
+    "Partial",
+    "Paid"
+   ]
+  }
+ },
+ {
+  "id": "26:4866",
+  "name": "Segmented control",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4856",
+    "name": "Selected=First",
+    "w": 260,
+    "h": 40
+   },
+   {
+    "id": "26:4861",
+    "name": "Selected=Second",
+    "w": 260,
+    "h": 40
+   }
+  ],
+  "props": {
+   "Option 1#26:0": "TEXT",
+   "Option 2#26:3": "TEXT",
+   "Selected": [
+    "First",
+    "Second"
+   ]
+  }
+ },
+ {
+  "id": "26:4879",
+  "name": "Calendar/Booking chip",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4867",
+    "name": "Status=Draft",
+    "w": 128,
+    "h": 20
+   },
+   {
+    "id": "26:4870",
+    "name": "Status=Partially paid",
+    "w": 128,
+    "h": 20
+   },
+   {
+    "id": "26:4873",
+    "name": "Status=Paid",
+    "w": 128,
+    "h": 20
+   }
+  ],
+  "props": {
+   "Label#26:6": "TEXT",
+   "Status": [
+    "Draft",
+    "Partially paid",
+    "Paid"
+   ]
+  }
+ },
+ {
+  "id": "26:4944",
+  "name": "Calendar/Day cell",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4880",
+    "name": "State=Default",
+    "w": 142,
+    "h": 128
+   },
+   {
+    "id": "26:4896",
+    "name": "State=Today",
+    "w": 142,
+    "h": 128
+   },
+   {
+    "id": "26:4912",
+    "name": "State=Outside month",
+    "w": 142,
+    "h": 128
+   },
+   {
+    "id": "26:4928",
+    "name": "State=Selected",
+    "w": 142,
+    "h": 128
+   }
+  ],
+  "props": {
+   "Date#26:11": "TEXT",
+   "Count#26:16": "TEXT",
+   "More#26:21": "TEXT",
+   "Show count#26:26": "BOOLEAN",
+   "Show chip 2#26:31": "BOOLEAN",
+   "Show chip 3#26:36": "BOOLEAN",
+   "Show chip 1#26:41": "BOOLEAN",
+   "Show more#26:46": "BOOLEAN",
+   "State": [
+    "Default",
+    "Today",
+    "Outside month",
+    "Selected"
+   ]
+  }
+ },
+ {
+  "id": "26:5008",
+  "name": "Timeline item",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:4945",
+    "name": "Payment=Confirmed",
+    "w": 420,
+    "h": 92
+   },
+   {
+    "id": "26:4966",
+    "name": "Payment=Pending",
+    "w": 420,
+    "h": 92
+   },
+   {
+    "id": "26:4987",
+    "name": "Payment=Void",
+    "w": 420,
+    "h": 92
+   }
+  ],
+  "props": {
+   "Invoice#26:51": "TEXT",
+   "Amount#26:55": "TEXT",
+   "Date#26:59": "TEXT",
+   "Meta#26:63": "TEXT",
+   "Show line#26:67": "BOOLEAN",
+   "Payment": [
+    "Confirmed",
+    "Pending",
+    "Void"
+   ]
+  }
+ },
+ {
+  "id": "26:5024",
+  "name": "Summary row",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:5009",
+    "name": "Type=Default",
+    "w": 360,
+    "h": 22
+   },
+   {
+    "id": "26:5012",
+    "name": "Type=Emphasis",
+    "w": 360,
+    "h": 22
+   },
+   {
+    "id": "26:5015",
+    "name": "Type=Total",
+    "w": 360,
+    "h": 28
+   },
+   {
+    "id": "26:5018",
+    "name": "Type=Accent",
+    "w": 360,
+    "h": 28
+   },
+   {
+    "id": "26:5021",
+    "name": "Type=Negative",
+    "w": 360,
+    "h": 22
+   }
+  ],
+  "props": {
+   "Label#26:71": "TEXT",
+   "Value#26:77": "TEXT",
+   "Type": [
+    "Default",
+    "Emphasis",
+    "Total",
+    "Accent",
+    "Negative"
+   ]
+  }
+ },
+ {
+  "id": "26:5037",
+  "name": "Inline input",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:5025",
+    "name": "State=Default",
+    "w": 160,
+    "h": 36
+   },
+   {
+    "id": "26:5028",
+    "name": "State=Focus",
+    "w": 160,
+    "h": 36
+   },
+   {
+    "id": "26:5031",
+    "name": "State=Error",
+    "w": 160,
+    "h": 36
+   },
+   {
+    "id": "26:5034",
+    "name": "State=Read-only",
+    "w": 160,
+    "h": 36
+   }
+  ],
+  "props": {
+   "Value#26:83": "TEXT",
+   "Prefix#26:88": "TEXT",
+   "Show prefix#26:93": "BOOLEAN",
+   "State": [
+    "Default",
+    "Focus",
+    "Error",
+    "Read-only"
+   ]
+  }
+ },
+ {
+  "id": "26:5060",
+  "name": "Line item row",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:5038",
+    "name": "Type=Header",
+    "w": 624,
+    "h": 37
+   },
+   {
+    "id": "26:5044",
+    "name": "Type=Row",
+    "w": 624,
+    "h": 53
+   }
+  ],
+  "props": {
+   "Type": [
+    "Header",
+    "Row"
+   ]
+  }
+ },
+ {
+  "id": "26:5220",
+  "name": "Booking table/Header",
+  "type": "COMPONENT",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:5220",
+    "name": "Booking table/Header",
+    "w": 996,
+    "h": 36
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "26:5322",
+  "name": "Booking table/Row",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "26:5250",
+    "name": "State=Default",
+    "w": 996,
+    "h": 62
+   },
+   {
+    "id": "26:5274",
+    "name": "State=Hover",
+    "w": 996,
+    "h": 62
+   },
+   {
+    "id": "26:5298",
+    "name": "State=Selected",
+    "w": 996,
+    "h": 62
+   }
+  ],
+  "props": {
+   "Booking#26:98": "TEXT",
+   "Ref#26:102": "TEXT",
+   "Client#26:106": "TEXT",
+   "Phone#26:110": "TEXT",
+   "Package#26:114": "TEXT",
+   "Date#26:118": "TEXT",
+   "Total#26:122": "TEXT",
+   "Paid#26:126": "TEXT",
+   "Remaining#26:130": "TEXT",
+   "State": [
+    "Default",
+    "Hover",
+    "Selected"
+   ]
+  }
+ },
+ {
+  "id": "28:29909",
+  "name": "Text area",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "28:29869",
+    "name": "State=Default",
+    "w": 320,
+    "h": 150
+   },
+   {
+    "id": "28:29877",
+    "name": "State=Filled",
+    "w": 320,
+    "h": 160
+   },
+   {
+    "id": "28:29885",
+    "name": "State=Focus",
+    "w": 320,
+    "h": 160
+   },
+   {
+    "id": "28:29893",
+    "name": "State=Error",
+    "w": 320,
+    "h": 160
+   },
+   {
+    "id": "28:29901",
+    "name": "State=Disabled",
+    "w": 320,
+    "h": 160
+   }
+  ],
+  "props": {
+   "Label#28:134": "TEXT",
+   "Value#28:140": "TEXT",
+   "Helper#28:146": "TEXT",
+   "Count#28:152": "TEXT",
+   "State": [
+    "Default",
+    "Filled",
+    "Focus",
+    "Error",
+    "Disabled"
+   ]
+  }
+ },
+ {
+  "id": "29:30134",
+  "name": "Invoice card",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "29:30088",
+    "name": "State=Default",
+    "w": 480,
+    "h": 135
+   },
+   {
+    "id": "29:30111",
+    "name": "State=Latest",
+    "w": 480,
+    "h": 135
+   }
+  ],
+  "props": {
+   "Invoice#29:158": "TEXT",
+   "Date#29:161": "TEXT",
+   "Amount#29:164": "TEXT",
+   "Meta#29:167": "TEXT",
+   "State": [
+    "Default",
+    "Latest"
+   ]
+  }
+ },
+ {
+  "id": "31:60358",
+  "name": "Crew chip",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:60347",
+    "name": "State=Default",
+    "w": 137,
+    "h": 28
+   },
+   {
+    "id": "31:60354",
+    "name": "State=Read-only",
+    "w": 121,
+    "h": 28
+   },
+   {
+    "id": "31:76092",
+    "name": "State=Read-only hover",
+    "w": 123,
+    "h": 30
+   }
+  ],
+  "props": {
+   "Name#31:170": "TEXT",
+   "State": [
+    "Default",
+    "Read-only",
+    "Read-only hover"
+   ]
+  }
+ },
+ {
+  "id": "31:60375",
+  "name": "Crew option",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:60359",
+    "name": "State=Unchecked",
+    "w": 296,
+    "h": 50
+   },
+   {
+    "id": "31:60366",
+    "name": "State=Checked",
+    "w": 296,
+    "h": 50
+   }
+  ],
+  "props": {
+   "Name#31:173": "TEXT",
+   "Role#31:176": "TEXT",
+   "State": [
+    "Unchecked",
+    "Checked"
+   ]
+  }
+ },
+ {
+  "id": "31:60376",
+  "name": "Crew dropdown",
+  "type": "COMPONENT",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:60376",
+    "name": "Crew dropdown",
+    "w": 320,
+    "h": 415
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "31:60504",
+  "name": "Crew select",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:60437",
+    "name": "State=Empty",
+    "w": 400,
+    "h": 90
+   },
+   {
+    "id": "31:60446",
+    "name": "State=Filled",
+    "w": 400,
+    "h": 126
+   },
+   {
+    "id": "31:60475",
+    "name": "State=Open",
+    "w": 400,
+    "h": 126
+   }
+  ],
+  "props": {
+   "State": [
+    "Empty",
+    "Filled",
+    "Open"
+   ]
+  }
+ },
+ {
+  "id": "31:75998",
+  "name": "Schedule item",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:75957",
+    "name": "State=Default",
+    "w": 328,
+    "h": 78
+   },
+   {
+    "id": "31:75970",
+    "name": "State=Hover",
+    "w": 328,
+    "h": 78
+   },
+   {
+    "id": "31:75983",
+    "name": "State=Current",
+    "w": 328,
+    "h": 80
+   }
+  ],
+  "props": {
+   "Day#31:180": "TEXT",
+   "Date#31:184": "TEXT",
+   "Title#31:188": "TEXT",
+   "Meta#31:192": "TEXT",
+   "State": [
+    "Default",
+    "Hover",
+    "Current"
+   ]
+  }
+ },
+ {
+  "id": "31:75999",
+  "name": "Crew schedule popover",
+  "type": "COMPONENT",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "31:75999",
+    "name": "Crew schedule popover",
+    "w": 344,
+    "h": 556
+   }
+  ],
+  "props": {}
+ },
+ {
+  "id": "32:81093",
+  "name": "Calendar/Week card",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "32:81024",
+    "name": "Status=Draft, State=Default",
+    "w": 130,
+    "h": 106
+   },
+   {
+    "id": "32:81029",
+    "name": "Status=Draft, State=Hover",
+    "w": 130,
+    "h": 106
+   },
+   {
+    "id": "32:81041",
+    "name": "Status=Partially paid, State=Default",
+    "w": 130,
+    "h": 136
+   },
+   {
+    "id": "32:81053",
+    "name": "Status=Partially paid, State=Hover",
+    "w": 130,
+    "h": 136
+   },
+   {
+    "id": "32:81067",
+    "name": "Status=Paid, State=Default",
+    "w": 130,
+    "h": 106
+   },
+   {
+    "id": "32:81079",
+    "name": "Status=Paid, State=Hover",
+    "w": 130,
+    "h": 106
+   }
+  ],
+  "props": {
+   "Title#32:209": "TEXT",
+   "Package#32:210": "TEXT",
+   "Second avatar#32:211": "BOOLEAN",
+   "Status": [
+    "Draft",
+    "Partially paid",
+    "Paid"
+   ],
+   "State": [
+    "Default",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "32:81221",
+  "name": "Calendar/Day row",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "32:81108",
+    "name": "Status=Draft, State=Default",
+    "w": 728,
+    "h": 73
+   },
+   {
+    "id": "32:81120",
+    "name": "Status=Draft, State=Hover",
+    "w": 728,
+    "h": 73
+   },
+   {
+    "id": "32:81139",
+    "name": "Status=Partially paid, State=Default",
+    "w": 728,
+    "h": 73
+   },
+   {
+    "id": "32:81159",
+    "name": "Status=Partially paid, State=Hover",
+    "w": 728,
+    "h": 73
+   },
+   {
+    "id": "32:81180",
+    "name": "Status=Paid, State=Default",
+    "w": 728,
+    "h": 73
+   },
+   {
+    "id": "32:81200",
+    "name": "Status=Paid, State=Hover",
+    "w": 728,
+    "h": 73
+   }
+  ],
+  "props": {
+   "Title#32:217": "TEXT",
+   "Meta#32:218": "TEXT",
+   "Amount#32:219": "TEXT",
+   "Remaining#32:220": "TEXT",
+   "Second avatar#32:221": "BOOLEAN",
+   "Status": [
+    "Draft",
+    "Partially paid",
+    "Paid"
+   ],
+   "State": [
+    "Default",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "32:81237",
+  "name": "Calendar/Week day head",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "32:81226",
+    "name": "State=Default",
+    "w": 130,
+    "h": 31
+   },
+   {
+    "id": "32:81229",
+    "name": "State=Today",
+    "w": 130,
+    "h": 31
+   },
+   {
+    "id": "32:81233",
+    "name": "State=Hover",
+    "w": 130,
+    "h": 31
+   }
+  ],
+  "props": {
+   "Day#32:224": "TEXT",
+   "Date#32:225": "TEXT",
+   "State": [
+    "Default",
+    "Today",
+    "Hover"
+   ]
+  }
+ },
+ {
+  "id": "33:98883",
+  "name": "Warning button",
+  "type": "COMPONENT_SET",
+  "section": "Booking components",
+  "variants": [
+   {
+    "id": "33:98865",
+    "name": "State=Default",
+    "w": 142,
+    "h": 32
+   },
+   {
+    "id": "33:98871",
+    "name": "State=Hover",
+    "w": 142,
+    "h": 32
+   },
+   {
+    "id": "33:98877",
+    "name": "State=Disabled",
+    "w": 142,
+    "h": 32
+   }
+  ],
+  "props": {
+   "Label#33:227": "TEXT",
+   "State": [
+    "Default",
+    "Hover",
+    "Disabled"
+   ]
+  }
+ }
+]

@@ -27,8 +27,8 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
 
 ## 1. Foundations (Day 1–2)
 
-1. Export CIR variables → `styles/tokens.css` (CSS vars) → `tailwind.config.ts` theme extension (`bg-surface-accent`, `text-secondary`, `rounded-card`, `gap-group`, …).
-2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField.
+1. Export CIR variables → `tokens/figma.tokens.json` → `src/styles/tokens.css` (Tailwind 4 `@theme`, defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). Font: self-hosted Inter 3.19 to match Figma's Inter 3.x metrics. *(Done in prototype slice F0.)*
+2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField. *(Done in prototype slice F1 — `prototype/src/components/ds/`; Tooltip, Side sheet, Skeleton and Loader follow in F6 / F12 / F17.)*
 3. Formatting utilities in `lib/format.ts`: `formatIDR(n) → "Rp 1.250.000"`, `parseIDR("1.250.000") → 1250000`, `formatDate(id-ID)`.
 
 ## 2. Database (Day 2–3)
@@ -43,9 +43,9 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
 4. RPC `cancel_booking(booking_id, reason?)`: `FOR UPDATE`, allowed only when status ∈ {draft, partially_paid}; sets `canceled_at/by/cancel_reason` (≤ 255) and status `canceled`. `save_booking` and `create_invoice` reject canceled bookings; `save_booking` rejects a newly picked archived package.
 5. RPC `save_booking(payload)`: upsert the booking + replace items + replace `booking_crew` rows in one transaction (new bookings start as `draft`, no invoice). Rejects `total < total_paid`. Returns the booking with its derived fields.
 6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `viewer`.
-7. Seed: 6 packages (1 archived) and 40 bookings across 2 months covering every status, including Canceled.
+7. Seed: 8 packages (6 active, 2 archived — as in Figma Package Lib), 6 crew and 40 bookings across Oct–Dec covering every status, including Canceled. *(Built in prototype slice F2 from the Figma data: `prototype/src/lib/data/seed.ts`.)*
 
-## 3. Domain logic (Day 3) — `lib/booking/calc.ts` (pure, 100% unit-tested)
+## 3. Domain logic (Day 3) — `lib/booking/calc.ts` (pure, 100% unit-tested) *(done in prototype slice F2)*
 
 ```ts
 itemSubtotal(price, qty)            // price*qty
@@ -72,7 +72,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - Upcoming rail: the next 7 days.
 
 ## 7. Booking detail + edit + follow-up invoice (Day 8–10)
-- Parallel route `@panel` renders the detail as a right sheet over Calendar or Table, and as a full page on a direct link.
+- Parallel route `@panel` renders the detail as a right sheet over Calendar or Table, and as a full page on a direct link. *(Prototype F12: the sheet is driven by `?booking=<id>` on `/bookings` — same URL contract, no parallel route — and `/bookings/[id]` is the full page.)*
 - Edit: same editor as create, plus a diff strip, an "Updated totals" card and `<InvoicesSection>` (existing cards + New invoice #n modal). An edit that drops the total below the amount paid is rejected with an inline error. Create invoice is hidden once Paid.
 - Detail panel is read-only: every linked invoice as an `<InvoiceCard>` (newest first, PDF per card); its primary action is Edit booking.
 

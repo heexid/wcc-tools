@@ -15,12 +15,12 @@ The IDs here are the same ones the other docs use: **US-n** (PRD stories), **scr
 
 ### 0.1 Scope of the prototype
 - **Front end only, real behaviour.** All screens, states and flows from the three docs work in the browser. Data comes from a **mock data layer** (`lib/data/*`), not Supabase. It has the same function signatures as the RPCs in PLAN §2 (`save_booking`, `create_invoice`, `cancel_booking`) and enforces the PRD §2.4 business rules, so Supabase can replace it later without touching the UI.
-- Persistence: in memory + `localStorage`, reset via `/dev/reset`. Seed per PLAN §2.7: 6 packages (1 archived) and 40 bookings over 2 months, covering every status including Canceled. Each Figma screen also gets a **named fixture** (e.g. `fixture=screen-06`) so the page renders exactly the data shown in that frame.
+- Persistence: in memory + `localStorage`, reset via `/dev/reset`. Seed per PLAN §2.7 (built from Figma in F2): 8 packages (6 active + 2 archived), 6 crew and 40 bookings Oct–Dec 2026, covering every status including Canceled. Each Figma screen also gets a **named fixture** (`?fixture=screen-06`, 58 in total) so the page renders exactly the data shown in that frame. Figma's data inconsistencies and who decides them: `prototype/docs/slices/F02.md`.
 - **Desktop 1440 only.** Tablet/mobile and the void-invoice dialog are deferred (PRD §5.1 v1.1, PLAN "Deferred").
-- **Frozen clock.** "Today" is fixed to the date shown in Figma screen 01 (read it in F0 and write it in §4 below). Visual tests always run on that date.
+- **Frozen clock.** "Today" is **Tue 10 Nov 2026** (the Today cell in Figma screen 01). `lib/clock.ts` `now()` reads `NEXT_PUBLIC_TODAY`; visual tests always run on that date.
 
 ### 0.2 Stack
-Next.js App Router · TypeScript · Tailwind (theme generated from CIR variables) · `react-hook-form` + `zod` · `@react-pdf/renderer` · Vitest (unit) · Playwright (interaction + visual). Motion: CSS transitions/WAAPI by default; the `motion` package only where the `animate` skill picks it.
+Next.js 16 App Router (`cacheComponents` on) · TypeScript · Tailwind 4 (CSS-first `@theme` generated from CIR variables — no `tailwind.config.ts`) · `react-hook-form` + `zod` · `@react-pdf/renderer` · Vitest (unit) · Playwright (interaction + visual) · npm. Font: self-hosted **Inter 3.19** (Figma renders Inter 3.x; Google's Inter 4 measures differently). Motion: CSS transitions/WAAPI by default; the `motion` package only where the `animate` skill picks it.
 
 Folder: `prototype/` at the repo root.
 
@@ -30,17 +30,21 @@ Every slice must pass all four gates:
 | Gate | Check | Pass |
 |---|---|---|
 | **G1 Tokens** | Every colour, spacing, radius, shadow and text style comes from a CIR variable/style (PLAN §0). | `grep` finds no raw hex / px outside `styles/tokens.css` |
-| **G2 Measurements** | For each frame, key nodes' size, position, padding, gap, font, line-height and colour (from `figma_get_component_for_development` / `figma_get_file_data`) equal the browser's computed styles and bounding boxes. | 0 mismatches (± 0 px; ± 0.5 px only for sub-pixel text boxes) |
+| **G2 Measurements** | For each frame, key nodes' size, position, padding, gap, font, line-height and colour (from `figma_get_component_for_development` / `figma_get_file_data`, or a spec JSON exported via `figma_execute`) equal the browser's computed styles and bounding boxes. | 0 mismatches (± 0 px). Text boxes: `ceil(browser width − trailing letter-spacing)` = Figma width (Figma rounds auto-width text up) |
 | **G3 Screenshot diff** | Playwright screenshot of the route at 1440 × frame height, animations off, clock frozen, fixture loaded vs the Figma frame exported at 1× (PNG). | `maxDiffPixelRatio ≤ 0.005`, `threshold 0.1` (the allowance is only for font antialiasing; any diff in layout, colour or icon fails) |
+| **G3c Components** | For isolated components (`/dev/components`, one per Figma variant, exported with render bounds): flat areas of the Figma image (fills, interiors, backgrounds) must match exactly; antialiased edge pixels (glyphs, curves) may differ. Figma and Chrome rasterise antialiasing differently, which makes a flat % budget meaningless on small text-dense parts. | 0 flat-area diffs · ≤ 20 % edge diffs · a 1 px shift must fail (self-test). Masks / accepted exceptions only with a written reason in the variants JSON |
 | **G4 Overlay** | Figma PNG overlaid at 50 % on the screenshot (`/dev/overlay?frame=…`). | No visible offset. Reviewed by eye, screenshot of the overlay saved in the slice log |
 
-Figma reference PNGs live in `prototype/tests/visual/figma/<frame>.png`. Screenshot tests live in `prototype/tests/visual/<slice>.spec.ts`.
+Figma-faithful building blocks (F1): use `<Txt>` for single-line labels in hug/centred layouts (Figma text-box rounding), `cn()` (tailwind-merge with CIR tokens) for class overrides, `usePresence()` for overlays. Findings list: `prototype/docs/slices/F01.md`.
+
+Figma reference PNGs live in `prototype/public/__figma__/<frame>.png` and node specs in `public/__figma__/specs/<slice>.json` (served so `/dev/overlay` can use them). They are exported straight to disk: run `npm run figma:receiver` (port 9232), then in `figma_execute` call `node.exportAsync({format:'PNG', constraint:{type:'SCALE', value:1}})` and `fetch('http://localhost:9232/save?name=<frame>.png', {method:'POST', body})`. Screenshot tests live in `prototype/tests/visual/<slice>.spec.ts`; G3 also fails if the Next.js dev "Issue" toast is on screen.
 
 ### 0.4 Motion rules (every slice)
 - Every development step runs the skills **`find-animation-opportunities`** (propose) then **`animate`** (implement), in that order, on the slice's UI.
+- Inline notices (alerts that appear in place: login errors, save / invoice failures) use `.motion-notice` (F3).
 - Accepted motion must respect `prefers-reduced-motion` and must not change the **end state**: gates G2–G3 are taken with animations disabled (`reducedMotion: 'reduce'` + `animation: none` test stylesheet) and must still pass.
 - Motion that the skill rejects (e.g. "this shouldn't animate") is written down in the slice log with the reason, so it isn't re-proposed.
-- Keep one shared set of durations and curves in `styles/motion.css` (created in F1, extended by later slices).
+- Keep one shared set of durations, curves and movement vars in `styles/motion.css` (created in F0, extended by later slices). Overlays use the F1 recipes (`.motion-toast`, `.motion-modal`, `.motion-popover` + `usePresence`), never new ones. Components use the movement vars (`--press-scale`, `--popover-from-scale`, `--toast-from-y`, …), never literal transforms, so reduced motion turns every entrance into a fade.
 
 ### 0.5 Doc sync rules
 - A slice is "done" only when its rows in INTERACTIONS.md all behave as written and its screens pass G1–G4.
@@ -68,12 +72,12 @@ Every slice F0…F17 follows the same loop. Do **not** start the next slice unti
 **Step details**
 
 1. **Read.** Open only the sections the slice lists. Note every acceptance criterion as a test case.
-2. **Pull design.** `figma_get_status` (desktop bridge connected) → `figma_navigate` to the page → `figma_search_components` (node IDs are per session; never reuse old ones) → per frame: `figma_get_component_for_development` / `figma_get_file_data` for exact values, `figma_get_variables` for tokens, `figma_capture_screenshot` / export at 1× to `tests/visual/figma/`.
+2. **Pull design.** `figma_get_status` (desktop bridge connected) → `figma_navigate` to the page → `figma_search_components` (node IDs are per session; never reuse old ones) → per frame: `figma_get_component_for_development` / `figma_get_file_data` / `figma_execute` for exact values, `figma_get_variables` for tokens, and the 1× PNG + spec JSON exported to `public/__figma__/` through the receiver (§0.3).
 3. **Plan.** Write the slice log header (`prototype/docs/slices/Fxx.md`): frames, components, fixtures, test list.
 4. **Build.** Invoke `build-design` with the frame and the project's tokens/components. New DS components are built once in `components/ds/` and shown on `/dev/components` next to their Figma variants.
 5. **Motion scan.** Invoke `find-animation-opportunities` on the slice's routes/components. Paste its proposals into the slice log with accept/reject.
 6. **Motion build.** Invoke `animate` for each accepted item.
-7. **Test.** `pnpm test` (Vitest) · `pnpm e2e --grep Fxx` (Playwright interaction) · `pnpm visual --grep Fxx` (G3) · G2 measurement script · G4 overlay check.
+7. **Test.** `npm run g1` · `npm test` (Vitest) · `npm run e2e -- -g Fxx` (Playwright interaction) · `npm run visual -- -g Fxx` (G2 + G3) · G4 overlay check (`/dev/overlay?frame=…&route=…`, difference blend).
 8. **Fix loop.** Fix the diff, rerun. After 3 failed rounds, stop and report the remaining diff with screenshots.
 9. **Done.** Tick the slice in §4, write the results (gate numbers, motion list, open issues) in the slice log, update any doc that changed.
 
@@ -89,18 +93,18 @@ Every slice F0…F17 follows the same loop. Do **not** start the next slice unti
 | F3 | Login | §4.3 | Login P1–P3, E1–E7 | 6.5 |
 | F4 | App shell + App launcher + Account menu | US-11, US-13 (menu) | Launchpad L1–L3, M1–M3, AC1 | 6.1, 6.1a, 6.6 |
 | F5 | Package Library | US-0 | Package 01–08 | 1.2, 5.1–5.11 |
-| F6 | Bookings dashboard frame | US-6 (rail), US-12 (KPIs) | 01 (frame), 36 | 1.1, 1.3, 1.16–1.18, 1.23, 1.32 |
+| F6 | Bookings dashboard frame (+ DS Tooltip) | US-6 (rail), US-12 (KPIs) | 01 (frame), 36 | 1.1, 1.3, 1.16–1.18, 1.23, 1.32 |
 | F7 | Calendar · Month | US-6 | 01, 17 | 1.11–1.15 |
 | F8 | Calendar · Week + Day | US-6 | 19, 20, 28–31 | 1.12, 1.24–1.31 |
 | F9 | Table + search + filters | US-7, US-8 | 02, 02b, 16, 18, 25, 26 | 1.4–1.10, 1.19–1.22, 1.33 |
 | F10 | New booking form + leave guard | US-1, US-0 (picker) | 03, 03b, 13, 14, 15, 32, 39, 40 | 2.1b, 2.2, 2.4–2.10, 2.12, 2.17 |
 | F11 | Invoice modal · first invoice | US-2, US-3 | 04, 04c, 05, 05b, 05c, 22, 23 | 2.11, 2.14, 3.1–3.3, 3.5–3.8 |
-| F12 | Booking detail panel + Crew schedule | US-9 | 06, 21, 24, 27 | 4.1–4.10 |
+| F12 | Booking detail panel (+ DS Side sheet) + Crew schedule | US-9 | 06, 21, 24, 27 | 4.1–4.10 |
 | F13 | Edit booking + follow-up invoice | US-4, US-5, US-0 (archived) | 07, 08, 09, 10, 12, 38 | 2.1, 2.3, 2.13, 2.18, 3.4 |
 | F14 | Cancel booking | US-12 | 33, 34, 35 | 2.15, 2.16, 4.11 |
 | F15 | Invoice PDF | US-10 | 11, 11b, 11c, 37 | 4.2, 4.6, 4.12 |
 | F16 | Account settings + Log out | US-13 | AC2–AC7, LO1–LO2 | 6.7–6.10 |
-| F17 | Viewer role, loading, full-flow E2E | all | all hi-fi flow lanes | 6.3, 6.4 |
+| F17 | Viewer role, loading (+ DS Skeleton, Loader), full-flow E2E | all | all hi-fi flow lanes | 6.3, 6.4 |
 
 Why this order: foundations first (F0–F2), then the shell every page sits in (F3–F4), then Package Library because the booking form needs its picker (F5), then read-only views (F6–F9), then the write path in the order a booking lives: create → first invoice → detail → edit + next invoice → cancel → PDF (F10–F15), then account (F16) and a full regression (F17).
 
@@ -115,8 +119,8 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 ### F0 — Scaffold, tokens, test harness
 
 **Feature**
-- `prototype/` Next.js App Router + TS + Tailwind + pnpm. Inter loaded locally.
-- CIR variables (Primitives / Semantic / Component / Breakpoint) → `styles/tokens.css` (CSS vars) → `tailwind.config.ts` (`bg-surface-accent`, `text-secondary`, `rounded-card`, `gap-group`, …). CIR Inter text styles → Tailwind `fontSize` presets.
+- `prototype/` Next.js App Router + TS + Tailwind 4 + npm. Inter 3.19 self-hosted.
+- CIR variables (Primitives / Semantic / Component / Breakpoint) → `tokens/figma.tokens.json` → `npm run tokens` → `src/styles/tokens.css` (`@theme static`, Tailwind defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). CIR text styles → `text-body`, `text-heading-page`, … Naming table in `prototype/docs/slices/F00.md`.
 - Test harness: Vitest; Playwright with frozen clock, 1440 viewport, `reducedMotion: 'reduce'`, fixture query param; visual spec helper (G3); G2 measurement helper (compares a JSON of Figma node specs with `getBoundingClientRect` + `getComputedStyle`); `/dev/overlay` page (G4); `/dev/reset`.
 - Lint rule / script for G1 (no raw hex/px outside tokens).
 - **Done when:** a token gallery page `/dev/tokens` renders every variable and text style and passes G3 against a Figma export of the variables, and the harness runs green on it.
@@ -124,10 +128,10 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 **Prompt**
 ```
 Slice F0 of context/PROTOTYPE-PLAN.md. Read §0 and §1 of that file and PLAN.md §0–§1.
-Create prototype/ (Next.js App Router, TypeScript, Tailwind, pnpm, Inter local).
+Create prototype/ (Next.js App Router, TypeScript, Tailwind 4, npm, Inter 3.19 self-hosted).
 Use figma-console (figma_get_status, figma_get_variables, figma_get_text_styles, figma_export_tokens)
-to export every CIR variable and text style from "bs internal tools" into styles/tokens.css and
-tailwind.config.ts — no hand-typed values. Read the "today" date from Booking screen 01 and
+to export every CIR variable and text style from "bs internal tools" into
+src/styles/tokens.css (Tailwind 4 @theme) — no hand-typed values. Read the "today" date from Booking screen 01 and
 write it into PROTOTYPE-PLAN.md §4.
 Set up Vitest, Playwright (1440 viewport, frozen clock, reducedMotion reduce, fixture param),
 the G1 lint script, the G2 measurement helper, the G3 visual helper, /dev/tokens, /dev/overlay, /dev/reset.
@@ -143,10 +147,10 @@ Then run find-animation-opportunities on the harness pages and animate only what
 ### F1 — Base CIR components + motion tokens
 
 **Feature**
-- Port from CIR: Button (all variants incl. Ghost + icon, Loading, Disabled), Warning button, Input field (Default / Focus / Error / Disabled / Read-only), Select, Date input, Text area (counter, max), Search field, Tab, Segmented control, Checkbox, Avatar, Tag, Payment status badge (Draft / Partially paid / Paid / Canceled), Invoice type tag, Metric card, Alert (Info / Warning / Danger / Success), Toast, Tooltip (dark), Popover, Modal, Side sheet, Loader, Skeleton, Pagination item, Table parts (Toolbar / Header / Row / Footer).
+- Port from CIR: Button (all variants incl. Ghost + icon, Loading, Disabled), Warning button, Input field (Text / Select / Date / Password × Default / Filled / Focus / Error / Disabled), Text area (counter, max), Search field, Tab, Segmented control, Checkbox, Avatar, Payment status badge (Draft / Partially paid / Paid / Canceled), Invoice type tag, Trend badge, Metric card, Alert (Info / Warning / Danger / Success), Toast, Shell/Popover, Modal, Menu item, Pagination item, Table parts (Toolbar / Header / Row / Footer). *(Done — Tooltip → F6, Side sheet → F12, Skeleton + Loader → F17: no DS source until those screens.)*
 - `styles/motion.css`: shared durations and curves chosen by `animate` (press, hover, popover in/out, modal in/out, sheet in/out, toast, skeleton shimmer).
 - `/dev/components` shows every variant next to the Figma component image.
-- **Done when:** every variant passes G2 + G3 against its Figma component (`figma_get_component_image`), and keyboard focus rings match the DS.
+- **Done when:** every variant passes G2 + G3c against its Figma component, and keyboard focus rings match the DS.
 
 **Prompt**
 ```
@@ -195,7 +199,7 @@ Standard loop without the visual gates. Step 2 = read data shown in frames (text
 
 **Feature**
 - `/login` per Login P1–P3; errors E1–E6; **Forgot password?** → Info alert E7 ("Passwords are managed by your workspace admin…"). Toast "You've logged out" when `?loggedOut=1` (LO2 is finished in F16).
-- Mock auth: session in cookie, redirect to `/bookings` after login; protected routes redirect to `/login`.
+- Mock auth: session flag in `localStorage` (`proto:session`), redirect to `?next=` or `/bookings` after login; protected routes redirect to `/login` (route guard lands with the shell in F4). Dev hooks: `?latency=` (P3), `?fail=login` (E6), `?expired=1` (E4).
 - **Done when:** P1–P3 and E1–E7 pass G1–G4; INTERACTIONS 6.5 passes.
 
 **Prompt**
@@ -219,7 +223,7 @@ Standard loop. Visual tests: one per frame, fixture = that error state.
 - **App launcher** (US-11, 6.1a): popover "App launcher", section "Management" with Launcher tiles Booking / Package Lib / Bookmark (Coming soon, locked), current tile highlighted, hover state, keyboard (Tab/arrows/Enter), `role="dialog"`, Esc / × / outside closes and returns focus. Current tile only closes. Leave guard hook point (wired in F10).
 - **Account menu** (AC1, 6.6): avatar + name + role → popover with Account Setting / Log out (danger); Esc / outside / profile again closes. Targets stubbed until F16.
 - `useLeaveGuard` interface created (no-op until F10).
-- **Done when:** Launchpad L1–L3, M1–M3 and AC1 pass G1–G4; Launchpad lanes A–B run in E2E (minus the unsaved-form branch).
+- **Done when:** the shell regions of Launchpad L1–L3 and AC1 pass G1–G4 (page bodies are checked in F5–F7; Figma has no separate M1–M3 frames); Launchpad lanes A–B run in E2E, including the leave-guard branch via `/dev/shell`.
 
 **Prompt**
 ```
@@ -243,7 +247,7 @@ Standard loop. E2E: Launchpad flow lanes A and B.
 
 **Feature**
 - `/packages` (Layout/List + Data table): Active / Archived tabs, search, pagination, New package (02), Edit (01), Archive confirm (03), Archived tab with Restore (04), validation (05: duplicate active name, price), save failed + Try again (06), empty library (07), no search results + Clear search (08). Description = Text area max 1000 with `n/1000` (5.7). Toasts.
-- Reusable `PackagePicker` data hook for F10.
+- Reusable `listPackages({ tab: "active" })` for F10's picker (archived hidden + note per US-0). New DS primitives for later slices: `Dialog` / `FormModal` (scrim, focus trap, dialog stack) and `StatusPill`.
 - **Done when:** Package 01–08 pass G1–G4; INTERACTIONS 5.1–5.11 pass; Package lanes A–D pass E2E.
 
 **Prompt**
@@ -264,6 +268,7 @@ Standard loop. E2E: Package lanes A (edit + fail), B (create + validation loop),
 ### F6 — Bookings dashboard frame
 
 **Feature**
+- **Decided 2026-11-11 (user): real data.** The KPI shows the true count (18 · −2); Figma's "24 · +4" is masked in G3 with that reason. See `prototype/docs/slices/F06.md`.
 - `/bookings` layout (Layout/Dashboard): Page header with **New booking** (1.1) and **Package library** (1.2), KPI row (Bookings this month / Outstanding balance / Collected this month; Canceled excluded per US-12) with ⓘ tooltips (1.23), Calendar / Table tabs with the divider (1.3), toolbar row placeholder (search + filters arrive in F9), **Upcoming** rail (next 7 days, Canceled hidden) with item → detail (1.16, wired in F12), **See all in table** (1.17), insight card actions (1.18).
 - First use (36, 1.32): KPIs 0 "No data yet", "Nothing scheduled in the next 7 days", "No bookings yet" + New booking.
 - URL state skeleton: `view`, `date`, `tab`.
@@ -335,9 +340,10 @@ Standard loop. E2E: lane F (F1 → F2 → F3, F2 → F2b, empty day → A2 stub)
 ### F9 — Table + search + filters
 
 **Feature**
+- **Decided 2026-11-11 (user):** Figma 02's filtered rows (Sari 12 → Laras 21 → Citra 27 → Nadia 14) follow no sort rule; the Table sorts by booking date per PRD US-7 and G3 masks rows 2–4 of 02 / 02b / 16.
 - Booking table (02): columns per US-7, sort (1.20; default booking date asc), pagination 10/25/50 (1.21), row/chevron → detail (1.19), **no actions menu** (1.22).
 - Search (1.4) with 250 ms debounce, × clears; no results (18, 1.5) with Reset filters + New booking.
-- Filters shared by Calendar and Table, in the URL: Status (1.6, incl. Canceled 1.33), Crew (02b, 1.7), Package + Invoice type (1.8, same dropdown), Date presets + range (16, 1.9); chips × + Reset all (1.10).
+- Filters shared by Calendar and Table, in the URL: Status (1.6, incl. Canceled 1.33), Crew (02b, 1.7), Package (1.8; Invoice type filter removed 2026-11-11), Date presets + range (16, 1.9); chips × + Reset all (1.10).
 - Rail/insight targets: 25 (Next 7 days), 26 (This week + Partially paid + DP).
 - **Done when:** 02, 02b, 16, 18, 25, 26 pass G1–G4; lanes C and D run.
 
@@ -559,27 +565,27 @@ Standard loop; step 7 is the full suite. Any failure reopens the slice that owns
 
 ## 4. Progress tracker
 
-Frozen "today" for tests: **_(fill in during F0 from Booking screen 01)_**
+Frozen "today" for tests: **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY=2026-11-10`).
 
 | Slice | Build | Motion scan | Motion build | Unit | E2E | G1 | G2 | G3 | G4 | Done |
 |---|---|---|---|---|---|---|---|---|---|---|
-| F0 Scaffold & tokens | ☐ | ☐ | ☐ | ☐ | — | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F1 Base components | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F2 Domain + mock data | — | ☐ | — | ☐ | — | — | — | — | — | ☐ |
-| F3 Login | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F4 Shell + launcher + menu | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F5 Package Library | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F6 Dashboard frame | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F7 Calendar Month | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F8 Calendar Week + Day | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F9 Table + filters | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F10 New booking + guard | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F11 Invoice modal #1 | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F12 Detail + crew schedule | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F13 Edit + follow-up invoice | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F14 Cancel booking | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F15 Invoice PDF | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
-| F16 Account + log out | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| F0 Scaffold & tokens | ✅ | ✅ (0 accepted) | ✅ (tokens only) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F1 Base components | ✅ | ✅ (3 accepted) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ (G3c) | ✅ | ✅ 2026-11-11 |
+| F2 Domain + mock data | — | ✅ (none) | — | ✅ (122) | ✅ | ✅ | — | — | — | ✅ 2026-11-11 |
+| F3 Login | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F4 Shell + launcher + menu | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ (regions) | ✅ | ✅ 2026-11-11 |
+| F5 Package Library | ✅ | ✅ (none new) | ✅ (review) | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F6 Dashboard frame | ✅ | ✅ (1 accepted) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F7 Calendar · Month | ✅ | ✅ (2 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F8 Calendar · Week + Day | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F9 Table + search + filters | ✅ | ✅ (1 accepted) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F10 New booking + leave guard | ✅ | ✅ (2 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F11 Invoice modal #1 | ✅ | ✅ (2 accepted) | ✅ | ✅ (134, +4) | ✅ | ✅ | ✅ | ✅ (05b by behaviour) | ✅ | ✅ 2026-11-11 |
+| F12 Detail + crew schedule | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
+| F13 Edit + follow-up invoice | ✅ | ✅ (0 new, 1 fix) | ✅ | ✅ (134) | ✅ | ✅ | ✅ | ✅ (10 by behaviour) | ✅ | ✅ 2026-11-12 |
+| F14 Cancel booking | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
+| F15 Invoice PDF (on hold — user, 2026-11-12) | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| F16 Account + log out | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
 | F17 Viewer, loading, regression | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 
 ## 5. Coverage check (sync with the other docs)

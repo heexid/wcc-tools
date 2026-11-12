@@ -73,7 +73,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - **Terms & Conditions** (section *Others*): a multi-line text area, **max 255 characters**, with a live counter (`174/255`). It's prefilled from the workspace default terms and can be edited per booking. Typing stops at 255, and pasted text over the limit shows the Error state ("Max 255 characters"). Validated server-side too.
 - **Crew** (section *Crew*): a multi-select of the crew handling the booking. A booking can have **0…n crew**. Selected crew show as removable chips (avatar + name). The dropdown lists active crew with avatar, name and role, has a search, and applies instantly (no footer). The source is the workspace crew list (members flagged as crew, with a role).
 - Additional items: add or remove rows dynamically. Each row has name (required), price (integer ≥ 0) and qty (integer 1–999). Subtotal = price × qty, shown live.
-- The summary card updates on every keystroke (< 50 ms): package price, additional items total, subtotal, **total**.
+- The summary card updates on every keystroke (< 50 ms): package price, additional items total, subtotal, **total**. With no package picked the form keeps the package card slot ("No package selected") and the summary reads "Package (not selected) · —".
 - `created_at` is stored automatically. The booking date shows in the calendar right after save.
 - **Invoices live in the same screen.** The right column of the New booking (and Edit booking) screen has an **Invoices (n)** section. A new booking starts as **Draft** with `Invoices (0)` and an empty state. Admins can save without an invoice (stays Draft) or create the first invoice right there.
 - Validation errors appear inline using the DS *Input field / Error* state. A negative price or a qty < 1 can't be entered (input mask) and is also rejected server-side.
@@ -107,7 +107,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 *As an admin, I want to search and edit an existing booking so that changes are reflected and the totals stay correct.*
 - Global search covers booking name, client name and phone (including partial digits). Results update after 250 ms of debounce.
 - Editable fields: client name, phone, package (re-pick), additional items (add, remove, change price or qty), booking date, **crew** and Terms & Conditions.
-- The new total recalculates live. A **diff strip** shows "Previous total Rp X → New total Rp Y (+/− Rp Z)".
+- The new total recalculates live. A **diff strip** shows "Total updated: Rp X → Rp Y" and "+/− Rp Z since last invoice · package → …, items updated, date moved to …" (Figma 07). The booking date shows "Moved from <old date>" until saved.
 - Saving an edit **never** changes existing invoices or payments.
 - Changing the date updates the calendar right away (optimistic UI, then revalidation).
 
@@ -126,9 +126,10 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - Month view is the default. Day and week views can be toggled (DS *Tab*).
 - Each date cell shows a booking count, up to 3 booking chips coloured by booking status (Draft / Partially paid / Paid), and "+N more". "+N more" opens a day popover listing every booking that day (row → detail panel), with "New booking on 14 Nov" and "Open day view" in its footer. Week view uses the same popover.
 - Today is highlighted (accent ring). Prev/Next month navigation plus a "Today" button.
+- The **selected date** (Calendar/Day cell *Selected*) is the calendar's anchor: the day last clicked or reached with the arrow keys, kept in the URL (`date=`). It is the grid's keyboard tab stop and the date Week / Day views open on. Outside-month days show their bookings too.
 - **Week view** (Mon–Sun, 7 columns):
   - Each column has a day header (*Calendar/Week day head*: Default / Today / Hover). Under it are the day's bookings as *Calendar/Week card*s, sorted by creation time. A card shows a status bar, name, package, a status badge and crew avatars.
-  - The column scrolls when its cards overflow. With more than 5 bookings, the column shows 5 cards plus a full-width "+N more" button. It opens a day popover listing every booking that day (status bar, name, package · client, badge; clicking a row opens the detail panel). The popover footer has "New booking on 14 Nov" and "Open day view".
+  - The week grid is at least 640 px tall and grows with the busiest day (at most 5 cards plus "+N more"). With more than 5 bookings, the column shows 5 cards plus a full-width "+N more" button. It opens a day popover listing every booking that day (status bar, name, package · client, badge; clicking a row opens the detail panel). The popover footer has "New booking on 14 Nov" and "Open day view".
   - Clicking a day header opens the Day view for that date (tooltip "Open day view · Sat, 14 Nov").
   - Clicking a card opens the Booking detail panel.
   - Hovering an empty day shows a dashed "+ New booking" target. Clicking it opens New booking with that date prefilled.
@@ -140,25 +141,25 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - **Crew avatars** in Week cards and Day rows open the **Crew schedule popover** (same as US-9). The booking you clicked from is marked *This booking*.
 - Switching Month / Week / Day keeps the anchor date and every search term and filter. The selected view is stored in the URL (`view=week&date=2026-11-12`).
 - Clicking a chip opens the **Booking detail** side panel (`Shell/Popover`-style right sheet).
-- A right rail lists **Upcoming** bookings (next 7 days), following the existing *Insights rail* pattern.
+- A right rail lists **Upcoming** bookings (next 7 days, up to 4, Canceled hidden; "See all in table" opens the Table filtered to the next 7 days), following the existing *Insights rail* pattern. Below it, **Needs attention** shows rule-based cards: *Balance due today* (a Partially paid booking happening today) and *Balance before event* (this week's Partially paid bookings that have a DP invoice, with their total outstanding).
 
 #### US-7 Booking dashboard: Table
 *As finance, I want a sortable table of bookings so that I can work through balances.*
 - Columns: Booking name, Client, Phone, Package, Booking date, Total, Total paid, Remaining, Status, and a chevron (›).
-- Sortable by booking date (default asc from today), total, remaining and status.
+- Sortable by booking date, total, remaining and status. The default order starts at today: upcoming bookings by date ascending, then past bookings newest first.
 - Paginated at 10 / 25 / 50 rows per page using the DS *Table/Footer* and *Pagination item* components.
 - Clicking a row (or its chevron) opens the read-only detail panel. There's no per-row actions menu: editing and creating invoices happen in the booking screen (via **Edit booking** in the detail panel).
 
 #### US-8 Search & filters
 *As any user, I want to combine filters so that I can narrow down quickly.*
-- Filters: date preset (Today / This week / This month / Next 7 days / Last month / Custom range), status (Draft / Partially paid / Paid / Canceled, multi), **crew (multi-select)**, package (multi), and the type of the latest invoice (DP / Full / Partial / Paid, multi).
+- Filters: date preset (Today / This week / This month / Next 7 days / Last month / Custom range), status (Draft / Partially paid / Paid / Canceled, multi), **crew (multi-select)**, and package (multi) (as designed in Figma 02 / 26). No invoice-type filter (removed 2026-11-11).
 - Filters combine with AND, values within one filter combine with OR, and the state lives in the URL query (shareable). The same filters apply to both Calendar and Table.
-- Active filters show as removable chips, plus a "Reset all" link.
+- Active filters show as removable chips, plus a "Reset all" link, and the Table shows "Showing n of N bookings". The date filter applies to the Table; the Calendar navigates by its own dates.
 - **Crew filter:** a dropdown with search, checkbox + avatar + name + role per crew member, a "n selected" count and Clear / Apply. The trigger shows `All crew` or `n crew`. A booking matches if **any** of its crew is selected (OR within the filter, AND with the other filters). The active chip reads e.g. "Crew: Raka Pratama, Dinda Ayu".
 
 #### US-9 Booking detail
 *As an admin, I want one place for everything about a booking.*
-- Sections: booking info (reference `BK-2026-0001`, client, phone with a `wa.me` link, date, package, **crew** as read-only chips, items), financial summary (total, paid, remaining, progress, status badge), **Invoices (n)** — one **Invoice card** per linked invoice, newest first (number, type tag, issue date, amount, "paid after this invoice", PDF download); when there are none an empty state with no button and the hint "Open Edit booking to create the first invoice" — and Terms & Conditions.
+- Sections: booking info (reference `BK-2026-0001`, client, phone with a `wa.me` link, date, package, **crew** as read-only chips, items), financial summary (total, paid, remaining, progress, status badge), **Invoices (n)** — one **Invoice card** per linked invoice, newest first (number, issue date, amount, "paid after this invoice", PDF download — no invoice type tag on the card; removed 2026-11-11 as it didn't help the user); when there are none an empty state with no button and the hint "Open Edit booking to create the first invoice" — and Terms & Conditions.
 - **Crew schedule:** clicking a crew chip opens a **Crew schedule popover**: avatar, name, role and number of bookings this month, then that person's upcoming bookings from today (date, booking name, package · client, status). The booking being viewed is marked *This booking* and isn't clickable. Clicking another booking switches the same side panel to that booking's detail. **See in calendar** opens the Calendar filtered to that crew member. Esc or clicking outside closes the popover.
 - The detail panel is **read-only** for invoices (cards + PDF download). Actions: **Edit booking** (opens the booking screen, where invoices are created) and Download latest PDF (hidden while Draft).
 
@@ -196,7 +197,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - **Where canceled bookings show:**
   - **Table:** included, with the Canceled badge.
   - **Calendar and Upcoming rail:** hidden by default. They appear when the Status filter includes Canceled.
-  - **KPIs:** excluded from Outstanding balance and Bookings this month. Collected this month still counts their invoices, because money was received.
+  - **KPIs:** excluded from Outstanding balance and Bookings this month. Collected this month still counts their invoices, because money was received. KPIs are always computed from the data (decided 2026-11-11; Figma 01's "24 · +4" is sample content).
   - **Status filter:** gains **Canceled**.
 
 #### US-13 Account menu, Account settings and Log out
@@ -335,7 +336,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 - **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `viewer` (read-only, for the Owner). Enforced by RLS.
 - **Settings:** business profile, bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated.
 - **Storage:** bucket `invoices/` (private) with signed URLs that expire after 10 min.
-- **Design tokens:** export CIR variables → `tailwind.config` theme (`surface/*`, `text/*`, `accent/*`, `status/*`, `space/*`, `radius/*`).
+- **Design tokens:** export CIR variables → Tailwind 4 `@theme` in `src/styles/tokens.css` (`surface/*`, `text/*`, `accent/*`, `status/*`, `space/*`, `radius/*`), generated from the Figma export (prototype F0).
 
 ### 4.4 Security & privacy
 

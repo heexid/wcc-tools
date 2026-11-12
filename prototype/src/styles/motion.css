@@ -1,0 +1,253 @@
+/* Shared motion tokens — PROTOTYPE-PLAN §0.4.
+   Every slice extends this file; components never hand-roll curves or durations.
+   Values follow the `animate` skill tables/recipes (Emil Kowalski). UI stays ≤ 300 ms
+   except surfaces that travel (toast, sheet).
+
+   Visual gates (G2–G4) inject `animation:none; transition:none`, so these tokens can
+   never change an end state. */
+
+:root {
+  /* Curves */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* enter / exit, press, popovers */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement: tab indicator, reorder */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* side sheet (booking detail panel) */
+  --ease-hover: ease; /* colour / background hover */
+
+  /* Durations, by surface */
+  --dur-press: 160ms; /* button / tile :active scale */
+  --dur-hover: 160ms; /* colour + background changes on hover */
+  --dur-tooltip: 125ms; /* tooltips; 0ms when moving between adjacent triggers */
+  --dur-popover: 200ms; /* dropdowns, selects, menus, crew/day popovers */
+  --dur-modal: 250ms; /* centred dialogs (invoice, cancel, guards) */
+  --dur-toast: 400ms; /* toasts travel their own height */
+  --dur-sheet: 500ms; /* right side sheet travels its own width */
+  --dur-collapse: 200ms; /* accordions, progressive disclosure, inline errors */
+  --dur-indicator: 250ms; /* tab / segmented-control indicator */
+  --stagger-step: 50ms; /* group entrances (rare surfaces only) */
+
+  /* Movement — the ONLY place transform distances live. Components must use these
+     vars (never literal scale/translate values) so reduced motion can neutralise them. */
+  --press-scale: 0.97;
+  --popover-from-scale: 0.95;
+  --tooltip-from-scale: 0.97;
+  --modal-from-scale: 0.96;
+  --toast-from-y: -100%; /* toasts sit top-centre and drop in from above */
+  --sheet-from-x: 100%;
+  --list-from-y: var(--spacing-8); /* stagger rise, from the animate recipe */
+}
+
+@theme {
+  --animate-spin: spin 1s linear infinite; /* Button Loading icon (Icon/loader) */
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Overlay surfaces (F1) ─────────────────────────────────────────────────────────────
+   Opt-in: a primitive gets `data-state="open|closed"` from usePresence(); without it nothing animates
+   and the element shows its settled (Figma) state. transform + opacity only, transitions (not
+   keyframes) so a re-open mid-exit retargets from where it is. */
+.motion-toast,
+.motion-modal,
+.motion-popover {
+  transition-property: opacity, transform;
+  transition-timing-function: var(--ease-out);
+}
+.motion-toast[data-state="open"],
+.motion-modal[data-state="open"],
+.motion-popover[data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Toast — top-centre; enters and leaves through the top edge (spatial consistency). */
+.motion-toast {
+  transition-duration: var(--dur-toast);
+}
+.motion-toast[data-state="closed"] {
+  opacity: 0;
+  transform: translateY(var(--toast-from-y));
+}
+@starting-style {
+  .motion-toast[data-state="open"] {
+    opacity: 0;
+    transform: translateY(var(--toast-from-y));
+  }
+}
+
+/* Modal — centred (not trigger-anchored); closes faster than it opens. */
+.motion-modal {
+  transform-origin: center;
+  transition-duration: var(--dur-modal);
+}
+.motion-modal[data-state="closed"] {
+  opacity: 0;
+  transform: scale(var(--modal-from-scale));
+  transition-duration: var(--dur-popover);
+}
+@starting-style {
+  .motion-modal[data-state="open"] {
+    opacity: 0;
+    transform: scale(var(--modal-from-scale));
+  }
+}
+
+/* Side sheet — the booking detail panel travels in from (and back out through) the right edge it is
+   attached to (spatial consistency). Drawer curve; leaves on the shorter modal duration. Reduced motion:
+   --sheet-from-x is 0, so it only fades. */
+.motion-sheet {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-sheet);
+  transition-timing-function: var(--ease-drawer);
+}
+.motion-sheet[data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+.motion-sheet[data-state="closed"] {
+  transform: translateX(var(--sheet-from-x));
+  transition-duration: var(--dur-modal);
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-sheet[data-state="closed"] {
+    opacity: 0;
+  }
+}
+@starting-style {
+  .motion-sheet[data-state="open"] {
+    transform: translateX(var(--sheet-from-x));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  @starting-style {
+    .motion-sheet[data-state="open"] {
+      opacity: 0;
+    }
+  }
+}
+
+/* Popover — grows from its trigger; caller sets --transform-origin (e.g. "top right"). */
+.motion-popover {
+  transform-origin: var(--transform-origin, top);
+  transition-duration: var(--dur-popover);
+}
+.motion-popover[data-state="closed"] {
+  opacity: 0;
+  transform: scale(var(--popover-from-scale));
+}
+@starting-style {
+  .motion-popover[data-state="open"] {
+    opacity: 0;
+    transform: scale(var(--popover-from-scale));
+  }
+}
+
+/* Tooltip — the first one in a burst fades + scales in from its trigger edge; while "warm" (another
+   tooltip just closed) it appears instantly (data-instant). Exit never runs longer than the show. */
+.motion-tooltip {
+  transform-origin: var(--transform-origin, top);
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-tooltip);
+  transition-timing-function: var(--ease-out);
+}
+.motion-tooltip[data-state="closed"] {
+  opacity: 0;
+  transform: scale(var(--tooltip-from-scale));
+}
+.motion-tooltip[data-instant] {
+  transition-duration: 0ms;
+}
+@starting-style {
+  .motion-tooltip[data-state="open"] {
+    opacity: 0;
+    transform: scale(var(--tooltip-from-scale));
+  }
+}
+
+/* Popover opened from the keyboard (Enter on a calendar day) — appears at once: keyboard-initiated
+   actions never wait on motion. Pointer-opened popovers keep the scale-from-trigger above. */
+.motion-popover[data-instant] {
+  transition-duration: 0ms;
+}
+
+/* Hover target (calendar empty-date "+ New booking": month F7, week F8) — fades in on hover so the accent block doesn't
+   flash while the pointer crosses the grid; hides instantly so it never trails the pointer. Opacity only
+   (no movement), so reduced motion keeps it as is. Callers toggle opacity with group-hover. */
+.motion-hover-target {
+  transition-property: opacity;
+  transition-duration: 0ms;
+}
+@media (hover: hover) and (pointer: fine) {
+  .group\/day:hover .motion-hover-target,
+  .group\/col:hover .motion-hover-target {
+    transition-duration: var(--dur-hover);
+    transition-timing-function: var(--ease-hover);
+  }
+}
+
+/* Filter chip (F9) — a newly applied filter fades + scales in place so the change is noticed; entry only:
+   a removed chip goes at once (the reflow is the confirmation). Keyed per filter, so editing a filter's
+   values doesn't replay it. Reduced motion → fade (scale var neutralised). */
+.motion-chip {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-tooltip);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .motion-chip {
+    opacity: 0;
+    transform: scale(var(--popover-from-scale));
+  }
+}
+
+/* Scrim behind modals — fades with the modal's timing (no movement). */
+.motion-scrim {
+  transition-property: opacity;
+  transition-duration: var(--dur-modal);
+  transition-timing-function: var(--ease-out);
+}
+.motion-scrim[data-state="closed"] {
+  opacity: 0;
+  transition-duration: var(--dur-popover); /* leaves with the modal (.motion-modal closes at --dur-popover) */
+}
+@starting-style {
+  .motion-scrim[data-state="open"] {
+    opacity: 0;
+  }
+}
+
+/* Notice — an inline Alert that appears in place (login errors, save / invoice failures).
+   Entrance only: it drops in from just above its slot; it's replaced or stays, never animates out.
+   Re-key the element when its content changes to replay the entrance. */
+.motion-notice {
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-collapse);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .motion-notice {
+    opacity: 0;
+    transform: translateY(calc(var(--list-from-y) * -1));
+  }
+}
+
+/* Reduced motion = fewer and gentler, not zero (animate §7).
+   Movement and scale are neutralised, so every entrance becomes a pure opacity fade
+   on the same duration/curve; colour and opacity transitions stay — they aid comprehension. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --press-scale: 1;
+    --popover-from-scale: 1;
+    --tooltip-from-scale: 1;
+    --modal-from-scale: 1;
+    --toast-from-y: 0;
+    --sheet-from-x: 0;
+    --list-from-y: 0;
+    --stagger-step: 0ms;
+  }
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}
