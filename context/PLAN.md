@@ -79,6 +79,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 ## 8. PDF (Day 10–11)
 - `components/pdf/InvoiceDocument.tsx` (@react-pdf) renders from `invoice.snapshot` only.
 - Register the Inter font and use token colours.
+- Brand row (logo or initials · name · address · phone · email) and the From block read the **current** `workspace_settings` business at generation time, not the snapshot (PRD US-14); every figure stays the snapshot's. Logo: `<Image>` from a data URL / signed URL (PNG or JPEG only — react-pdf can't draw SVG/WebP, so uploads are re-encoded).
 - Generate on confirm, upload to Storage, signed URL route. *(Prototype F15: generated in the browser on download from the snapshot; the snapshot now also carries the business details and package summary.)*
 
 ## 8b. Account (Day 11)
@@ -87,8 +88,14 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - Change password: re-verify the current password, then update the password through Supabase Auth and sign out other sessions (scope "others"). Use the same rules client-side (checklist) and server-side.
 - Log out: `<AccountMenu>` → `<ConfirmDialog>` → sign out → redirect to `/login?loggedOut=1` (toast). Goes through `useLeaveGuard` first.
 
+## 8c. Business information (Day 11)
+- `/account` gets a third `<Card>` "Business information" (read-only rows + admin-only **Edit**), data from `getBusiness()`; viewer role hides the button.
+- `<BusinessModal>` (DS Modal, like `<PaymentInstructionModal>`): `<LogoField>` (hidden `<input type=file accept="image/png,image/jpeg,image/webp">`, ≤ 1 MB, re-encoded to ≤ 256 px on a canvas), name, address (`<TextArea>` max 150), email, phone. Validation lives in `lib/booking/business.ts` (`validateBusiness`, shared with the service layer); `updateBusiness()` = Supabase update on `workspace_settings` (admin only, RLS) + logo upload to Storage `branding/`.
+- Saving never touches invoices. `downloadInvoicePdf()` merges `getBusiness()` into the snapshot before rendering (PRD US-14).
+- Tests: unit `business.test.ts` (validation), e2e `F18-business.spec.ts` (prefill, validation, logo, save → PDF, failure, viewer).
+
 ## 9. QA & launch (Day 11–12)
-- Unit: calc (≥ 30 cases). Integration: RPC concurrency (2 parallel `create_invoice` calls → one fails). E2E (Playwright): every hi-fi flow lane (Bookings A–H, Package Lib A–D, Launchpad A–B, Profile A–D).
+- Unit: calc (≥ 30 cases). Integration: RPC concurrency (2 parallel `create_invoice` calls → one fails). E2E (Playwright): every hi-fi flow lane (Bookings A–H, Package Lib A–D, Launchpad A–B, Profile A–E).
 - Visual QA against the Figma frames at 1440 (gates G1–G4 in `PROTOTYPE-PLAN.md` §0.3). 768 / 390 come with the deferred tablet/mobile layouts.
 - Reconciliation SQL check (success criterion #3) runs as a nightly cron.
 
@@ -133,9 +140,12 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - **Launchpad** page → section **Launchpad · Hi-fi flow** (module switching with the App launcher):
   - A: Booking → Package Library: L1 Bookings → clicks ⋮⋮ → L2 launcher open (Booking current, hover Package Lib) → *Unsaved New / Edit booking?* → No → L3 Package Library → End. Yes → leave guard (Bookings lane G). Esc / × / outside click → closes and stays.
   - B: Package Library → Booking: M1 Package Library → ⋮⋮ → M2 launcher (Package Lib current, hover Booking) → M3 Bookings (last view + filters restored) → End. Clicking the current tile only closes the launcher.
-- **Launchpad & Profile** page → *Profile · Screens*: AC1 Account menu open · AC2 Account settings · AC3 Change name · AC3b Name error · AC4 Name updated · AC5 Change password · AC6 Password errors · AC7 Password updated · LO1 Log out confirm · LO2 Login after logout. *Profile · Hi-fi flow* lanes:
+- **Launchpad & Profile** page → *Profile · Screens*: AC1 Account menu open · AC2 Account settings · AC3 Change name · AC3b Name error · AC4 Name updated · AC5 Change password · AC6 Password errors · AC7 Password updated · LO1 Log out confirm · LO2 Login after logout · **AC8 Business information (full page) · AC9 Edit business information · AC9b Validation errors + logo error · AC10 Business information updated**. AC1–AC7 and LO1 show the third card peeking below Security. *Profile · Hi-fi flow* lanes:
   - A: profile → account menu → Account settings.
   - B: change name (*2–50 characters?* loop).
   - C: change password (*current correct, rules met, match?* loop).
   - D: log out (*unsaved booking form?* → leave guard; confirm → Login).
+  - E: business information — E1 Account settings (card) → Clicks "Edit" → E2 Edit business information (prefilled) → Clicks "Save changes" → *Valid?* → Yes → E3 Updated (toast) → Downloads an invoice PDF → E4 Invoice PDF brand row (logo, name, address, phone · email) → End. No → E2b errors → Fixes the fields → back to E2.
+- **Bookings · Invoice PDF frames** (11, 11b, 11c, A5, A5b): Brand row is now three text lines — name · address · "phone · email" — and the header grows by 20 px.
+- **Booking components** gained `Business information card` and `Logo upload field` (2026-11-14); the Account-settings frames AC1–AC7 / flow copies are now 1440 × 864 viewports with clipped content (the page is taller than the viewport).
 - **Deferred (noted 2026-11-10, design later):** tablet/mobile layouts, void-invoice dialog (v1.1).

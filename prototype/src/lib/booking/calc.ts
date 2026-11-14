@@ -18,6 +18,9 @@ export const LIMITS = {
   clientNameMax: 80,
   displayNameMin: 2,
   displayNameMax: 50,
+  businessNameMin: 2,
+  businessNameMax: 60,
+  businessAddressMax: 150,
   pctMax: 100,
 };
 

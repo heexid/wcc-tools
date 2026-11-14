@@ -24,8 +24,9 @@ export type Crew = { id: string; name: string; role: string; isActive: boolean }
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
 
-/** Business profile printed on the invoice PDF header and "From" block (PRD US-10, Settings). */
-export type Business = { name: string; address: string; phone: string; email: string };
+/** Business information (Account settings → Business information, PRD US-14). Printed in the invoice PDF's Brand row and
+ *  "From" block. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
+export type Business = { name: string; address: string; phone: string; email: string; logo?: string | null };
 
 export type BookingItem = { id: string; name: string; price: number; qty: number };
 

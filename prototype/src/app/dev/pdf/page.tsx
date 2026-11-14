@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { getInvoiceSnapshot } from "@/lib/data/repo";
+import { getBusiness, getInvoiceSnapshot } from "@/lib/data/repo";
 import { renderInvoicePdf } from "@/lib/pdf/download";
 
 // Dev only — F15 gate. Renders an invoice's PDF (?invoice=INV-2026-0187, with ?fixture=…) exactly as the download
@@ -18,7 +18,7 @@ function PdfPreview() {
     let live = true;
     let task: { cancel: () => void; promise: Promise<void> } | null = null;
     (async () => {
-      const blob = await renderInvoicePdf(await getInvoiceSnapshot(number));
+      const blob = await renderInvoicePdf({ ...(await getInvoiceSnapshot(number)), business: await getBusiness() });
       const pdfjs = await import("pdfjs-dist");
       pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
       const doc = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;

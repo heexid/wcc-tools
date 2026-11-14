@@ -1,0 +1,4 @@
+# Local secrets — never commit
+CREDENTIALS.md
+*.credentials.md
+.env*

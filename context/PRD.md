@@ -4,8 +4,8 @@
 |---|---|
 | **Status** | Draft v1 · 2026-11-10 |
 | **Owner** | bs.moment internal tools |
-| **Design source** | Figma `bs internal tools` → page **CIR · Design System** (tokens, components, layouts) · pages **Bookings** (screens 01–11, interaction states 12–40, hi-fi flow lanes A–H), **Package Lib** (01–08, lanes A–D), **Login** (P1–P3, E1–E7), **Launchpad & Profile** (launcher flow, AC1–AC7, LO1–LO2) |
-| **Companions** | `context/PLAN.md` (build plan, DS mapping) · `context/INTERACTIONS.md` (94 interactions) · `context/PROTOTYPE-PLAN.md` (prototype slices F0–F17) · last synced 2026-11-11 |
+| **Design source** | Figma `bs internal tools` → page **CIR · Design System** (tokens, components, layouts) · pages **Bookings** (screens 01–11, interaction states 12–40, hi-fi flow lanes A–H), **Package Lib** (01–08, lanes A–D), **Login** (P1–P3, E1–E7), **Launchpad & Profile** (launcher flow, AC1–AC10, LO1–LO2, Profile lanes A–E) |
+| **Companions** | `context/PLAN.md` (build plan, DS mapping) · `context/INTERACTIONS.md` (96 interactions) · `context/PROTOTYPE-PLAN.md` (prototype slices F0–F18) · last synced 2026-11-14 |
 | **Stack** | Next.js (App Router) · Tailwind (CIR tokens) · Supabase (Postgres, Auth, Storage) · `@react-pdf/renderer` |
 | **Currency** | IDR only (`Rp 1.250.000`, `id-ID` locale, no decimals) |
 
@@ -166,7 +166,8 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-10 PDF invoice
 *As an admin, I want a professional PDF so that I can send it directly to the client.*
 - A4 portrait, following the existing *Invoice editor → A4 preview* style.
-- Contents: business name, logo and contact (from Settings), invoice number `INV-2026-0001`, invoice date, client name and phone, booking ref, booking date, package line, item breakdown (name, price, qty, subtotal), booking total, invoice type, **this payment**, total paid (including this invoice), remaining balance, payment instructions (bank, account no., account name from Settings), and the booking's Terms & Conditions (≤ 255 chars, copied into the invoice snapshot at issue time).
+- **Brand row** (top of the header): the business **logo** (or the name's initials when there is none), **business name**, **address**, and one line with **phone · email**, then the status tag at the far right. All of it comes from **Business information** (US-14) and always shows the *current* values: change them in Account settings and the next PDF you download has them, for old invoices too. Only the business block is live. Money, items, booking details, payment instructions and terms stay exactly as issued (snapshot). The *From* block repeats name, email and phone.
+- Contents: business name, logo and contact (from Business information, US-14), invoice number `INV-2026-0001`, invoice date, client name and phone, booking ref, booking date, package line, item breakdown (name, price, qty, subtotal), booking total, invoice type, **this payment**, total paid (including this invoice), remaining balance, payment instructions (bank, account no., account name from Settings), and the booking's Terms & Conditions (≤ 255 chars, copied into the invoice snapshot at issue time).
 - Generated from the **invoice snapshot only**, never from the live booking. Regenerating an old invoice always produces identical figures.
 - File name: `INV-2026-0001_{client-slug}.pdf`.
 - **Generation failure:** if a PDF can't be generated (on invoice confirm or on download), a dialog reads "Couldn't generate the invoice PDF" ("INV-… is saved — only the PDF file couldn't be created…") with **Try again** and **Cancel**. The invoice itself is never rolled back; Cancel leaves the card without a file until the next download attempt (Bookings screen 37).
@@ -217,6 +218,20 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
   - If a New or Edit booking has unsaved changes, the leave guard (screen 12 / lane G) shows first.
   - Cancel and Esc close the dialog, and you stay logged in.
 
+#### US-14 Business information
+*As an admin, I want to keep my business's name, logo and contact details in one place so that every invoice PDF carries the right brand.*
+- **Where:** a third card on **Account settings** (`/account`), under Security: **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only rows: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials."), **Business name**, **Address**, **Email**, **Phone**. **Viewers** see the card without the Edit button.
+- **Prefilled:** the card and the modal always start from the saved values (seed: bs.moment · Jl. Rawa Mangun No. 12, Jakarta Timur · finance@bs-moment.com · +62 21-555-0100, no logo). The business can never be empty: every field except the logo is required.
+- **Edit modal** "Business information" (DS Modal, 640 wide, same chrome as *Payment instruction*), opened prefilled:
+  - **Business logo** — upload field: 56 px preview + **Upload logo** (or **Replace logo** + ghost **Remove** when one is set) and the helper "PNG, JPG or WebP · up to 1 MB · square works best." Anything else shows the inline error "Use a PNG, JPG or WebP image." or "Logo must be 1 MB or smaller." and keeps the previous logo. The prototype re-encodes the file to ≤ 256 px.
+  - **Business name** (input, required, 2–60 characters, trimmed — "Enter 2–60 characters.").
+  - **Address** (text area, required, max 150 with counter — "Enter the business address.").
+  - **Email** (input, required, valid format — "Enter a valid email address.").
+  - **Phone number** (input, required, 8–15 digits, only `+ space - ( )` accepted — "Enter a valid phone number.").
+  - Footer **Cancel** · **Save changes**. Save validates every field at once; errors show inline, the modal stays open and each error clears as the field is fixed. Cancel, Esc and × discard the draft (the next open starts from the saved values). A failed save shows "Couldn't save. Check your connection and try again." and keeps the draft.
+- **After saving:** the modal closes, the card shows the new values and the toast "Business information updated" appears. Nothing else changes: existing invoices keep their figures.
+- **Effect on the PDF:** see US-10. The Brand row (logo/initials, name, address, phone · email) and the From block use the current business information every time a PDF is generated.
+
 ### 2.4 Business rules (enforced in the DB and service layer)
 
 1. All money is stored as `bigint` Rupiah. No floats.
@@ -232,6 +247,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 11. A date change shows in Calendar and Table right away.
 12. **Canceled is terminal.** `cancel_booking` is allowed only from `draft` or `partially_paid`. After it, `save_booking` and `create_invoice` reject the booking, and nothing reverts it.
 13. Archived packages can't be selected for a booking (`save_booking` rejects a newly picked archived package). A booking that already has one keeps it.
+14. **Business information** is one record per workspace, validated in the UI and the service layer (name 2–60, address 1–150, valid email, phone 8–15 digits, logo PNG/JPEG ≤ 1 MB). It is *not* part of the invoice snapshot's frozen figures: the PDF's Brand row and From block read the current value at generation time (US-10, US-14).
 
 ### 2.5 Booking status derivation
 
@@ -272,7 +288,7 @@ Next.js App Router (RSC + Server Actions)
  ├─ /bookings/[id]/edit  Same editor as /new: updated totals + Invoices (n) + New invoice #n modal
  ├─ /packages            Package Library (List layout)
  ├─ /login               Login (no self-service reset, see §4.3)
- ├─ /account             Account settings (name, password) — US-13
+ ├─ /account             Account settings (name, password, business information) — US-13, US-14
  └─ /api/invoices/[id]/pdf  → renders @react-pdf from snapshot, caches in Supabase Storage
         │
         ▼
@@ -302,6 +318,12 @@ bookings(id uuid pk, ref text unique,               -- BK-2026-0001
          canceled_at timestamptz null, canceled_by uuid null,
          cancel_reason text null check (char_length(cancel_reason) <= 255),
          created_by uuid, created_at, updated_at)
+
+workspace_settings(workspace_id uuid pk, business_name text not null check (char_length(business_name) between 2 and 60),
+         business_address text not null check (char_length(business_address) between 1 and 150),
+         business_email text not null, business_phone text not null,
+         business_logo_path text null,          -- Storage `branding/` (PNG/JPEG ≤ 1 MB)
+         default_terms text, default_payment jsonb, updated_by uuid, updated_at timestamptz)
 
 profiles(id uuid pk fk → auth.users, display_name text not null check (char_length(display_name) between 2 and 50),
          role text check (role in ('admin','viewer')), password_changed_at timestamptz)
@@ -334,7 +356,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 - **Login → Forgot password:** there's no self-service reset. The **Forgot password?** link under the password field shows an Info alert in the login card: "Forgot your password? Passwords are managed by your workspace admin. Ask them to reset it, then log in with the new password." (Login screen E7).
 - **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `viewer` (read-only, for the Owner). Enforced by RLS.
-- **Settings:** business profile, bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated.
+- **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Account settings (US-14) and stored in `workspace_settings`.
 - **Storage:** bucket `invoices/` (private) with signed URLs that expire after 10 min.
 - **Design tokens:** export CIR variables → Tailwind 4 `@theme` in `src/styles/tokens.css` (`surface/*`, `text/*`, `accent/*`, `status/*`, `space/*`, `radius/*`), generated from the Figma export (prototype F0).
 
@@ -360,7 +382,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 | Phase | Scope |
 |---|---|
-| **MVP** | Login, App launcher, Account settings + Log out, Package Library, Create booking (crew, T&C, leave guard), Cancel booking (manual, with optional reason), DP/Full invoice, Edit booking, Partial/Paid, total-below-paid guard, Calendar (month/week/day), Table, search + filters, Detail panel + Crew schedule, PDF. Built first as a front-end prototype (`context/PROTOTYPE-PLAN.md`). |
+| **MVP** | Login, App launcher, Account settings (+ Business information) + Log out, Package Library, Create booking (crew, T&C, leave guard), Cancel booking (manual, with optional reason), DP/Full invoice, Edit booking, Partial/Paid, total-below-paid guard, Calendar (month/week/day), Table, search + filters, Detail panel + Crew schedule, PDF. Built first as a front-end prototype (`context/PROTOTYPE-PLAN.md`). |
 | **v1.1** | Refund records, discounts/VAT lines, send via WhatsApp/email, CSV export, **void invoice dialog**, **tablet & mobile layouts** (deferred 2026-11-10, not yet designed) |
 | **v2.0** | Payment gateway and auto-reconciliation, client portal, resource/conflict scheduling, reminders for unpaid balances before the booking date |
 

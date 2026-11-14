@@ -3,15 +3,16 @@
 // independently of the UI. All functions are async (simulated latency) and can be made to fail
 // once via failNext() to drive the error screens (Package 06, Bookings 23, 37).
 import { LIMITS, allowedInvoiceTypes, bookingTotal, validateInvoice, validateTotalAgainstPaid, type DpMethod, type InvoiceError, type InvoiceType } from "@/lib/booking/calc";
+import { cleanBusiness, validateBusiness, type BusinessErrors } from "@/lib/booking/business";
 import { cleanPayment, validatePayment } from "@/lib/booking/payment";
 import { now } from "@/lib/clock";
 import { addDays, isoToLocalDate, normalizePhone, parseISODate, type ISODate } from "@/lib/format";
 import { buildInvoice, invoicesOf, nextNumber, recompute } from "./ledger";
 import { getDb, transaction } from "./store";
-import type { Booking, BookingStatus, Crew, Db, Invoice, Package, PaymentInstruction, Profile } from "./types";
+import type { Booking, BookingStatus, Business, Crew, Db, Invoice, Package, PaymentInstruction, Profile } from "./types";
 
 // ── Dev controls ───────────────────────────────────────────────────────────────────
-type Op = "savePackage" | "saveBooking" | "createInvoice" | "cancelBooking" | "generatePdf" | "login" | "updateProfile" | "changePassword";
+type Op = "savePackage" | "saveBooking" | "createInvoice" | "cancelBooking" | "generatePdf" | "login" | "updateProfile" | "updateBusiness" | "changePassword";
 const failing = new Set<Op>();
 let latencyMs = Number(process.env.NEXT_PUBLIC_LATENCY ?? 0);
 /** Next call of `op` throws a NetworkError (Package 06, Bookings 23 / 37). */
@@ -519,4 +520,21 @@ export async function getInvoiceSnapshot(invoiceId: string) {
 /** Business profile + bank details for the PDF (PRD §4.3 Settings). */
 export async function getSettings() {
   return call(null, () => clone(getDb().settings));
+}
+
+/** Business information shown in Account settings and printed in the invoice PDF's Brand row (PRD US-14). */
+export async function getBusiness(): Promise<Business> {
+  return call(null, () => clone(getDb().settings.business));
+}
+/** Save the business information. Validated here like the form (name, address, email, phone, logo). The PDF reads the
+ *  current value at download, so the next PDF shows it; invoice figures stay the snapshot's. */
+export async function updateBusiness(input: Business) {
+  return call("updateBusiness", () => {
+    const errors: BusinessErrors = validateBusiness(input);
+    if (Object.keys(errors).length) return { ok: false as const, errors };
+    transaction((d) => {
+      d.settings.business = cleanBusiness(input);
+    });
+    return { ok: true as const, business: clone(getDb().settings.business) };
+  });
 }

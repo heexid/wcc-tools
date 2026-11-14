@@ -1,7 +1,7 @@
 // Invoice PDF (Figma Bookings 11 / 11b / 11c, PRD US-10, PLAN §8). Rendered by @react-pdf from the invoice
 // SNAPSHOT ONLY — never from the live booking — so regenerating an old invoice always gives the same figures.
 // A4 portrait, laid out in Figma px (794 × 1123) via the token helper (pt = px × 0.75). The PDF never animates.
-import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { InvoiceSnapshot, InvoiceType } from "@/lib/data/types";
 import { color, pt, radius, space, text } from "@/lib/pdf/tokens";
 import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, initials, isoToLocalDate } from "@/lib/format";
@@ -89,7 +89,10 @@ const s = StyleSheet.create({
   page: { backgroundColor: color("surface/default"), color: color("text/primary"), ...bodyFont, paddingTop: space("region"), paddingBottom: pt(FOOTER_H) },
   header: { marginTop: -space("region"), backgroundColor: color("surface/accent"), paddingTop: pt(40), paddingBottom: pt(40), paddingHorizontal: space("region"), gap: space("group") },
   row: { flexDirection: "row" },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: space("control"), height: pt(44) },
+  // Brand row: logo / initials · name + address + "phone · email" · status tag. Hugs its text (44 with one text line,
+  // +20 per extra caption line, Figma 11).
+  brandRow: { flexDirection: "row", alignItems: "center", gap: space("control"), minHeight: pt(44) },
+  logo: { width: pt(38), height: pt(38), borderRadius: radius("control"), objectFit: "contain" },
   avatar: { width: pt(38), height: pt(38), borderRadius: pt(19), backgroundColor: color("brand/avatar"), alignItems: "center", justifyContent: "center" },
   tag: { paddingVertical: pt(2), paddingHorizontal: space("tight"), borderRadius: radius("small") },
   titleRow: { flexDirection: "row", alignItems: "flex-end", gap: space("control") },
@@ -146,12 +149,18 @@ export function InvoiceDocument({ snapshot: sn, measure }: { snapshot: InvoiceSn
       <Page size="A4" style={s.page}>
         <View style={s.header}>
           <View style={s.brandRow}>
-            <View style={s.avatar}>
-              <Text style={[text("UI/Avatar"), { color: color("text/on-accent") }]}>{initials(biz.name)}</Text>
-            </View>
-            <View style={{ flexGrow: 1 }}>
+            {biz.logo ? (
+              // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image renders into the PDF, it has no alt
+              <Image src={biz.logo} style={s.logo} />
+            ) : (
+              <View style={s.avatar}>
+                <Text style={[text("UI/Avatar"), { color: color("text/on-accent") }]}>{initials(biz.name)}</Text>
+              </View>
+            )}
+            <View style={{ flexGrow: 1, flexShrink: 1 }}>
               <Text style={text("Heading/Section")}>{biz.name}</Text>
-              <Caption>{`${biz.address} · ${biz.phone}`}</Caption>
+              <Caption>{wrap(biz.address.replace(/\s*\n\s*/g, ", "), 420, "Text/Caption")}</Caption>
+              <Caption>{`${biz.phone} · ${biz.email}`}</Caption>
             </View>
             <View style={[s.tag, { backgroundColor: color(tag.bg) }]}>
               <Text style={[text("Text/Caption Strong"), { color: color(tag.fg) }]}>{tag.label}</Text>

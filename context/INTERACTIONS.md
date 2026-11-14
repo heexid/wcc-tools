@@ -6,13 +6,13 @@ Audited and completed 2026-11-10 against Figma `bs internal tools`:
 - **Bookings page**: *Booking · Screens* (01–11), *Booking · Interaction states* (12–40) and *Booking · Hi-fi flow* (lanes A–H).
 - **Package Lib page**: screens 01–08 and the hi-fi flow (lanes A–D).
 - **Login page**: P1–P3 and errors E1–E7.
-- **Launchpad & Profile page**: *Launchpad · Hi-fi flow* (module switching), *Profile · Screens* (AC1–AC7, LO1–LO2) and *Profile · Hi-fi flow* (lanes A–D: account menu, change name, change password, log out).
+- **Launchpad & Profile page**: *Launchpad · Hi-fi flow* (module switching), *Profile · Screens* (AC1–AC10, LO1–LO2) and *Profile · Hi-fi flow* (lanes A–E: account menu, change name, change password, log out, business information).
 
 **Status legend**
 - ✅ **Designed**: a screen, state or flow step exists in Figma.
 - 📝 **Spec**: the behaviour is defined here or in the PRD. It reuses existing visuals, so no new state is needed.
 
-All 94 interactions are now defined. There are no ❌ items left.
+All 96 interactions are now defined. There are no ❌ items left.
 
 ---
 
@@ -140,6 +140,8 @@ All 94 interactions are now defined. There are no ❌ items left.
 | 6.8 | **Edit name** → modal → Save | 2–50 chars; error "Enter 2–50 characters."; toast "Name updated", header updates | ✅ | **AC3**, **AC3b**, **AC4** · flow B |
 | 6.9 | **Change password** → modal → Update | Current / new / confirm, live rules; errors inline; others logged out; toast | ✅ | **AC5**, **AC6**, **AC7** · flow C |
 | 6.10 | **Log out** → centred confirm → Login | Cancel / Esc stays; unsaved booking → leave guard first (wired; not reachable today — New / Edit booking use the Editor header without the account menu); toast "You’ve logged out" (top-centre, 32 from the top on Login) | ✅ | **LO1**, **LO2** · flow D |
+| 6.11 | **Edit** (Business information card) → modal | Admin only (viewer: no button). Modal opens **prefilled**: logo upload (Upload / Replace + Remove), Business name, Address (text area, ≤ 150), Email, Phone number. Cancel / Esc / × discard the draft | ✅ | **AC8**, **AC9** · flow E |
+| 6.12 | **Save changes** (Business information) | Validates all fields at once: "Enter 2–60 characters." · "Enter the business address." · "Enter a valid email address." · "Enter a valid phone number." · logo "Use a PNG, JPG or WebP image." / "Logo must be 1 MB or smaller."; errors stay inline and clear as fixed. Success → close + toast "Business information updated"; the next invoice PDF's Brand row (logo/initials, name, address, phone · email) and From block show it. Failure → "Couldn't save…" inline | ✅ | **AC9b**, **AC10** · flow E · PDF 11 / 11b / 11c |
 
 ---
 
@@ -147,6 +149,6 @@ All 94 interactions are now defined. There are no ❌ items left.
 
 | Status | Count |
 |---|---|
-| ✅ Designed | 78 |
+| ✅ Designed | 80 |
 | 📝 Spec (behaviour defined, reuses existing visuals) | 16 |
 | ❌ Undefined | 0 |

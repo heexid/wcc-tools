@@ -5,7 +5,7 @@
 | **Status** | v1 · 2026-11-11 |
 | **Goal** | A clickable, front-end prototype that matches Figma `bs internal tools` **1:1, pixel perfect, at 1440 px**, built one feature at a time: **develop → test → done → next feature**. |
 | **Companions** | `context/PRD.md` (what + rules) · `context/PLAN.md` (architecture, DS mapping, Figma deliverables) · `context/INTERACTIONS.md` (every interaction, numbered 1.1–6.10) |
-| **Design source** | Figma `bs internal tools` → **CIR · Design System** (tokens, `Booking components`) · **Bookings** page (*Booking · Screens* 01–11, *Interaction states* 12–40, *Hi-fi flow* lanes A–H) · **Package Lib** page (01–08, lanes A–D) · **Login** page (P1–P3, E1–E7) · **Launchpad & Profile** page (L/M flow, AC1–AC7, LO1–LO2) |
+| **Design source** | Figma `bs internal tools` → **CIR · Design System** (tokens, `Booking components`) · **Bookings** page (*Booking · Screens* 01–11, *Interaction states* 12–40, *Hi-fi flow* lanes A–H) · **Package Lib** page (01–08, lanes A–D) · **Login** page (P1–P3, E1–E7) · **Launchpad & Profile** page (L/M flow, AC1–AC10, LO1–LO2, lanes A–E) |
 
 The IDs here are the same ones the other docs use: **US-n** (PRD stories), **screen numbers** (PLAN "Figma deliverables"), **#x.y** (INTERACTIONS rows) and **lanes** (hi-fi flows). If any of those docs change, update the matching slice here.
 
@@ -108,6 +108,9 @@ Every slice F0…F17 follows the same loop. Do **not** start the next slice unti
 | F15 | Invoice PDF | US-10 | 11, 11b, 11c, 37 | 4.2, 4.6, 4.12 |
 | F16 | Account settings + Log out | US-13 | AC2–AC7, LO1–LO2 | 6.7–6.10 |
 | F17 | Viewer role, loading (+ DS Skeleton, Loader), full-flow E2E | all | all hi-fi flow lanes | 6.3, 6.4 |
+| F18 | Business information (Account settings) → invoice PDF Brand row | US-14, US-10 | AC8–AC10, lane E, PDF 11 / 11b / 11c / A5 / A5b | 6.11, 6.12 |
+
+F18 was added 2026-11-14 after the MVP slices: a third Account-settings card + modal that feeds the PDF Brand row (see §3b).
 
 Why this order: foundations first (F0–F2), then the shell every page sits in (F3–F4), then Package Library because the booking form needs its picker (F5), then read-only views (F6–F9), then the write path in the order a booking lives: create → first invoice → detail → edit + next invoice → cancel → PDF (F10–F15), then account (F16) and a full regression (F17).
 
@@ -545,9 +548,9 @@ Standard loop. E2E: Profile lanes A–D, D with a dirty booking form.
 **Feature**
 - `viewer` role (6.4): hide New booking, Edit booking, Create invoice, Archive, New package, Cancel booking section.
 - Loading (6.3): skeleton rows (table), skeleton date cells (calendar), Loader in the detail panel; filters stay interactive.
-- Full regression: every frame in the Figma deliverables list re-run through G1–G4; every hi-fi lane (Bookings A–H, Package A–D, Launchpad A–B, Profile A–D) as one Playwright suite; a11y check (keyboard, focus, `role`s, badge text + icon, WCAG 2.2 AA contrast); reduced-motion pass.
+- Full regression: every frame in the Figma deliverables list re-run through G1–G4; every hi-fi lane (Bookings A–H, Package A–D, Launchpad A–B, Profile A–E) as one Playwright suite; a11y check (keyboard, focus, `role`s, badge text + icon, WCAG 2.2 AA contrast); reduced-motion pass.
 - Motion consistency pass: one more `find-animation-opportunities` over the whole app to catch gaps between slices, then `animate` for accepted items.
-- **Done when:** all suites green, INTERACTIONS summary 94/94 verified, tracker fully ticked.
+- **Done when:** all suites green, INTERACTIONS summary 96/96 verified, tracker fully ticked.
 
 **Prompt**
 ```
@@ -590,6 +593,17 @@ Frozen "today" for tests: **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY=2026-11-10`).
 | F15 Invoice PDF | ✅ | ✅ (none) | — | ✅ (136) | ✅ | ⚠ (motion.css, other session) | ✅ | ✅ 11 / 11b / 11c · 37 follows the Figma re-centring (§4.1; PNG re-export pending) | ✅ | ⚠ 2026-11-14 |
 | F16 Account + log out | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
 | F17 Viewer, loading, regression | ✅ viewer + loading | ✅ (3 accepted, 4 rejected) | ✅ | ✅ (136) | ✅ 9 new · ⚠ full suite: 53/55 failures pre-date F17 (clean `HEAD` fails the same) | ✅ | ☐ | ⚠ 53 inherited (dialogs + login now fixed in Figma, §4.1 — re-export PNGs, re-run) | ✅ Skeleton added to Figma | 🟡 a11y: contrast tokens + 2 ARIA fixes open · 2026-11-14 |
+| F18 Business information | ✅ | ☐ | ✅ (AC8–AC10, lane E, PDF header) | ✅ (6) | ✅ (6) | ☐ | ☐ | ☐ PNG re-export pending | ✅ | ⚠ 2026-11-14 |
+
+### 3b. F18 — Business information (added 2026-11-14)
+
+**Feature**
+- Account settings (`/account`) gets a third card **Business information** (AC8): read-only rows Logo / Business name / Address / Email / Phone and a Secondary **Edit** button in the card head (hidden for the viewer role).
+- **Edit modal** (AC9, 6.11 — DS Modal, 640 wide, prefilled): Business logo upload (Upload / Replace + Remove; PNG/JPG/WebP ≤ 1 MB, re-encoded ≤ 256 px), Business name (2–60), Address (text area ≤ 150), Email, Phone number (8–15 digits). Validation errors AC9b (6.12); success toast "Business information updated" (AC10).
+- **PDF:** the Brand row shows logo (or initials) · name · address · "phone · email" and the status tag; the From block repeats name, email and phone. Both read the **current** business information at download (`downloadInvoicePdf` merges `getBusiness()`); the header is 20 px taller (three text lines). Figures stay the snapshot's.
+- Data: `Business.logo?: string | null`, `settings.business`, repo `getBusiness()` / `updateBusiness()` (op `updateBusiness` for `?fail=`), `lib/booking/business.ts`. No `DB_VERSION` bump (the new field is optional).
+- **Done when:** AC8–AC10 + Profile lane E run; PDF frames 11 / 11b / 11c / A5 / A5b match the new header; unit `business.test.ts` and e2e `F18-business.spec.ts` green.
+- **Status 2026-11-14:** code, unit + e2e tests, docs and Figma (AC8–AC10, lane E, PDF header) done. G1–G4 PNG re-export for AC1–AC10 and the PDF frames is pending, same as §4.1.
 
 ### 4.1 Design sync · 2026-11-14
 
@@ -607,8 +621,8 @@ Expected effect on the pixel gates: the ~20 dialog frames that failed G3 on plac
 
 ## 5. Coverage check (sync with the other docs)
 
-- **PRD stories:** US-0 → F5, F10, F13 · US-1 → F10 · US-2 → F11 · US-3 → F2, F11 · US-4 → F13 · US-5 → F13 · US-6 → F6–F8 · US-7 → F9 · US-8 → F9 · US-9 → F12 · US-10 → F15 · US-11 → F4 · US-12 → F6, F9, F14 · US-13 → F4, F16 · §4.3 Login → F3.
-- **Figma screens:** Bookings 01–11 + 02b, 03b, 04c, 05b, 05c, 11b, 11c and 12–40 · Package 01–08 · Login P1–P3, E1–E7 · Launchpad L1–L3, M1–M3 · Profile AC1–AC7, LO1–LO2 — each appears in exactly one slice's frame list (02b/16/… shared frames are owned by the slice listed first).
-- **INTERACTIONS:** all 94 rows (§1–§6) are assigned in the §2 table. 1.22 is verified as "no actions menu".
-- **Hi-fi lanes:** Bookings A (F10–F11, F15) · B (F12–F13) · C (F7, F9, F12) · D (F6, F9, F12) · E (F12) · F (F7–F8) · G (F10) · H (F14) · Package A–D (F5) · Launchpad A–B (F4) · Profile A–D (F16).
+- **PRD stories:** US-0 → F5, F10, F13 · US-1 → F10 · US-2 → F11 · US-3 → F2, F11 · US-4 → F13 · US-5 → F13 · US-6 → F6–F8 · US-7 → F9 · US-8 → F9 · US-9 → F12 · US-10 → F15 · US-11 → F4 · US-14 → F18 · US-12 → F6, F9, F14 · US-13 → F4, F16 · §4.3 Login → F3.
+- **Figma screens:** Bookings 01–11 + 02b, 03b, 04c, 05b, 05c, 11b, 11c and 12–40 · Package 01–08 · Login P1–P3, E1–E7 · Launchpad L1–L3, M1–M3 · Profile AC1–AC10, LO1–LO2 — each appears in exactly one slice's frame list (02b/16/… shared frames are owned by the slice listed first).
+- **INTERACTIONS:** all 96 rows (§1–§6) are assigned in the §2 table. 1.22 is verified as "no actions menu".
+- **Hi-fi lanes:** Bookings A (F10–F11, F15) · B (F12–F13) · C (F7, F9, F12) · D (F6, F9, F12) · E (F12) · F (F7–F8) · G (F10) · H (F14) · Package A–D (F5) · Launchpad A–B (F4) · Profile A–D (F16), E (F18) (F16).
 - **Out of scope (as in PRD §5.1 / PLAN "Deferred"):** tablet & mobile layouts, void invoice, refunds, VAT/discounts, WhatsApp/email sending, Supabase backend.

@@ -13,8 +13,10 @@ import { usePresence } from "@/components/ds/usePresence";
 import { PROFILE_EVENT } from "@/components/shell/AppShell";
 import { LIMITS } from "@/lib/booking/calc";
 import { now } from "@/lib/clock";
-import { changePassword, getProfile, passwordRules, updateDisplayName } from "@/lib/data/repo";
-import type { Profile } from "@/lib/data/types";
+import { changePassword, getBusiness, getProfile, passwordRules, updateDisplayName } from "@/lib/data/repo";
+import type { Business, Profile } from "@/lib/data/types";
+import { useIsViewer } from "@/lib/role";
+import { BusinessModal, BusinessRows } from "./BusinessInformation";
 import { formatDate, initials, isoToLocalDate } from "@/lib/format";
 
 // Figma Launchpad & Profile → AC2–AC7 (PRD US-13, INTERACTIONS 6.7–6.9; Profile lanes B, C).
@@ -30,19 +32,22 @@ const ROLE_NOTE = {
 
 export function AccountSettings() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const entering = useEntrance(!!profile); // module entrance cascade (motion.css) — starts once the profile is in
-  const [modal, setModal] = useState<null | "name" | "password">(null);
+  const [business, setBusiness] = useState<Business | null>(null);
+  const viewer = useIsViewer();
+  const entering = useEntrance(!!profile && !!business); // module entrance cascade (motion.css) — starts once the profile is in
+  const [modal, setModal] = useState<null | "name" | "password" | "business">(null);
   const [toast, setToastState] = useState<{ text: string; open: boolean } | null>(null);
   const toastPresence = usePresence(!!toast?.open);
   useEffect(() => {
     getProfile().then(setProfile);
+    getBusiness().then(setBusiness);
   }, []);
   useEffect(() => {
     if (!toast?.open) return;
     const t = setTimeout(() => setToastState((v) => v && { ...v, open: false }), 4000);
     return () => clearTimeout(t);
   }, [toast]);
-  if (!profile) return <div className="flex-1" aria-busy="true" />;
+  if (!profile || !business) return <div className="flex-1" aria-busy="true" />;
 
   const today = isoToLocalDate(now().toISOString());
   const role = profile.role === "admin" ? "Admin" : "Viewer";
@@ -96,9 +101,33 @@ export function AccountSettings() {
             </Button>
           </Row>
         </Card>
+
+        <Card
+          title="Business information"
+          caption="Printed in the header of every invoice PDF."
+          action={
+            !viewer && (
+              <Button variant="secondary" icon="pencil" onClick={() => setModal("business")}>
+                Edit
+              </Button>
+            )
+          }
+        >
+          <BusinessRows business={business} />
+        </Card>
       </main>
 
       <ChangeNameModal open={modal === "name"} current={profile.displayName} onClose={() => setModal(null)} onSaved={(p) => done(p, "Name updated")} />
+      <BusinessModal
+        open={modal === "business"}
+        value={business}
+        onClose={() => setModal(null)}
+        onSaved={(b) => {
+          setBusiness(b);
+          setModal(null);
+          setToastState({ text: "Business information updated", open: true });
+        }}
+      />
       <ChangePasswordModal
         open={modal === "password"}
         onClose={() => setModal(null)}
@@ -113,14 +142,17 @@ export function AccountSettings() {
   );
 }
 
-function Card({ title, caption, children }: { title: string; caption: string; children: ReactNode }) {
+function Card({ title, caption, action, children }: { title: string; caption: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section aria-label={title} className="flex flex-col rounded-card border border-border-default bg-surface-default px-24 pt-20 pb-8">
-      <div className="flex flex-col gap-2 pb-12">
-        <h2 className="flex text-heading-section text-text-primary">
-          <Txt>{title}</Txt>
-        </h2>
-        <Txt className="text-caption text-text-secondary">{caption}</Txt>
+      <div className="flex items-start gap-16 pb-12">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <h2 className="flex text-heading-section text-text-primary">
+            <Txt>{title}</Txt>
+          </h2>
+          <Txt className="text-caption text-text-secondary">{caption}</Txt>
+        </div>
+        {action}
       </div>
       {children}
     </section>
