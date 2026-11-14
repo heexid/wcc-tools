@@ -7,7 +7,7 @@ import { Alert, Toast, ToastRegion } from "@/components/ds/Feedback";
 import { usePresence } from "@/components/ds/usePresence";
 import { InputField } from "@/components/ds/InputField";
 import { Txt } from "@/components/ds/Txt";
-import { GrainyBackground } from "@/components/login/GrainyBackground";
+import { LiquidBackground } from "@/components/login/LiquidBackground";
 import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 
 // Figma: Login page — P1 empty · P2 filled · P3 logging in · E1 required · E2 email format ·
@@ -84,8 +84,8 @@ function LoginForm() {
 
   return (
     <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-surface-default">
-      {/* Page background: animated grainy gradient in DS colours (styles/grainy.css). */}
-      <GrainyBackground />
+      {/* Page background: WebGL liquid gradient + grain (components/login/LiquidBackground). */}
+      <LiquidBackground />
       <section
         aria-labelledby="login-title"
         className="flex w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] flex-col overflow-hidden rounded-card bg-surface-header p-popover-inset shadow-floating motion-enter"

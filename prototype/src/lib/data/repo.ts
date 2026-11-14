@@ -506,6 +506,16 @@ export async function getCrewSchedule(crewId: string) {
   });
 }
 
+/** The PDF's only data source (US-10): the invoice snapshot, unchanged since issue. Op "generatePdf" so ?fail=generatePdf
+ *  drives Bookings 37. The invoice itself is never touched by a PDF failure. */
+export async function getInvoiceSnapshot(invoiceId: string) {
+  return call("generatePdf", () => {
+    const inv = getDb().invoices.find((i) => i.id === invoiceId || i.number === invoiceId);
+    if (!inv) throw new Error(`invoice ${invoiceId} not found`);
+    return clone(inv.snapshot);
+  });
+}
+
 /** Business profile + bank details for the PDF (PRD §4.3 Settings). */
 export async function getSettings() {
   return call(null, () => clone(getDb().settings));

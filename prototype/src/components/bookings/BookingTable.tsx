@@ -12,6 +12,8 @@ import type { SortKey } from "@/lib/booking/filters";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDate, formatIDR, formatPhone } from "@/lib/format";
 import { BOOKING_COLS, BookingTableHeader } from "./BookingTableHeader";
+import { useIsViewer } from "@/lib/role";
+import { Skeleton } from "@/components/ds/Loading";
 
 // Figma Bookings 02 / 18 / 25 / 26 — Booking table (998, 1px border, radius card, clips): header, Booking
 // table/Row (h 62, pad 0/control, bottom border; Hover surface/subtle), Table/Footer ("Showing 1–4 of 4
@@ -20,6 +22,21 @@ import { BOOKING_COLS, BookingTableHeader } from "./BookingTableHeader";
 // secondary Reset filters + primary New booking (pad region/group, gap compact).
 
 const cell = "flex shrink-0 flex-col pr-compact";
+
+/** 6.3: skeleton rows — same height and column widths as Row; the header above stays live (sort stays usable). */
+function SkeletonRow() {
+  return (
+    <div role="row" aria-hidden className="flex h-table-row-height w-full items-center border-b border-border-default bg-surface-default px-control">
+      {[BOOKING_COLS.booking, BOOKING_COLS.client, BOOKING_COLS.package, BOOKING_COLS.date, BOOKING_COLS.money, BOOKING_COLS.money, BOOKING_COLS.money, BOOKING_COLS.status].map((w, k) => (
+        <span key={k} role="cell" className={cn(cell, w)}>
+          <Skeleton className="h-16 w-3/4" />
+          {k < 2 && <Skeleton className="h-12 w-1/2" />}
+        </span>
+      ))}
+      <span className={cn("shrink-0", BOOKING_COLS.actions)} />
+    </div>
+  );
+}
 
 function Row({ b, onOpen }: { b: BookingRow; onOpen: (id: string) => void }) {
   return (
@@ -71,6 +88,7 @@ function Row({ b, onOpen }: { b: BookingRow; onOpen: (id: string) => void }) {
 }
 
 export function BookingTable({
+  className,
   rows,
   total,
   page,
@@ -82,7 +100,10 @@ export function BookingTable({
   onOpen,
   onReset,
   onNew,
+  loading,
 }: {
+  loading?: boolean;
+  className?: string;
   rows: BookingRow[];
   total: number;
   page: number;
@@ -95,16 +116,19 @@ export function BookingTable({
   onReset: () => void;
   onNew: () => void;
 }) {
+  const viewer = useIsViewer();
   const first = (page - 1) * size + 1;
   return (
-    <section aria-label="Bookings table" className="motion-swap flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default">
-      <div role="table" aria-label="Bookings" aria-rowcount={total + 1} className="flex flex-col">
+    <section aria-label="Bookings table" className={cn("motion-swap flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", className)}>
+      <div key={loading ? "loading" : "rows"} role="table" aria-label="Bookings" aria-rowcount={total + 1} className={cn("flex flex-col", !loading && "motion-swap")}>
         <BookingTableHeader sort={sort} onSort={onSort} />
-        {rows.map((b) => (
-          <Row key={b.id} b={b} onOpen={onOpen} />
-        ))}
+        {loading
+          ? Array.from({ length: 8 }, (_, k) => <SkeletonRow key={k} />)
+          : rows.map((b) => <Row key={b.id} b={b} onOpen={onOpen} />)}
       </div>
-      {total === 0 ? (
+      {loading ? (
+        <TableFooter summary={<Skeleton className="h-16 w-[calc(var(--spacing-64)*3)]" />} />
+      ) : total === 0 ? (
         <div className="flex flex-col items-center gap-compact px-group py-region">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/empty-invoice.png" srcSet="/assets/empty-invoice.png 1x, /assets/empty-invoice@2x.png 2x" alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
@@ -118,9 +142,11 @@ export function BookingTable({
             <Button variant="secondary" onClick={onReset}>
               Reset filters
             </Button>
-            <Button icon="plus" onClick={onNew}>
-              New booking
-            </Button>
+            {!viewer && (
+              <Button icon="plus" onClick={onNew}>
+                New booking
+              </Button>
+            )}
           </div>
         </div>
       ) : (

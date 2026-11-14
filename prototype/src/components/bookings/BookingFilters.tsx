@@ -336,6 +336,7 @@ function DebouncedSearch({ value, onChange, className }: { value: string; onChan
 }
 
 export function BookingToolbar({
+  className,
   view,
   onView,
   filters,
@@ -344,6 +345,7 @@ export function BookingToolbar({
   crew,
   packages,
 }: {
+  className?: string;
   view: View;
   onView: (v: View) => void;
   filters: BookingFilters;
@@ -355,7 +357,7 @@ export function BookingToolbar({
   const w = view === "calendar" ? W.calendar : W.table;
   const pkgName = (id: string) => packages.find((p) => p.id === id)?.name ?? id;
   return (
-    <div className="flex flex-col gap-base">
+    <div className={cn("flex flex-col gap-base", className)}>
       <TabList label="View" className="flex border-b border-border-default">
         <Tab active={view === "calendar"} onClick={() => onView("calendar")}>
           Calendar
@@ -407,6 +409,7 @@ export function BookingToolbar({
  * Strong text/accent · spacer · "Showing 4 of 24 bookings" (Table). Gap compact.
  */
 export function ActiveFilters({
+  className,
   filters,
   update,
   reset,
@@ -415,6 +418,7 @@ export function ActiveFilters({
   packages,
   summary,
 }: {
+  className?: string;
   filters: BookingFilters;
   update: (p: Partial<BookingFilters>) => void;
   reset: () => void;
@@ -433,7 +437,7 @@ export function ActiveFilters({
   return (
     // Many chips wrap onto more lines (instead of running off screen) and "Reset all" flows right after the last
     // chip, so it's always visible. The summary stays on the right of the first line.
-    <div className="flex min-h-24 items-start gap-compact">
+    <div className={cn("flex min-h-24 items-start gap-compact", className)}>
       {chips.length > 0 && (
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-compact gap-y-tight">
           <Txt className="flex h-24 items-center text-caption text-text-secondary">{`${chips.length} ${chips.length === 1 ? "filter" : "filters"} ·`}</Txt>

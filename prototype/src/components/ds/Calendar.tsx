@@ -44,6 +44,8 @@ export function CalendarBookingChip({
       className={cn(
         "flex h-20 w-full min-w-0 shrink-0 cursor-pointer items-center gap-micro rounded-small py-2 pr-tight pl-micro text-left outline-none",
         "[&:hover>span:last-child]:underline", // hover: underlined label, like the Week card title (1.25)
+        // Press feedback (Button recipe): the sheet opens on release, so the chip confirms the press first.
+        "transition-transform duration-(--dur-press) ease-(--ease-out) active:scale-(--press-scale)",
         tone.surface,
         className,
       )}

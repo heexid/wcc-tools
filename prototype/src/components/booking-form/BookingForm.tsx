@@ -13,6 +13,7 @@ import { PaymentStatusBadge, type BookingStatus } from "@/components/ds/Badges";
 import { TextArea } from "@/components/ds/TextArea";
 import { Tooltip } from "@/components/ds/Tooltip";
 import { Txt } from "@/components/ds/Txt";
+import { cascade, cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { InvoiceCard } from "@/components/ds/InvoiceCard";
@@ -28,6 +29,7 @@ import { formatDate, formatDateTime, formatIDR, formatPhone, isoToLocalDate, nor
 import { CrewSelect, DateField, PackageSelect } from "./FormPopovers";
 import { NewInvoiceModal, type InvoiceModalRequest } from "./InvoiceModal";
 import { CancelBookingDialog, CancelBookingSection } from "./CancelBooking";
+import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
 import { PaymentInstructionField, PaymentInstructionModal } from "./PaymentInstruction";
 import { setFlash } from "@/lib/flash";
 import { useRouter } from "next/navigation";
@@ -171,7 +173,7 @@ function BelowPaidTotals({ l }: { l: Ledger }) {
 /** Invoices (n) card (US-1 / US-2, Figma 03 / 05 / 05c): status badge; (0) → dashed empty state with Create invoice
  *  (disabled + tooltip until client name and phone are valid — INTERACTIONS 2.12); (n) → Invoice cards, newest first
  *  and highlighted (Latest), then a full-width Secondary "Create invoice" (hidden once Paid — PRD US-5). */
-function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf }: {
+function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf, pdfBusyId }: {
   status: BookingStatus;
   invoices: Invoice[];
   /** Invoice created in this session — its card enters with motion. */
@@ -179,6 +181,8 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf 
   canInvoice: boolean;
   onCreate: () => void;
   onPdf: (inv: Invoice) => void;
+  /** Invoice whose PDF is generating (its button shows Loading). */
+  pdfBusyId: string | null;
 }) {
   const button = (
     <Button icon="plus" disabled={!canInvoice} onClick={onCreate} className={cn(!canInvoice && "pointer-events-none")}>
@@ -205,6 +209,7 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf 
               amount={formatIDR(inv.amount)}
               meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
               latest={i === 0}
+              pdfBusy={pdfBusyId === inv.id}
               onPdf={() => onPdf(inv)}
             />
           ))}
@@ -333,6 +338,7 @@ function DiscardDialog({ open, editing, changes, onKeep, onDiscard }: { open: bo
 }
 
 export function BookingForm({ date, initial }: Props) {
+  const entering = useEntrance(); // module entrance cascade (motion.css)
   const { packages, crew, terms, payment, refresh } = useCatalog();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const { navigate, setGuard } = useLeaveGuard();
@@ -354,6 +360,7 @@ export function BookingForm({ date, initial }: Props) {
   const [fresh, setFresh] = useState<string | null>(null);
   const [invoiceUi, setInvoiceUi] = useState<{ open: boolean; busy: boolean; failed: boolean; rejected: InvoiceError | null }>({ open: false, busy: false, failed: false, rejected: null });
   const [saving, setSaving] = useState(false);
+  const pdf = useInvoicePdf(); // invoice card Download PDF (2.14)
   const router = useRouter();
   const [cancelUi, setCancelUi] = useState({ open: false, busy: false, failed: false });
   const [isAdmin] = useState(() => getDb().profile.role === "admin");
@@ -548,10 +555,10 @@ export function BookingForm({ date, initial }: Props) {
         </span>
       </EditorActions>
 
-      <EditorPageHeader title={savedId ? saved.name : "New booking"} status={saved.status} onBack={() => navigate("/bookings")} backLabel="Back to bookings" />
-      <div className="flex flex-1 gap-section pl-section">
+      <EditorPageHeader className={entering ? cascade(0) : undefined} title={savedId ? saved.name : "New booking"} status={saved.status} onBack={() => navigate("/bookings")} backLabel="Back to bookings" />
+      <div data-cascade className="flex flex-1 gap-section pl-section">
         <main className="flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))]">
-          <form noValidate onSubmit={onSave} className="contents">
+          <form noValidate onSubmit={onSave} className={cn("contents", entering && cascadeChildren(1))}>
             <section aria-labelledby="sec-client" className="flex flex-col gap-base">
               <SectionHeader id="sec-client" title="Client" meta="Required fields" required />
               <div className="flex gap-base">
@@ -638,7 +645,7 @@ export function BookingForm({ date, initial }: Props) {
             )}
           </form>
         </main>
-        <aside aria-label="Summary and invoices" className="flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section">
+        <aside aria-label="Summary and invoices" className={cn("flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section", entering && cascade(1))}>
           {showAlert && (
             <Alert tone="danger" title={`${liveCount} ${liveCount === 1 ? "field needs" : "fields need"} attention`} className="motion-notice">
               Fix the highlighted fields to save the booking or create an invoice.
@@ -664,7 +671,8 @@ export function BookingForm({ date, initial }: Props) {
             invoices={saved.invoices}
             fresh={fresh}
             canInvoice={canInvoice}
-            onPdf={() => setToast("Invoice PDFs arrive in slice F15.")}
+            onPdf={pdf.download}
+            pdfBusyId={pdf.busyId}
             onCreate={async () => {
               if (!(await trigger())) {
                 setAttention(countErrors(form.formState.errors));
@@ -700,6 +708,7 @@ export function BookingForm({ date, initial }: Props) {
           setPaymentOpen(false);
         }}
       />
+      {pdf.dialog}
       <CancelBookingDialog
         open={cancelUi.open}
         title={`${saved.ref} · ${saved.name}`}

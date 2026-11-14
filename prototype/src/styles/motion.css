@@ -25,6 +25,7 @@
   --dur-indicator: 250ms; /* tab / segmented-control indicator */
   --dur-swap: 150ms; /* in-place view swap (Calendar ↔ Table, Month / Week / Day) — tens/day, so near-imperceptible */
   --stagger-step: 50ms; /* group entrances (rare surfaces only) */
+  --stagger-tight: 40ms; /* module entrance cascade (Bookings) — frequent surface, so the whole cascade lands < 500ms */
 
   /* Movement — the ONLY place transform distances live. Components must use these
      vars (never literal scale/translate values) so reduced motion can neutralise them. */
@@ -35,6 +36,7 @@
   --toast-from-y: -100%; /* toasts sit top-centre and drop in from above */
   --sheet-from-x: 100%;
   --list-from-y: var(--spacing-8); /* stagger rise, from the animate recipe */
+  --cascade-from-blur: 4px; /* module entrance: sections come into focus — kept small, these are large surfaces (blur cost, Safari) */
   --page-from-y: var(--spacing-4); /* route-change content rise — tiny: page changes are tens/day */
 }
 
@@ -285,13 +287,13 @@
    is no direction, slide or stagger. Entry only. `.fixed` children (ToastRegion) are skipped: they carry their own
    .motion-toast travel. Settled state declares no transform, so fixed popovers inside the page aren't re-anchored once
    it lands. Reduced motion → --page-from-y 0, fade only. */
-.motion-page > :not(.fixed) {
+.motion-page > :not(.fixed, [data-cascade], .motion-cascade) {
   transition-property: opacity, transform;
   transition-duration: var(--dur-modal);
   transition-timing-function: var(--ease-out);
 }
 @starting-style {
-  .motion-page > :not(.fixed) {
+  .motion-page > :not(.fixed, [data-cascade], .motion-cascade) {
     opacity: 0;
     transform: translateY(var(--page-from-y));
   }
@@ -326,6 +328,40 @@
   }
 }
 
+/* Module entrance cascade (every module screen: Bookings, New / Edit booking, read-only booking, Package library,
+   Account settings) — on arrival the screen assembles one section at a time instead of popping in
+   one frame: title → KPI cards (left to right, the rail alongside) → toolbar → filters → calendar / table. Each element
+   rises --list-from-y + fades over --dur-modal, delayed --i × --stagger-tight (last one lands ≈ 490ms). The page sets
+   --i per element and drops the class once the entrance is over, so later view swaps (.motion-swap) and re-renders
+   never replay it. The container carries [data-cascade] so .motion-page doesn't fade it on top. Declared after
+   .motion-swap so it wins on the calendar / table section during the entrance. @starting-style only: nothing waits
+   on JS, every control works at once. Blur 4px → sharp rides the same curve as the fade (opacity 0 → 1). Reduced motion →
+   no rise, no delay: one fade that still comes into focus (blur isn't movement). */
+.motion-cascade,
+.motion-cascade-auto > :not(.fixed) {
+  transition-property: opacity, transform, filter;
+  transition-duration: var(--dur-modal);
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc(var(--i, 0) * var(--stagger-tight));
+}
+@starting-style {
+  .motion-cascade,
+  .motion-cascade-auto > :not(.fixed) {
+    opacity: 0;
+    transform: translateY(var(--list-from-y));
+    filter: blur(var(--cascade-from-blur)); /* blur → sharp with the fade; settles to no filter (none), so no layer lingers */
+  }
+}
+/* .motion-cascade-auto: the container's direct children take steps in DOM order from --base (set on the container);
+   capped at base + 5 so long forms (sections + dividers) still land < 500ms. Used by every module screen except Bookings,
+   which places its steps by hand (KPI cards left → right, rail alongside). */
+.motion-cascade-auto > :nth-child(1) { --i: calc(var(--base, 0) + 0); }
+.motion-cascade-auto > :nth-child(2) { --i: calc(var(--base, 0) + 1); }
+.motion-cascade-auto > :nth-child(3) { --i: calc(var(--base, 0) + 2); }
+.motion-cascade-auto > :nth-child(4) { --i: calc(var(--base, 0) + 3); }
+.motion-cascade-auto > :nth-child(5) { --i: calc(var(--base, 0) + 4); }
+.motion-cascade-auto > :nth-child(n + 6) { --i: calc(var(--base, 0) + 5); }
+
 /* Reduced motion = fewer and gentler, not zero (animate §7).
    Movement and scale are neutralised, so every entrance becomes a pure opacity fade
    on the same duration/curve; colour and opacity transitions stay — they aid comprehension. */
@@ -340,8 +376,54 @@
     --list-from-y: 0;
     --page-from-y: 0;
     --stagger-step: 0ms;
+    --stagger-tight: 0ms;
   }
   html:focus-within {
     scroll-behavior: auto;
+  }
+}
+
+/* ── Loading (F17, INTERACTIONS 6.3) ───────────────────────────────────────────────────
+   Skeleton: a quiet opacity pulse (no shimmer sweep — it would cross large surfaces). Loader: Figma
+   "Loader" — 5×5 orchid dots, opacity wave 0.3→1, 1200ms loop, 60ms stagger along the diagonal.
+   Reduced motion: Skeleton static; Loader static at 60%. */
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes loader-wave {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* The Loader appears only if loading outlasts 250ms, so a fast load never flashes it. */
+@keyframes loader-in {
+  from {
+    opacity: 0;
+  }
+}
+.motion-loader {
+  animation: loader-in var(--dur-swap) var(--ease-out) 250ms backwards;
+}
+.motion-skeleton {
+  animation: skeleton-pulse 1400ms ease-in-out infinite;
+}
+.motion-loader-dot {
+  opacity: 0.3;
+  animation: loader-wave 1200ms ease-in-out infinite;
+  animation-delay: calc(var(--i) * 60ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-skeleton {
+    animation: none;
+  }
+  .motion-loader-dot {
+    animation: none;
+    opacity: 0.6;
   }
 }

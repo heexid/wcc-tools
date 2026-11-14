@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/components/ds/cn";
+import { cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Alert, Toast, ToastRegion, type ToastTone } from "@/components/ds/Feedback";
 import { Button } from "@/components/ds/Button";
@@ -16,6 +18,7 @@ import { usePresence } from "@/components/ds/usePresence";
 import { AppShell } from "@/components/shell/AppShell";
 import { archivePackage, listPackages, NetworkError, restorePackage, savePackage, type PackageErrors, type PackageRow } from "@/lib/data/repo";
 import { formatDate, formatIDR } from "@/lib/format";
+import { useIsViewer } from "@/lib/role";
 
 // Figma: Package Lib 01–08 (PRD US-0, INTERACTIONS §5). Layout/List: title + "New package", toolbar
 // (Active / Archived tabs · 280 search), table card (header 36, rows 62, columns 644 / 180 / 140 / 160 /
@@ -175,12 +178,14 @@ function PackageLibrary() {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState<PackageRow[] | null>(null);
   const [counts, setCounts] = useState({ active: 0, archived: 0 });
+  const viewer = useIsViewer();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [archiving, setArchiving] = useState<Draft | null>(null);
   // Content stays while the toast animates out; only `open` flips (else an Error toast would turn Success mid-exit).
   const [toast, setToastState] = useState<{ text: string; tone: ToastTone; open: boolean } | null>(null);
   const setToast = (text: string, tone: ToastTone = "success") => setToastState({ text, tone, open: true });
   const t = usePresence(!!toast?.open);
+  const entering = useEntrance(); // module entrance cascade (motion.css)
 
   const load = useCallback(async () => {
     const [all, a, b] = await Promise.all([listPackages({ tab, search }), listPackages({ tab: "active" }), listPackages({ tab: "archived" })]);
@@ -226,7 +231,7 @@ function PackageLibrary() {
   const noMatch = rows !== null && rows.length === 0 && !!search;
 
   return (
-    <main className="flex flex-col gap-inset px-section py-section">
+    <main data-cascade className={cn("flex flex-col gap-inset px-section py-section", entering && cascadeChildren())}>
       <div className="flex items-center gap-compact">
         <div className="flex flex-col gap-2">
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
@@ -235,9 +240,11 @@ function PackageLibrary() {
           <p className="text-caption text-text-secondary">Packages used when creating bookings. Price changes never alter existing bookings.</p>
         </div>
         <span className="flex-1" />
-        <Button icon="plus" onClick={() => setEditing(EMPTY)}>
-          New package
-        </Button>
+        {!viewer && (
+          <Button icon="plus" onClick={() => setEditing(EMPTY)}>
+            New package
+          </Button>
+        )}
       </div>
 
       <div className="flex items-center gap-compact">
@@ -270,9 +277,11 @@ function PackageLibrary() {
             <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary">
               Create the packages your team sells. They appear in the package picker when you add a booking, and their price is copied into each booking.
             </p>
-            <Button icon="plus" onClick={() => setEditing(EMPTY)}>
-              Create first package
-            </Button>
+            {!viewer && (
+              <Button icon="plus" onClick={() => setEditing(EMPTY)}>
+                Create first package
+              </Button>
+            )}
           </div>
         ) : (
           <>
@@ -317,7 +326,7 @@ function PackageLibrary() {
                     <StatusPill tone={p.isActive ? "positive" : "neutral"}>{p.isActive ? "Active" : "Archived"}</StatusPill>
                   </div>
                   <div role="cell" className={`${COLS.actions} flex h-20 items-start justify-end gap-micro`}>
-                    {p.isActive ? (
+                    {viewer ? null : p.isActive ? (
                       <>
                         <Button variant="ghost" onClick={() => setEditing(toDraft(p))} aria-label={`Edit ${p.name}`}>
                           Edit

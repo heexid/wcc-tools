@@ -584,9 +584,9 @@ Frozen "today" for tests: **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY=2026-11-10`).
 | F12 Detail + crew schedule | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
 | F13 Edit + follow-up invoice | ✅ | ✅ (0 new, 1 fix) | ✅ | ✅ (134) | ✅ | ✅ | ✅ | ✅ (10 by behaviour) | ✅ | ✅ 2026-11-12 |
 | F14 Cancel booking | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
-| F15 Invoice PDF (on hold — user, 2026-11-12) | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| F15 Invoice PDF | ✅ | ✅ (none) | — | ✅ (136) | ✅ | ⚠ (motion.css, other session) | ✅ | ✅ 11 / 11b / 11c · ⚠ 37 (dialog centring) | ✅ | ⚠ 2026-11-14 |
 | F16 Account + log out | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
-| F17 Viewer, loading, regression | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
+| F17 Viewer, loading, regression | ✅ viewer + loading | ✅ (3 accepted, 4 rejected) | ✅ | ✅ (136) | ✅ 9 new · ⚠ full suite: 53/55 failures pre-date F17 (clean `HEAD` fails the same) | ✅ | ☐ | ⚠ 53 inherited | ☐ (no Skeleton in Figma) | 🟡 a11y: contrast tokens + 2 ARIA fixes open · 2026-11-14 |
 
 ## 5. Coverage check (sync with the other docs)
 

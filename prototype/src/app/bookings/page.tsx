@@ -6,6 +6,7 @@ import { Button } from "@/components/ds/Button";
 import { MetricCard } from "@/components/ds/Surfaces";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
+import { cascade, useEntrance } from "@/components/ds/useEntrance";
 import { AppShell } from "@/components/shell/AppShell";
 import { useLeaveGuard } from "@/components/shell/LeaveGuard";
 import { BookingTableHeader } from "@/components/bookings/BookingTableHeader";
@@ -23,10 +24,12 @@ import { hasFilters, toQuery } from "@/lib/booking/filters";
 import { UpcomingRail } from "@/components/bookings/UpcomingRail";
 import { buildInsights, countTrend, percentTrend } from "@/lib/booking/insights";
 import { now } from "@/lib/clock";
-import { computeKpis, filterBookings, type BookingRow } from "@/lib/data/repo";
+import { computeKpis, filterBookings, listCrew, type BookingRow } from "@/lib/data/repo";
 import type { Crew, Db } from "@/lib/data/types";
 import { getDb } from "@/lib/data/store";
 import { addDays, formatIDR, isoToLocalDate, type ISODate } from "@/lib/format";
+import { useIsViewer } from "@/lib/role";
+import { Skeleton } from "@/components/ds/Loading";
 
 // Figma Bookings 01 (calendar) + 02 / 16 / 18 / 25 / 26 (table) + 36 (first use) — PRD US-6–8, US-12,
 // INTERACTIONS 1.1–1.10, 1.16–1.23, 1.32–1.33. Workspace: content (pad section) + 352 rail, 32 px margins.
@@ -44,18 +47,21 @@ const KPI_INFO = {
 function useDashboardData() {
   const [data, setData] = useState<null | { db: Db; rows: BookingRow[]; crew: Map<string, Crew>; kpis: ReturnType<typeof computeKpis>; today: ISODate }>(null);
   const load = useCallback(() => {
-    const d = getDb();
-    const today = isoToLocalDate(now().toISOString());
-    setData({ db: d, rows: filterBookings(d, {}), crew: new Map(d.crew.map((c) => [c.id, c])), kpis: computeKpis(d, today.slice(0, 7)), today });
+    // Goes through the data layer's latency (?latency=…) so the loading state (6.3) can be held on screen.
+    void listCrew().then(() => {
+      const d = getDb();
+      const today = isoToLocalDate(now().toISOString());
+      setData({ db: d, rows: filterBookings(d, {}), crew: new Map(d.crew.map((c) => [c.id, c])), kpis: computeKpis(d, today.slice(0, 7)), today });
+    });
   }, []);
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- the mock store lives in the browser
   useEffect(load, [load]);
   return data;
 }
 
-function FirstUse({ onNew }: { onNew: () => void }) {
+function FirstUse({ onNew, className }: { onNew: () => void; className?: string }) {
+  const viewer = useIsViewer();
   return (
-    <section aria-label="Bookings" className="flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default">
+    <section aria-label="Bookings" className={cn("flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", className)}>
       <BookingTableHeader />
       <div className="flex flex-col items-center gap-compact px-group py-region">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -64,11 +70,13 @@ function FirstUse({ onNew }: { onNew: () => void }) {
           <Txt>No bookings yet</Txt>
         </h2>
         <p className="flex text-caption text-text-secondary">
-          <Txt>Create your first booking. It appears on the calendar and in this table right away.</Txt>
+          <Txt>{viewer ? "Bookings created by your team appear on the calendar and in this table." : "Create your first booking. It appears on the calendar and in this table right away."}</Txt>
         </p>
-        <Button icon="plus" onClick={onNew}>
-          New booking
-        </Button>
+        {!viewer && (
+          <Button icon="plus" onClick={onNew}>
+            New booking
+          </Button>
+        )}
       </div>
     </section>
   );
@@ -79,7 +87,10 @@ function Dashboard() {
   const router = useRouter();
   const path = usePathname();
   const { navigate } = useLeaveGuard();
+  const viewer = useIsViewer();
   const data = useDashboardData();
+  // The arrival cascade plays once per visit, then its classes go, so view swaps and re-renders never replay it.
+  const entering = useEntrance(!!data);
   // One-shot toast carried from another screen ("Booking canceled · BK-…" after canceling in Edit booking, US-12).
   const [flash, setFlashState] = useState<{ text: string; open: boolean } | null>(null);
   const flashPresence = usePresence(!!flash?.open);
@@ -127,77 +138,89 @@ function Dashboard() {
   const page = Math.min(filters.page, pages);
   const tableRows = tableAll.slice((page - 1) * filters.size, page * filters.size);
   const insights = useMemo(() => (data ? buildInsights(data.rows, data.today, now()) : []), [data]);
-  if (!data) return <div className="flex-1" aria-busy="true" />;
+  // 6.3: while the data loads the frame stays — title, filters and view switch are live; KPIs, rail, table rows and
+  // calendar cells show skeletons.
+  const loading = !data;
+  const today = data?.today ?? isoToLocalDate(now().toISOString());
+  const crewList = data ? [...data.crew.values()] : [];
+  const packageList = data?.db.packages ?? [];
+  const rise = (i: number) => (entering ? cascade(i) : undefined);
 
-  const { kpis } = data;
-  const firstUse = data.rows.length === 0;
-  const count = countTrend(kpis.bookingsThisMonth, kpis.bookingsPrevMonth);
-  const collected = percentTrend(kpis.collectedThisMonth, kpis.collectedPrevMonth);
+  const kpis = data?.kpis;
+  const firstUse = !!data && data.rows.length === 0;
+  const count = kpis ? countTrend(kpis.bookingsThisMonth, kpis.bookingsPrevMonth) : null;
+  const collected = kpis ? percentTrend(kpis.collectedThisMonth, kpis.collectedPrevMonth) : null;
   const noData = firstUse ? "No data yet" : undefined;
+  const kpiSkeleton = <Skeleton className="h-[calc(var(--spacing-24)+var(--spacing-4))] w-[calc(var(--spacing-64)+var(--spacing-24))]" />;
 
   return (
     <CrewScheduleContext.Provider value={crewCtx}>
-    <div className="flex flex-1 gap-group px-section">
+    <div data-cascade className="flex flex-1 gap-group px-section">
       <main className={cn("flex min-w-0 flex-1 flex-col py-section", firstUse || view === "table" ? "gap-inset" : "gap-group")}>
-        <div className="flex items-center gap-compact">
+        <div className={cn("flex items-center gap-compact", rise(0))}>
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
             <Txt>Bookings</Txt>
           </h1>
           <span className="flex-1" />
           {/* No Package library button here (removed 2026-11-11) — Packages is reached from the app launcher. */}
-          <Button icon="plus" onClick={() => navigate("/bookings/new")}>
-            New booking
-          </Button>
+          {!viewer && (
+            <Button icon="plus" onClick={() => navigate("/bookings/new")}>
+              New booking
+            </Button>
+          )}
         </div>
 
         <div className="flex items-start gap-base">
           <MetricCard
-            className="min-w-0 flex-1"
+            className={cn("min-w-0 flex-1", rise(1))}
             label="Bookings this month"
             info={KPI_INFO.bookings}
             icon="calendar"
-            value={String(kpis.bookingsThisMonth)}
-            trend={!firstUse && count.changed ? { value: count.value, direction: count.direction, tone: count.tone } : undefined}
-            period={noData ?? "vs last month"}
+            value={kpis ? String(kpis.bookingsThisMonth) : kpiSkeleton}
+            trend={!firstUse && count?.changed ? { value: count.value, direction: count.direction, tone: count.tone } : undefined}
+            period={loading ? undefined : (noData ?? "vs last month")}
           />
           <MetricCard
-            className="min-w-0 flex-1"
+            className={cn("min-w-0 flex-1", rise(2))}
             label="Outstanding balance"
             info={KPI_INFO.outstanding}
             icon="wallet"
-            value={formatIDR(kpis.outstanding)}
-            period={noData ?? `${kpis.outstandingCount} ${kpis.outstandingCount === 1 ? "booking" : "bookings"}`}
+            value={kpis ? formatIDR(kpis.outstanding) : kpiSkeleton}
+            period={kpis ? (noData ?? `${kpis.outstandingCount} ${kpis.outstandingCount === 1 ? "booking" : "bookings"}`) : undefined}
           />
           <MetricCard
-            className="min-w-0 flex-1"
+            className={cn("min-w-0 flex-1", rise(3))}
             label="Collected this month"
             info={KPI_INFO.collected}
             icon="chart-analytics"
-            value={formatIDR(kpis.collectedThisMonth)}
+            value={kpis ? formatIDR(kpis.collectedThisMonth) : kpiSkeleton}
             trend={!firstUse && collected ? collected : undefined}
             period={noData ?? (collected ? "vs last month" : undefined)}
           />
         </div>
 
-        <BookingToolbar view={view} onView={setView} filters={filters} update={update} today={data.today} crew={[...data.crew.values()]} packages={data.db.packages} />
+        <BookingToolbar className={rise(4)} view={view} onView={setView} filters={filters} update={update} today={today} crew={crewList} packages={packageList} />
         {!firstUse && (
           <ActiveFilters
+            className={rise(5)}
             filters={filters}
             update={update}
             reset={reset}
-            today={data.today}
-            crew={[...data.crew.values()]}
-            packages={data.db.packages}
-            summary={view === "table" && hasFilters(filters) ? `Showing ${tableAll.length} of ${data.rows.length} bookings` : undefined}
+            today={today}
+            crew={crewList}
+            packages={packageList}
+            summary={view === "table" && hasFilters(filters) && data ? `Showing ${tableAll.length} of ${data.rows.length} bookings` : undefined}
           />
         )}
 
         {firstUse ? (
-          <FirstUse onNew={() => navigate("/bookings/new")} />
+          <FirstUse className={rise(6)} onNew={() => navigate("/bookings/new")} />
         ) : view === "calendar" ? (
-          <BookingCalendar rows={calendarRows} crew={data.crew} today={data.today} onOpenBooking={openBooking} onNewBooking={(d) => navigate(`/bookings/new?date=${d}`)} />
+          <BookingCalendar loading={loading} className={rise(6)} rows={calendarRows} crew={data?.crew ?? new Map()} today={today} onOpenBooking={openBooking} onNewBooking={(d) => navigate(`/bookings/new?date=${d}`)} />
         ) : (
           <BookingTable
+            loading={loading}
+            className={rise(6)}
             rows={tableRows}
             total={tableAll.length}
             page={page}
@@ -212,7 +235,7 @@ function Dashboard() {
           />
         )}
       </main>
-      <UpcomingRail upcoming={upcoming} insights={insights} today={data.today} onOpenBooking={openBooking} onNavigate={(href) => navigate(href)} />
+      <UpcomingRail loading={loading} className={rise(1)} upcoming={upcoming} insights={insights} today={today} onOpenBooking={openBooking} onNavigate={(href) => navigate(href)} />
     </div>
     <SideSheet open={!!bookingId} onClose={closeBooking} label="Booking detail">
       {bookingId && (

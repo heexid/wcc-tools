@@ -53,6 +53,7 @@ export function buildInvoice(
   const snapshot: InvoiceSnapshot = {
     invoiceNumber: a.number,
     issuedAt: a.issuedAt,
+    business: { ...db.settings.business },
     booking: {
       ref: b.ref,
       bookingName: b.bookingName,
@@ -61,6 +62,7 @@ export function buildInvoice(
       bookingDate: b.bookingDate,
       packageName: b.packageNameSnapshot,
       packagePrice: b.packagePriceSnapshot,
+      packageSummary: db.packages.find((p) => p.id === b.packageId)?.summary ?? "",
       items: b.items.map((i) => ({ name: i.name, price: i.price, qty: i.qty, subtotal: itemSubtotal(i.price, i.qty) })),
       terms: b.terms,
       paymentInstruction: { ...b.paymentInstruction },

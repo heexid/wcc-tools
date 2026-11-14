@@ -16,7 +16,10 @@ import { now } from "@/lib/clock";
 import { getBooking, type BookingDetail as Detail } from "@/lib/data/repo";
 import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, initials, isoToLocalDate, waLink } from "@/lib/format";
 import { useShellCrumb } from "@/components/shell/AppShell";
+import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
 import { CrewSchedulePopover, type CrewPopoverAnchor } from "./CrewSchedule";
+import { useIsViewer } from "@/lib/role";
+import { Loader } from "@/components/ds/Loading";
 
 // Figma Bookings 06 / 21 / 24 / 27 — Booking detail (PRD US-9, PLAN §7, INTERACTIONS 4.1–4.10). Read-only.
 // Header (pad inset/group, gap control, bottom border): ref Caption secondary · status · [open full page · ×] /
@@ -41,14 +44,14 @@ type Props = {
 
 export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBooking, onSeeInCalendar }: Props) {
   const [state, setState] = useState<{ id: string; b: Detail | null } | null>(null);
+  const viewer = useIsViewer();
   const [crewAnchor, setCrewAnchor] = useState<CrewPopoverAnchor | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastPresence = usePresence(!!toast);
   const chips = useRef(new Map<string, HTMLButtonElement>());
-  // Switching to another booking inside the open sheet (4.9) replays a short entrance on the content; the first
-  // open doesn't (the sheet's own slide covers it).
-  const [firstId] = useState(id);
-  const swap = id !== firstId ? "motion-notice" : undefined;
+  const pdf = useInvoicePdf(); // 4.2 / 4.6 / 4.12
+  // Content eases in after the Loader (first open) and when switching to another booking inside the open sheet (4.9).
+  const swap = "motion-notice";
 
   useEffect(() => {
     let live = true;
@@ -65,7 +68,12 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
 
   const b = state?.id === id ? state.b : undefined;
   useShellCrumb(mode === "page" ? (b?.ref ?? null) : null); // full page: breadcrumb shows the ref
-  if (b === undefined) return <div className="flex-1" aria-busy="true" />;
+  if (b === undefined)
+    return (
+      <div className="flex flex-1 items-center justify-center" aria-busy="true">
+        <Loader label="Loading booking…" />
+      </div>
+    ); // 6.3: DS Loader in the detail panel
   if (b === null) return <p className="p-group text-body text-text-secondary">This booking doesn’t exist.</p>;
 
   const today = isoToLocalDate(now().toISOString());
@@ -78,7 +86,6 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
       : b.status === "paid"
         ? `Paid in full · ${b.invoices.length} ${b.invoices.length === 1 ? "invoice" : "invoices"}`
         : `${pct}% paid · balance due ${b.bookingDate === today ? `today (${formatDate(b.bookingDate)})` : `before ${formatDate(b.bookingDate)}`}`;
-  const pdfSoon = () => setToast("Invoice PDFs arrive in slice F15.");
 
   return (
     <>
@@ -89,7 +96,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <span className="flex-1" />
           {mode === "sheet" && (
             <>
-              <Button variant="ghost" iconOnly icon="external-link" aria-label="Open full page" onClick={() => onOpenFull?.(canceled)} />
+              <Button variant="ghost" iconOnly icon="external-link" aria-label="Open full page" onClick={() => onOpenFull?.(canceled || viewer)} />
               <Button variant="ghost" iconOnly icon="x" aria-label="Close" data-close onClick={onClose} />
             </>
           )}
@@ -98,13 +105,13 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <Txt>{b.bookingName}</Txt>
         </h2>
         <div className="flex gap-compact">
-          {!canceled && (
+          {!canceled && !viewer && (
             <Button icon="pencil" onClick={onEdit}>
               Edit booking
             </Button>
           )}
           {b.invoices.length > 0 && (
-            <Button variant="secondary" icon="download" onClick={pdfSoon}>
+            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
               Download latest PDF
             </Button>
           )}
@@ -212,7 +219,8 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
                 amount={formatIDR(inv.amount)}
                 meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                 latest={i === 0}
-                onPdf={pdfSoon}
+                pdfBusy={pdf.busyId === inv.id}
+                onPdf={() => pdf.download(inv)}
               />
             ))
           ) : (
@@ -222,7 +230,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
               <p className="flex text-body-strong text-text-primary">
                 <Txt>No invoices yet</Txt>
               </p>
-              <p className="w-full text-caption text-text-secondary">Open Edit booking to create the first invoice (DP or full price). Invoices are created inside the booking screen.</p>
+              <p className="w-full text-caption text-text-secondary">{viewer ? "No invoice has been created for this booking yet." : "Open Edit booking to create the first invoice (DP or full price). Invoices are created inside the booking screen."}</p>
             </DashedBox>
           )}
         </section>
@@ -241,6 +249,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           onSeeInCalendar(crewId);
         }}
       />
+      {pdf.dialog}
       {toastPresence.mounted && (
         <div className="pointer-events-none fixed inset-x-0 bottom-section z-50 flex justify-center">
           <Toast presence={toastPresence.presence}>{toast}</Toast>

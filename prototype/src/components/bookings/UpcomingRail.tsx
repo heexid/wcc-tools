@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/components/ds/cn";
 import { Button } from "@/components/ds/Button";
 import { Icon } from "@/components/ds/Icon";
 import { InsightCard } from "@/components/ds/Surfaces";
@@ -8,6 +9,7 @@ import { Txt } from "@/components/ds/Txt";
 import type { BookingRow } from "@/lib/data/repo";
 import type { Insight } from "@/lib/booking/insights";
 import { formatDowUpper, formatIDR, parseISODate } from "@/lib/format";
+import { Skeleton } from "@/components/ds/Loading";
 
 // Figma Bookings 01 → Rail (352, pad section/group, gap inset, left border): Upcoming heading (calendar 20
 // text/accent · Heading/Section · "Next 7 days" Caption), up to 4 Upcoming items, "See all in table",
@@ -48,12 +50,16 @@ function UpcomingItem({ b, today, onOpen }: { b: BookingRow; today: string; onOp
 }
 
 export function UpcomingRail({
+  className,
   upcoming,
   insights,
   today,
   onOpenBooking,
   onNavigate,
+  loading,
 }: {
+  loading?: boolean;
+  className?: string;
   upcoming: BookingRow[];
   insights: Insight[];
   today: string;
@@ -62,7 +68,7 @@ export function UpcomingRail({
 }) {
   const shown = upcoming.slice(0, RAIL_LIMIT);
   return (
-    <aside aria-label="Upcoming and insights" className="flex w-layout-rail-width shrink-0 flex-col gap-inset border-l border-border-default bg-surface-default px-group py-section">
+    <aside aria-label="Upcoming and insights" className={cn("flex w-layout-rail-width shrink-0 flex-col gap-inset border-l border-border-default bg-surface-default px-group py-section", className)}>
       <div className="flex items-center gap-compact">
         <Icon name="calendar" className="size-icon-md text-text-accent" />
         <h2 className="flex text-heading-section text-text-primary">
@@ -71,7 +77,15 @@ export function UpcomingRail({
         <span className="flex-1" />
         <Txt className="text-caption text-text-secondary">Next 7 days</Txt>
       </div>
-      {shown.length ? (
+      {loading ? (
+        <ul aria-busy="true" className="flex flex-col gap-compact">
+          {Array.from({ length: RAIL_LIMIT }, (_, k) => (
+            <li key={k}>
+              <Skeleton className="h-[calc(var(--spacing-64)+var(--spacing-24))] w-full rounded-control" />
+            </li>
+          ))}
+        </ul>
+      ) : shown.length ? (
         <>
           <ul className="flex flex-col gap-compact">
             {shown.map((b) => (

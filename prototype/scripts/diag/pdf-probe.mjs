@@ -1,0 +1,10 @@
+import { chromium } from "@playwright/test";
+const b = await chromium.launch(); const p = await b.newPage();
+p.on("console", (m) => console.log("console:", m.type(), m.text().slice(0, 300)));
+p.on("pageerror", (e) => console.log("pageerror:", String(e).slice(0, 300)));
+await p.goto("http://localhost:3100/dev");
+await p.evaluate(() => localStorage.setItem("proto:session", "1"));
+await p.goto("http://localhost:3100/dev/pdf?fixture=screen-11b&invoice=INV-2026-0187");
+await p.waitForTimeout(25000);
+console.log("state:", await p.locator("canvas").getAttribute("data-state"));
+await b.close();

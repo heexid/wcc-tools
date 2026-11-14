@@ -11,9 +11,9 @@ import { cn } from "./cn";
 // input, Line item row, Summary row, Crew chip, dashed empty box.
 
 /** Page header (h 82, pad group/gutter, bottom border): ‹ back 20 · Heading/Page title · status badge (gap control). */
-export function EditorPageHeader({ title, status, onBack, backLabel = "Back", actions }: { title: string; status?: BookingStatus; onBack: () => void; backLabel?: string; actions?: ReactNode }) {
+export function EditorPageHeader({ title, status, onBack, backLabel = "Back", actions, className }: { title: string; status?: BookingStatus; onBack: () => void; backLabel?: string; actions?: ReactNode; className?: string }) {
   return (
-    <div className="flex w-full items-center justify-between border-b border-border-default px-layout-gutter py-group">
+    <div className={cn("flex w-full items-center justify-between border-b border-border-default px-layout-gutter py-group", className)}>
       <div className="flex items-center gap-control">
         <button type="button" aria-label={backLabel} onClick={onBack} className="flex cursor-pointer rounded-small text-text-primary outline-none focus-visible:shadow-focus-ring">
           <Icon name="chevron-left" className="size-icon-md" />
@@ -156,6 +156,7 @@ export const CrewChipButton = forwardRef<HTMLButtonElement, { name: string; init
       className={cn(
         "flex h-[calc(var(--spacing-24)+var(--spacing-4))] shrink-0 cursor-pointer items-center gap-tight rounded-pill bg-surface-accent py-2 pl-2 pr-[calc(var(--spacing-12)-var(--spacing-2))] text-caption text-text-primary outline-0 outline-border-accent outline-none",
         "hover:outline-1 hover:outline-solid data-open:outline-1 data-open:outline-solid focus-visible:shadow-focus-ring",
+        "transition-transform duration-(--dur-press) ease-(--ease-out) active:scale-(--press-scale)", // press feedback (Button recipe)
       )}
     >
       <Avatar size={24} initials={initials} />

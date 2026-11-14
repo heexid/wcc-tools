@@ -16,7 +16,14 @@ import type { Booking, Crew, Db, DpMethod, InvoiceType, Package } from "./types"
 export const at = (local: string) => new Date(`${local.replace(" ", "T")}:00+07:00`).toISOString();
 
 /** Studio account (Figma lane I) — prefills every booking's payment instruction. */
+/** Saved-data schema version: the store reseeds when localStorage holds another one. Bump on any Db shape change.
+ *  2: bookings carry a payment instruction (lane I) · 3: invoice snapshots carry the business + package summary (F15). */
+export const DB_VERSION = 3;
+
 export const DEFAULT_PAYMENT = { receiptName: "Bank BCA", accountNumber: "1234567890", accountName: "bs.moment Studio" };
+
+/** Figma Bookings 11 header / "From" block. */
+export const DEFAULT_BUSINESS = { name: "bs.moment", address: "Jl. Rawa Mangun No. 12, Jakarta Timur", phone: "+62 21-555-0100", email: "finance@bs-moment.com" };
 
 export const DEFAULT_TERMS =
   "Remaining balance is due H-3 before the booking date. DP is non-refundable once the date is locked. Reschedule requests must be made at least 14 days before the booking date.";
@@ -149,7 +156,7 @@ const FIRST_GENERATED_INVOICE = 140;
 
 export function seedDb(): Db {
   const db: Db = {
-    version: 1,
+    version: DB_VERSION,
     fixture: "seed",
     packages: PACKAGES.map((p) => ({ ...p })),
     crew: CREW.map((c) => ({ ...c })),
@@ -161,6 +168,7 @@ export function seedDb(): Db {
     settings: {
       defaultTerms: DEFAULT_TERMS,
       defaultPayment: { ...DEFAULT_PAYMENT },
+      business: { ...DEFAULT_BUSINESS },
     },
   };
 

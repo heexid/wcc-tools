@@ -10,6 +10,8 @@ import { useDismiss } from "@/components/shell/useDismiss";
 import type { BookingRow } from "@/lib/data/repo";
 import { addDays, formatDateLongDay, parseISODate, toISODate, type ISODate } from "@/lib/format";
 import { DayPopover, DAY_POPOVER_WIDTH } from "./DayPopover";
+import { useIsViewer } from "@/lib/role";
+import { Skeleton } from "@/components/ds/Loading";
 
 // Figma Bookings 01 (month) + 17 ("+N more" popover, empty-date hover) — PRD US-6, §4.5 (keyboard grid),
 // INTERACTIONS 1.11–1.15. Weekdays row (h 36, surface/header, Caption text/secondary, pad compact) + 6 week
@@ -46,7 +48,9 @@ export function MonthCalendar({
   onOpenBooking,
   onNewBooking,
   onOpenDay,
+  loading,
 }: {
+  loading?: boolean;
   rows: BookingRow[];
   today: ISODate;
   anchor: ISODate;
@@ -55,6 +59,7 @@ export function MonthCalendar({
   onNewBooking: (d: ISODate) => void;
   onOpenDay: (d: ISODate) => void;
 }) {
+  const viewer = useIsViewer();
   const days = useMemo(() => monthGrid(anchor), [anchor]);
   const month = anchor.slice(0, 7);
   const byDate = useMemo(() => {
@@ -121,7 +126,7 @@ export function MonthCalendar({
     if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) {
       e.preventDefault();
       if (byDate.get(date)?.length) openDay(date, true);
-      else onNewBooking(date);
+      else if (!viewer) onNewBooking(date);
     }
   };
 
@@ -169,15 +174,22 @@ export function MonthCalendar({
                   // A click on the date itself (not a booking chip or "+N more") starts a New booking on that date —
                   // also on dates that already have bookings (decision 2026-11-11). Chips still open their booking.
                   onClick={(e: MouseEvent) => {
-                    if (e.target === e.currentTarget || !(e.target as HTMLElement).closest("button")) onNewBooking(date);
+                    if (!viewer && (e.target === e.currentTarget || !(e.target as HTMLElement).closest("button"))) onNewBooking(date);
                   }}
                   onKeyDown={(e) => onKey(e, date)}
                   more={extra > 0 && <CalendarMore n={extra} aria-haspopup="dialog" aria-expanded={pop?.date === date} onClick={() => openDay(date)} />}
                 >
-                  {chips.map((b) => (
-                    <CalendarBookingChip key={b.id} status={b.status} label={b.bookingName} aria-label={`${b.bookingName}, ${STATUS_TEXT[b.status]}`} onClick={() => onOpenBooking(b.id)} />
-                  ))}
-                  {n === 0 && <EmptyDateTarget date={date} onNew={onNewBooking} />}
+                  {loading ? (
+                    // 6.3: skeleton date cells — the grid and day numbers are real, the bookings aren't known yet.
+                    <Skeleton className="h-20 w-full" />
+                  ) : (
+                    <>
+                      {chips.map((b) => (
+                        <CalendarBookingChip key={b.id} status={b.status} label={b.bookingName} aria-label={`${b.bookingName}, ${STATUS_TEXT[b.status]}`} onClick={() => onOpenBooking(b.id)} />
+                      ))}
+                      {n === 0 && <EmptyDateTarget date={date} onNew={onNewBooking} />}
+                    </>
+                  )}
                 </CalendarDayCell>
               );
             })}
@@ -217,6 +229,7 @@ export function MonthCalendar({
  * Enter on the date.
  */
 function EmptyDateTarget({ date, onNew }: { date: ISODate; onNew: (d: ISODate) => void }) {
+  if (useIsViewer()) return null;
   return (
     <button
       type="button"

@@ -268,3 +268,21 @@ describe("account (US-13, §4.3)", () => {
     expect(getDb().profile.passwordChangedAt).toBe("2026-11-10");
   });
 });
+
+describe("invoice snapshot + saved data (F15)", () => {
+  it("seed data carries the store's schema version (else every reload reseeds and drops saved changes)", async () => {
+    const { seedDb, DB_VERSION } = await import("@/lib/data/seed");
+    expect(seedDb().version).toBe(DB_VERSION);
+  });
+
+  it("an edit never changes an issued invoice's snapshot; it carries business + package summary (US-10)", async () => {
+    const sari = getDb().bookings.find((b) => b.ref === "BK-2026-0142")!;
+    const before = await repo.getInvoiceSnapshot("INV-2026-0187");
+    expect(before.business).toMatchObject({ name: "bs.moment", email: "finance@bs-moment.com" });
+    expect(before.booking.packageSummary).toBe("8-hour coverage · 2 crew · 1 premium album");
+    const r = await repo.saveBooking({ ...newBooking({ clientName: "Sari W. Pratama", packageId: sari.packageId, bookingDate: "2026-11-21" }), id: sari.id });
+    expect(r.ok).toBe(true);
+    expect(await repo.getInvoiceSnapshot("INV-2026-0187")).toEqual(before);
+    expect(snapshotIntact(getDb().invoices.find((i) => i.number === "INV-2026-0187")!)).toBe(true);
+  });
+});

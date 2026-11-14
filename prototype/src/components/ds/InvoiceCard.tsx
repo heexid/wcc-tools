@@ -19,6 +19,7 @@ export function InvoiceCard({
   meta,
   latest,
   onPdf,
+  pdfBusy,
   className,
 }: {
   number: string;
@@ -30,6 +31,8 @@ export function InvoiceCard({
   meta: string;
   latest?: boolean;
   onPdf?: () => void;
+  /** The PDF is being generated (button shows Loading). */
+  pdfBusy?: boolean;
   className?: string;
 }) {
   return (
@@ -50,7 +53,7 @@ export function InvoiceCard({
       <div className="flex w-full items-center gap-compact border-t border-border-default pt-control">
         {/* Meta fills the free space and wraps on narrow cards so the button never overflows (Figma 10, 398 wide). */}
         <p className="min-w-0 flex-1 text-caption text-text-secondary">{meta}</p>
-        <Button variant="secondary" icon="download" onClick={onPdf} aria-label={`Download PDF (${number})`} className="shrink-0">
+        <Button variant="secondary" icon="download" loading={pdfBusy} onClick={onPdf} aria-label={`Download PDF (${number})`} className="shrink-0">
           Download PDF
         </Button>
       </div>

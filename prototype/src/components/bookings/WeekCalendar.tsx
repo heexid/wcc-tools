@@ -15,6 +15,7 @@ import type { BookingRow } from "@/lib/data/repo";
 import type { Crew } from "@/lib/data/types";
 import { addDays, formatDayMonth, formatDateLongDay, initials, parseISODate, type ISODate } from "@/lib/format";
 import { DayPopover, DAY_POPOVER_WIDTH } from "./DayPopover";
+import { useIsViewer } from "@/lib/role";
 
 // Figma Bookings 19 (week), 28 (hover · drill-in · quick add), 31 (busy day "+N more") — PRD US-6 week,
 // INTERACTIONS 1.24–1.27. Mon–Sun, 7 columns (pad compact/tight, gap tight, right border; today's column
@@ -191,6 +192,7 @@ export function WeekCalendar({
  * text/accent, centred. Replaces "No bookings" while the column is hovered (INTERACTIONS 1.26).
  */
 function WeekQuickAdd({ date, onNew }: { date: ISODate; onNew: (d: ISODate) => void }) {
+  if (useIsViewer()) return null;
   return (
     <button
       type="button"

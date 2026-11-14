@@ -7,9 +7,11 @@ import { Alert, Toast, ToastRegion } from "@/components/ds/Feedback";
 import { FieldBox, FieldHelper, FieldLabel, InputField } from "@/components/ds/InputField";
 import { Icon } from "@/components/ds/Icon";
 import { InvoiceCard } from "@/components/ds/InvoiceCard";
+import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
 import { PaymentStatusBadge } from "@/components/ds/Badges";
 import { TextArea } from "@/components/ds/TextArea";
 import { Txt } from "@/components/ds/Txt";
+import { cascade, cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { useShellCrumb } from "@/components/shell/AppShell";
@@ -26,6 +28,7 @@ import { formatDate, formatDateTime, formatIDR, formatPhone, initials, isoToLoca
 // (n) without Create invoice. The editor global header shows no save status or buttons.
 
 export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () => void }) {
+  const entering = useEntrance(); // module entrance cascade (motion.css)
   useShellCrumb(b.ref);
   const [toast, setToast] = useState<{ text: string; open: boolean } | null>(null);
   const toastPresence = usePresence(!!toast?.open);
@@ -43,7 +46,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
     return () => window.removeEventListener("keydown", onKey);
   }, [onBack]);
 
-  const pdfSoon = () => setToast({ text: "Invoice PDFs arrive in slice F15.", open: true });
+  const pdf = useInvoicePdf(); // PDFs still download on a canceled booking (US-12, 4.11)
   const extras = b.items.reduce((s, it) => s + it.price * it.qty, 0);
   const pct = paidPercent(b.total, b.totalPaid);
   const n = b.invoices.length;
@@ -51,20 +54,21 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
   return (
     <>
       <EditorPageHeader
+        className={entering ? cascade(0) : undefined}
         title={b.bookingName}
         status={b.status}
         onBack={onBack}
         backLabel="Back to bookings"
         actions={
           n > 0 && (
-            <Button variant="secondary" icon="download" onClick={pdfSoon}>
+            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
               Download latest PDF
             </Button>
           )
         }
       />
-      <div className="flex flex-1 gap-section pl-section">
-        <main className="flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))]">
+      <div data-cascade className="flex flex-1 gap-section pl-section">
+        <main className={cn("flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))]", entering && cascadeChildren(1))}>
           {b.canceledAt && (
             <Alert tone="danger" title={`Canceled on ${formatDate(isoToLocalDate(b.canceledAt))} by ${b.canceledBy}`}>
               {`${b.cancelReason ? `Reason: ${b.cancelReason.replace(/\.?$/, ".")} ` : ""}This booking is read-only — it can’t be edited and no new invoices can be created.`}
@@ -148,7 +152,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
           </section>
         </main>
 
-        <aside aria-label="Summary and invoices" className="flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section">
+        <aside aria-label="Summary and invoices" className={cn("flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section", entering && cascade(1))}>
           <section aria-label="Totals" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset">
             <h2 className="flex text-heading-section text-text-primary">
               <Txt>Totals</Txt>
@@ -161,7 +165,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
             <div className="flex flex-col gap-micro rounded-control bg-surface-subtle p-base">
               <SummaryRow label="Not collected" value={formatIDR(b.remaining)} />
               <Txt className="text-caption text-text-secondary">
-                {`${pct}% paid before cancellation · no balance due.${n ? " Existing invoices stay on record." : ""}`}
+                {b.canceledAt ? `${pct}% paid before cancellation · no balance due.${n ? " Existing invoices stay on record." : ""}` : `${pct}% paid`}
               </Txt>
             </div>
           </section>
@@ -182,7 +186,8 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
                   amount={formatIDR(inv.amount)}
                   meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                   latest={i === 0}
-                  onPdf={pdfSoon}
+                  pdfBusy={pdf.busyId === inv.id}
+                  onPdf={() => pdf.download(inv)}
                 />
               ))
             ) : (
@@ -190,12 +195,13 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
                 <p className="flex text-body-strong text-text-primary">
                   <Txt>No invoices</Txt>
                 </p>
-                <p className="w-full text-caption text-text-secondary">This booking was canceled before any payment. No new invoices can be created.</p>
+                <p className="w-full text-caption text-text-secondary">{b.canceledAt ? "This booking was canceled before any payment. No new invoices can be created." : "No invoice has been created for this booking yet."}</p>
               </DashedBox>
             )}
           </section>
         </aside>
       </div>
+      {pdf.dialog}
       {toastPresence.mounted && (
         <ToastRegion>
           <Toast presence={toastPresence.presence}>{toast?.text}</Toast>

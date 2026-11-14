@@ -24,6 +24,9 @@ export type Crew = { id: string; name: string; role: string; isActive: boolean }
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
 
+/** Business profile printed on the invoice PDF header and "From" block (PRD US-10, Settings). */
+export type Business = { name: string; address: string; phone: string; email: string };
+
 export type BookingItem = { id: string; name: string; price: number; qty: number };
 
 export type Booking = {
@@ -54,6 +57,8 @@ export type Booking = {
 export type InvoiceSnapshot = {
   invoiceNumber: string;
   issuedAt: string;
+  /** Business details at issue time — the PDF is rebuilt from the snapshot only (US-10). */
+  business: Business;
   booking: {
     ref: string;
     bookingName: string;
@@ -62,6 +67,8 @@ export type InvoiceSnapshot = {
     bookingDate: ISODate;
     packageName: string;
     packagePrice: number;
+    /** The package's one-line summary at issue time (PDF item line "Gold Package — 8-hour coverage · …"). */
+    packageSummary: string;
     items: { name: string; price: number; qty: number; subtotal: number }[];
     terms: string;
     /** Printed on the invoice (F15). */
@@ -117,5 +124,5 @@ export type Db = {
   password: string;
   counters: { booking: Record<number, number>; invoice: Record<number, number> };
   /** `defaultPayment` prefills every new booking's payment instruction. */
-  settings: { defaultTerms: string; defaultPayment: PaymentInstruction };
+  settings: { defaultTerms: string; defaultPayment: PaymentInstruction; business: Business };
 };

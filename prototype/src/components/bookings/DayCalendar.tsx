@@ -9,6 +9,7 @@ import type { BookingRow } from "@/lib/data/repo";
 import type { Crew } from "@/lib/data/types";
 import { formatDayMonth, formatIDR, parseISODate, type ISODate } from "@/lib/format";
 import { CrewAvatars } from "./WeekCalendar";
+import { useIsViewer } from "@/lib/role";
 
 // Figma Bookings 20 (day), 29 (row hover · crew schedule → F12), 30 (no bookings) — PRD US-6 day,
 // INTERACTIONS 1.28–1.31. Summary bar (h 45, pad control/base, gap base, surface/subtle, bottom border):
@@ -33,6 +34,7 @@ export function DayCalendar({
   onOpenBooking: (id: string) => void;
   onNewBooking: (d: ISODate) => void;
 }) {
+  const viewer = useIsViewer();
   const list = rows.filter((r) => r.bookingDate === date);
   const n = list.length;
 
@@ -46,9 +48,11 @@ export function DayCalendar({
         <p className="flex text-body text-text-secondary">
           <Txt>Nothing is scheduled for this date with the current filters.</Txt>
         </p>
-        <Button icon="plus" onClick={() => onNewBooking(date)}>
-          New booking on this date
-        </Button>
+        {!viewer && (
+          <Button icon="plus" onClick={() => onNewBooking(date)}>
+            New booking on this date
+          </Button>
+        )}
       </div>
     );
 
@@ -74,11 +78,13 @@ export function DayCalendar({
           </li>
         ))}
       </ul>
-      <div className="flex px-base py-control">
-        <Button variant="ghost" icon="plus" onClick={() => onNewBooking(date)}>
-          New booking on this date
-        </Button>
-      </div>
+      {!viewer && (
+        <div className="flex px-base py-control">
+          <Button variant="ghost" icon="plus" onClick={() => onNewBooking(date)}>
+            New booking on this date
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

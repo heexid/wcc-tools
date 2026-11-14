@@ -7,6 +7,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { bookingToValues } from "@/lib/booking/form";
 import { getBooking } from "@/lib/data/repo";
 import { formatPhone } from "@/lib/format";
+import { useIsViewer } from "@/lib/role";
 
 // /bookings/[id]/edit — the booking form in edit mode (breadcrumb = ref, title = booking name, Figma 05 / 07 / 08 /
 // 12 / 38; PRD US-4, US-5). F10 lands here after "Save booking" (INTERACTIONS 2.2); F13 completes it (diff strip,
@@ -24,6 +25,7 @@ function EditBooking({ id }: { id: string }) {
     if (seen.current) setVisit((v) => v + 1);
     seen.current = true;
   }, []);
+  const viewer = useIsViewer();
   const key = `${id}#${visit}`;
   const [state, setState] = useState<{ key: string; data: Initial | "missing" } | null>(null);
   useEffect(() => {
@@ -31,7 +33,7 @@ function EditBooking({ id }: { id: string }) {
     getBooking(id).then((b) => {
       if (!live) return;
       // Canceled is read-only (US-12): /edit goes to the read-only full page (Figma H5) instead.
-      if (b?.status === "canceled") return router.replace(`/bookings/${b.id}`);
+      if (b?.status === "canceled" || (b && viewer)) return router.replace(`/bookings/${b.id}`); // viewers get the read-only page (6.4)
       setState({
         key,
         data: b
@@ -53,7 +55,7 @@ function EditBooking({ id }: { id: string }) {
     return () => {
       live = false;
     };
-  }, [id, key, router]);
+  }, [id, key, router, viewer]);
   if (!state || state.key !== key) return <div className="flex-1" aria-busy="true" />;
   if (state.data === "missing") return <p className="p-section text-body text-text-secondary">This booking doesn’t exist.</p>;
   return <BookingForm key={key} date={null} initial={state.data} />;

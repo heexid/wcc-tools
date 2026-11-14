@@ -7,6 +7,7 @@ import { Avatar, Toast, ToastRegion } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
 import { InputField } from "@/components/ds/InputField";
 import { Txt } from "@/components/ds/Txt";
+import { cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { PROFILE_EVENT } from "@/components/shell/AppShell";
@@ -29,6 +30,7 @@ const ROLE_NOTE = {
 
 export function AccountSettings() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const entering = useEntrance(!!profile); // module entrance cascade (motion.css) — starts once the profile is in
   const [modal, setModal] = useState<null | "name" | "password">(null);
   const [toast, setToastState] = useState<{ text: string; open: boolean } | null>(null);
   const toastPresence = usePresence(!!toast?.open);
@@ -52,8 +54,8 @@ export function AccountSettings() {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-center pt-[calc(var(--spacing-32)+var(--spacing-8))] pb-[calc(var(--spacing-64)+var(--spacing-16))]">
-      <main className="flex w-[calc(var(--spacing-64)*12-var(--spacing-8))] flex-col gap-section">
+    <div data-cascade className="flex flex-1 flex-col items-center pt-[calc(var(--spacing-32)+var(--spacing-8))] pb-[calc(var(--spacing-64)+var(--spacing-16))]">
+      <main className={cn("flex w-[calc(var(--spacing-64)*12-var(--spacing-8))] flex-col gap-section", entering && cascadeChildren())}>
         <div className="flex flex-col gap-micro">
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
             <Txt>Account settings</Txt>

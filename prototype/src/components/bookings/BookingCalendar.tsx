@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/components/ds/cn";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CalendarHeader, type CalendarRange } from "@/components/ds/Calendar";
@@ -9,6 +10,7 @@ import type { Crew } from "@/lib/data/types";
 import { DayCalendar } from "./DayCalendar";
 import { MonthCalendar, shiftMonth } from "./MonthCalendar";
 import { WeekCalendar, weekStartOf } from "./WeekCalendar";
+import { Skeleton } from "@/components/ds/Loading";
 
 // Calendar card (Figma 01: 998 wide, 1px border, radius card, surface/default): Calendar/Header + the
 // range body (Month F7 · Week / Day F8). URL: `view=day|week` (Month is the default, no param) and
@@ -18,12 +20,16 @@ import { WeekCalendar, weekStartOf } from "./WeekCalendar";
 const isISO = (v: string | null): v is ISODate => !!v && /^\d{4}-\d{2}-\d{2}$/.test(v);
 
 export function BookingCalendar({
+  className,
   rows,
   crew,
   today,
   onOpenBooking,
   onNewBooking,
+  loading,
 }: {
+  loading?: boolean;
+  className?: string;
   rows: BookingRow[];
   crew: Map<string, Crew>;
   today: ISODate;
@@ -80,7 +86,7 @@ export function BookingCalendar({
   };
 
   return (
-    <section aria-label="Calendar" className="motion-swap flex flex-col rounded-card border border-border-default bg-surface-default">
+    <section aria-label="Calendar" className={cn("motion-swap flex flex-col rounded-card border border-border-default bg-surface-default", className)}>
       <CalendarHeader
         title={head.title}
         unit={head.unit}
@@ -92,8 +98,14 @@ export function BookingCalendar({
       />
       {/* Keyed by range: a new body (Month / Week / Day) fades in; ‹ › keep the same element, so they never replay it. */}
       <div key={range} className="motion-swap">
-        {range === "month" ? (
-          <MonthCalendar rows={rows} today={today} anchor={anchor} onAnchor={setAnchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
+        {loading && range !== "month" ? (
+          <div aria-busy="true" className="flex flex-col gap-compact p-base">
+            {Array.from({ length: range === "week" ? 3 : 4 }, (_, k) => (
+              <Skeleton key={k} className="h-[calc(var(--spacing-48)+var(--spacing-8))] w-full" />
+            ))}
+          </div>
+        ) : range === "month" ? (
+          <MonthCalendar loading={loading} rows={rows} today={today} anchor={anchor} onAnchor={setAnchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
         ) : range === "week" ? (
           <WeekCalendar rows={rows} crew={crew} today={today} anchor={anchor} onOpenBooking={onOpenBooking} onNewBooking={onNewBooking} onOpenDay={openDay} />
         ) : (

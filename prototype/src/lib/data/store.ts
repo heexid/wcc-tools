@@ -1,11 +1,11 @@
 // In-memory database with localStorage persistence (browser) — the prototype's "Supabase".
 // Keys are prefixed "proto:" so /dev/reset can clear them. Node/Vitest: memory only.
-import { seedDb } from "./seed";
+import { DB_VERSION, seedDb } from "./seed";
 import { applyFixture } from "./fixtures";
 import type { Db } from "./types";
 
 const KEY = "proto:db";
-const VERSION = 2; // 2: bookings carry a payment instruction (lane I) — older saved data reseeds
+const VERSION = DB_VERSION; // one source with seedDb() — older saved data reseeds
 let db: Db | null = null;
 
 const storage = (): Storage | null => {

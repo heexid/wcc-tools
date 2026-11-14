@@ -79,7 +79,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 ## 8. PDF (Day 10–11)
 - `components/pdf/InvoiceDocument.tsx` (@react-pdf) renders from `invoice.snapshot` only.
 - Register the Inter font and use token colours.
-- Generate on confirm, upload to Storage, signed URL route.
+- Generate on confirm, upload to Storage, signed URL route. *(Prototype F15: generated in the browser on download from the snapshot; the snapshot now also carries the business details and package summary.)*
 
 ## 8b. Account (Day 11)
 - `/account` page (server component) reading the signed-in user plus their `profiles` row (`display_name`, role from the workspace membership).
