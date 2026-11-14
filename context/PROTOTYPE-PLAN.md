@@ -39,6 +39,9 @@ Figma-faithful building blocks (F1): use `<Txt>` for single-line labels in hug/c
 
 Figma reference PNGs live in `prototype/public/__figma__/<frame>.png` and node specs in `public/__figma__/specs/<slice>.json` (served so `/dev/overlay` can use them). They are exported straight to disk: run `npm run figma:receiver` (port 9232), then in `figma_execute` call `node.exportAsync({format:'PNG', constraint:{type:'SCALE', value:1}})` and `fetch('http://localhost:9232/save?name=<frame>.png', {method:'POST', body})`. Screenshot tests live in `prototype/tests/visual/<slice>.spec.ts`; G3 also fails if the Next.js dev "Issue" toast is on screen.
 
+### 0.3a Testing instruction (user, 2026-11-14)
+When asked to **test**, do **not** re-export Figma reference PNGs (`npm run figma:receiver`, `public/__figma__/`) and do **not** re-run the visual tests (G3, `npm run visual`). Run only the unit and behaviour/e2e tests, unless the user explicitly asks for the visual gate or a re-export. If a change affects visual gates, report them as unconfirmed.
+
 ### 0.4 Motion rules (every slice)
 - Every development step runs the skills **`find-animation-opportunities`** (propose) then **`animate`** (implement), in that order, on the slice's UI.
 - Inline notices (alerts that appear in place: login errors, save / invoice failures) use `.motion-notice` (F3).
@@ -584,9 +587,23 @@ Frozen "today" for tests: **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY=2026-11-10`).
 | F12 Detail + crew schedule | ✅ | ✅ (1 accepted) | ✅ | — | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-11 |
 | F13 Edit + follow-up invoice | ✅ | ✅ (0 new, 1 fix) | ✅ | ✅ (134) | ✅ | ✅ | ✅ | ✅ (10 by behaviour) | ✅ | ✅ 2026-11-12 |
 | F14 Cancel booking | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
-| F15 Invoice PDF | ✅ | ✅ (none) | — | ✅ (136) | ✅ | ⚠ (motion.css, other session) | ✅ | ✅ 11 / 11b / 11c · ⚠ 37 (dialog centring) | ✅ | ⚠ 2026-11-14 |
+| F15 Invoice PDF | ✅ | ✅ (none) | — | ✅ (136) | ✅ | ⚠ (motion.css, other session) | ✅ | ✅ 11 / 11b / 11c · 37 follows the Figma re-centring (§4.1; PNG re-export pending) | ✅ | ⚠ 2026-11-14 |
 | F16 Account + log out | ✅ | ✅ (none) | — | ✅ (134) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 2026-11-12 |
-| F17 Viewer, loading, regression | ✅ viewer + loading | ✅ (3 accepted, 4 rejected) | ✅ | ✅ (136) | ✅ 9 new · ⚠ full suite: 53/55 failures pre-date F17 (clean `HEAD` fails the same) | ✅ | ☐ | ⚠ 53 inherited | ☐ (no Skeleton in Figma) | 🟡 a11y: contrast tokens + 2 ARIA fixes open · 2026-11-14 |
+| F17 Viewer, loading, regression | ✅ viewer + loading | ✅ (3 accepted, 4 rejected) | ✅ | ✅ (136) | ✅ 9 new · ⚠ full suite: 53/55 failures pre-date F17 (clean `HEAD` fails the same) | ✅ | ☐ | ⚠ 53 inherited (dialogs + login now fixed in Figma, §4.1 — re-export PNGs, re-run) | ✅ Skeleton added to Figma | 🟡 a11y: contrast tokens + 2 ARIA fixes open · 2026-11-14 |
+
+### 4.1 Design sync · 2026-11-14
+
+The prototype is the reference where it moved past Figma; Figma was updated to match (user, 2026-11-14). Resolves the F15 / F17 open question "Dialog centring and login background — which wins?".
+
+| Area | Prototype | Figma change |
+|---|---|---|
+| Modal placement | `Dialog.tsx` centres every modal in the viewport; taller than viewport − 160 → starts 80 from the top (decision 2026-11-12) | 41 frames re-placed to `y = max(80, (frame height − modal height) / 2)`; 17 hotspots moved with their buttons. Frames are full-page height, so the modal sits at the frame's middle (the G3 harness renders at frame height, same rule) |
+| Login background | `LiquidBackground` — WebGL liquid gradient + 25.8 % overlay grain (reduced motion = one still frame) | P1–P3, E1–E7 background = image fill of that still frame (1440 × 900) |
+| Loading | `Skeleton`, `Loader` (F17) | `Skeleton` component added; `Loader` 104 × 104 (5×5) |
+| Invoice PDF tags | Type tag text = "Partially paid" (DP / Partial) or "Paid" (Full / Paid) — Figma A5 / A5b | none — Figma already has it |
+| Module entrance cascade, press feedback on chips / crew chips | motion only (`motion.css`, F17) | none — not a static design property |
+
+Expected effect on the pixel gates: the ~20 dialog frames that failed G3 on placement and the Login frames that failed on the background pass after the Figma PNGs are re-exported (`npm run figma:receiver`). Not yet re-exported.
 
 ## 5. Coverage check (sync with the other docs)
 

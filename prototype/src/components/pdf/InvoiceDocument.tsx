@@ -24,9 +24,9 @@ export function registerInvoiceFonts(base = "") {
 }
 
 const TYPE_TAG: Record<InvoiceType, { label: string; bg: string; fg: string }> = {
-  dp: { label: "DP", bg: "surface/info", fg: "status/info" },
-  full: { label: "Full", bg: "surface/accent", fg: "text/accent" },
-  partial: { label: "Partial", bg: "surface/warning", fg: "status/warning" },
+  dp: { label: "Partially paid", bg: "surface/warning", fg: "status/warning" }, // Figma A5: DP tag removed
+  full: { label: "Paid", bg: "surface/positive", fg: "status/positive" }, // Figma A5b
+  partial: { label: "Partially paid", bg: "surface/warning", fg: "status/warning" },
   paid: { label: "Paid", bg: "surface/positive", fg: "status/positive" },
 };
 

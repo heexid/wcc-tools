@@ -28,7 +28,7 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
 ## 1. Foundations (Day 1–2)
 
 1. Export CIR variables → `tokens/figma.tokens.json` → `src/styles/tokens.css` (Tailwind 4 `@theme`, defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). Font: self-hosted Inter 3.19 to match Figma's Inter 3.x metrics. *(Done in prototype slice F0.)*
-2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField. *(Done in prototype slice F1 — `prototype/src/components/ds/`; Tooltip, Side sheet, Skeleton and Loader follow in F6 / F12 / F17.)*
+2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField. *(Done in prototype slice F1 — `prototype/src/components/ds/`; Tooltip, Side sheet, Skeleton and Loader followed in F6 / F12 / F17. Figma `Skeleton` was added 2026-11-14; `Loader` fixed to a 5×5 grid, 104 × 104.)*
 3. Formatting utilities in `lib/format.ts`: `formatIDR(n) → "Rp 1.250.000"`, `parseIDR("1.250.000") → 1250000`, `formatDate(id-ID)`.
 
 ## 2. Database (Day 2–3)
@@ -92,7 +92,8 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - Visual QA against the Figma frames at 1440 (gates G1–G4 in `PROTOTYPE-PLAN.md` §0.3). 768 / 390 come with the deferred tablet/mobile layouts.
 - Reconciliation SQL check (success criterion #3) runs as a nightly cron.
 
-## Figma deliverables (`bs internal tools`, updated 2026-11-10)
+## Figma deliverables (`bs internal tools`, updated 2026-11-14)
+- **Prototype → Figma sync, 2026-11-14 (prototype wins):** (1) every modal / confirm dialog (41 frames on Bookings, Package Lib, Launchpad & Profile) is **vertically centred in its frame** — `y = max(80, (frame height − modal height) / 2)` — replacing the fixed tops (128 / 150 / 220 / 240 / 260); the flow-lane hotspots on those dialogs moved with them. Side sheets stay 8 / 8 / 8. (2) **Login** frames P1–P3 and E1–E7 use the liquid gradient + grain background (still frame of the prototype's WebGL shader; colours `#fbf2fe` → `#fdb5df`) instead of the flat fill. (3) CIR · Design System → *Pattern · Data & content*: new `Skeleton` component (surface/header, radius 6); `Loader` resized 100 → 104 so its 5×5 grid no longer wraps to 4 columns. Colour-contrast tokens are unchanged (open, needs a design decision — PROTOTYPE-PLAN §4 F17).
 - **CIR · Design System** page → section **Booking components**: `Payment status badge` (Draft / Partially paid / Paid), `Invoice type tag`, `Segmented control`, `Calendar/Booking chip`, `Calendar/Day cell`, `Invoice card`, `Timeline item` (legacy, unused), `Summary row`, `Inline input`, `Line item row`, `Text area`, `Booking table/Header`, `Booking table/Row`, `Calendar/Week card`, `Calendar/Week day head`, `Calendar/Day row`. All are bound to CIR variables and styles.
 - **Bookings** page → section **Booking · Screens**:
   - 01 Calendar (month) · 02 Table + filters (incl. Crew filter) · 02b Crew filter dropdown open (multi-select)
