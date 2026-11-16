@@ -42,6 +42,19 @@ Supabase → *Authentication → URL Configuration* → **Site URL** = your Verc
 
 Open the site, log in with the account from step 1.4, and you're live. From now on, every push to GitHub redeploys automatically.
 
+## 4 · Check it works (10 minutes, on the live site)
+
+1. Log in with your admin account.
+2. *Package Library* → create a package.
+3. *Bookings* → *New booking* → fill it in → *Save booking*.
+4. *Create invoice* → DP 50 % → confirm.
+5. Download the invoice PDF and check your business name and bank details.
+6. *Cancel booking* on that test booking (it stays as a record, marked Canceled).
+
+All six work → you're live.
+
+**Before real client data:** make sure your Supabase plan includes backups (the free plan has none; Pro has daily backups) under *Project Settings → Add-ons / Backups*.
+
 ## After launch
 
 - **Business name, logo, address:** in the app, *Account settings → Business information*.
