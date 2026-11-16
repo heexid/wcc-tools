@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  pull_request:
+  push: # every branch: work lands on branches, and CI must run before a PR is opened
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # P10: no committed secrets (keys, tokens). The local seed's demo passwords are test fixtures by design.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  app:
+    name: typecheck · lint · G1 · unit · build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      # Generates .next/types so tsc sees the route types (page.dev.tsx files are routes only in dev/test builds).
+      - run: npx next typegen
+        env:
+          APP_ENV: test
+      - run: npm run typecheck
+        env:
+          APP_ENV: test
+      - run: npm run lint
+      - run: npm run g1
+      - run: npm test
+      # PG2 fast loop (PGlite): migrations from zero + seed + pgTAP, and the seed must be regenerated from seed.ts.
+      - run: npm run db:seed && git diff --exit-code -- ../supabase/seed.sql ../supabase/tests/005_seed_parity.test.sql
+      - run: npm run db:test
+      # PG3: the shared vectors against calc.ts, the mock repo and the RPCs.
+      - run: npm run test:parity
+      # PG1: production build with hosted env. Placeholder, non-secret values: the build only validates presence/shape.
+      - name: next build (APP_ENV=production)
+        run: npm run build
+        env:
+          APP_ENV: production
+          DATA_SOURCE: supabase
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+      # --strict-proto: the mock data source (seed, proto: keys) must not be in the hosted bundle (P3).
+      - name: Production build has no dev surface and no mock data source
+        run: npm run check:build -- --strict-proto
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+      # P10: known-vulnerable production dependencies fail the build.
+      - run: npm audit --omit=dev --audit-level=high
+      # P10: the RLS / grant matrix (PG4) on PGlite; the database job runs it on real Supabase via `supabase test db`.
+      - run: npm run test:rls
+
+  database:
+    name: supabase local stack · pgTAP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          # Pinned so a CLI release can't change `test db` / `gen types` output under us. Bump deliberately.
+          version: 2.109.1
+      - name: Start local stack (applies supabase/migrations from zero + seed.sql)
+        run: supabase start
+      - name: Reset again (migrations re-apply cleanly from zero)
+        run: supabase db reset
+      - name: pgTAP
+        run: supabase test db
+      - name: Concurrency (two parallel create_invoice → exactly one invoice)
+        run: supabase/scripts/concurrency.sh
+      - name: Generated types are current
+        run: |
+          mkdir -p app/src/lib/db
+          supabase gen types typescript --local > app/src/lib/db/database.types.ts
+          # intent-to-add so an uncommitted (untracked) file also shows up as a diff
+          git add --intent-to-add app/src/lib/db/database.types.ts
+          git diff --exit-code -- app/src/lib/db/database.types.ts
+      # P3: the production build on DATA_SOURCE=supabase, end-to-end against this stack (real auth, real clock).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Supabase smoke (e2e)
+        working-directory: app
+        timeout-minutes: 45 # a hang must fail the run, not hold the runner for 6 h
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          eval "$(supabase status -o env | grep -E '^(API_URL|ANON_KEY|SERVICE_ROLE_KEY)=' | sed -E 's/^API_URL=/export NEXT_PUBLIC_SUPABASE_URL=/; s/^ANON_KEY=/export NEXT_PUBLIC_SUPABASE_ANON_KEY=/; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/')"
+          npm run e2e:supabase
+      - name: Stop
+        if: always()
+        run: supabase stop --no-backup

@@ -304,20 +304,26 @@ Supabase Postgres (RLS on, auth = existing internal-tools login)
 ### 4.2 Data model
 
 ```sql
-packages(id uuid pk, name text, price bigint check (price>=0), description text check (char_length(description) <= 1000),
-         is_active bool default true, created_at, updated_at)
+packages(id uuid pk, name text not null (trimmed), price bigint check (price>=0),
+         summary text,                               -- one-line list / picker summary (added in P1)
+         description text check (char_length(description) <= 1000),
+         is_active bool default true, archived_at timestamptz null,   -- is_active = (archived_at is null)
+         created_at, updated_at)
+-- unique (lower(name)) where is_active   -- duplicate check among active packages only
 
 bookings(id uuid pk, ref text unique,               -- BK-2026-0001
          booking_name text, client_name text not null, client_phone text not null,
          package_id uuid fk, package_name_snapshot text, package_price_snapshot bigint,
          booking_date date not null,
          terms text check (char_length(terms) <= 255),   -- Terms & Conditions, default from Settings
+         payment_instruction jsonb not null,         -- {receiptName ≤60, accountNumber 5–20 digits, accountName ≤80} (lane I, added in P1)
          total bigint not null,                      -- derived, maintained by trigger
          total_paid bigint not null default 0,       -- Σ amount of non-void invoices
          status text not null default 'draft',       -- draft|partially_paid|paid (derived) | canceled (manual)
          canceled_at timestamptz null, canceled_by uuid null,
          cancel_reason text null check (char_length(cancel_reason) <= 255),
-         created_by uuid, created_at, updated_at)
+         created_by uuid, created_at, updated_at)   -- created_by → profiles.id; the name resolves at read time
+-- check (total_paid <= total)  — rule 10 backstop; client_phone is normalised +62…; ref assigned by trigger
 
 workspace_settings(workspace_id uuid pk, business_name text not null check (char_length(business_name) between 2 and 60),
          business_address text not null check (char_length(business_address) between 1 and 150),
@@ -343,12 +349,16 @@ invoices(id uuid pk, booking_id fk, number text unique,  -- INV-2026-0001
          snapshot jsonb not null,    -- booking + items + totals + paid_before + remaining_after
          snapshot_hash text not null, pdf_path text,
          voided_at timestamptz null, void_reason text,   -- v1.1
+         issued_at timestamptz not null,             -- added in P1 (prototype Invoice.issuedAt)
          created_by, created_at)
 -- a booking has 0..n invoices (FK invoices.booking_id → bookings.id); no separate payments table:
 -- an invoice is the record of money received
 
 invoice_counters(year int pk, last_value int)
+booking_counters(year int pk, last_value int)   -- BK-YYYY-NNNN (added in P1)
 ```
+
+As built in `supabase/migrations/20261116000001_booking.sql` (P1). Not migrated: `packages.legacy_bookings` is prototype-only; the "n bookings" count is real from P5. RLS is on for every table from P1 (no policies until P4 / P10).
 
 Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `bookings(status)`, `invoices(booking_id, created_at desc)`, and a trigram GIN on `client_name`, `booking_name` and `client_phone` for search.
 
@@ -356,6 +366,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 - **Login → Forgot password:** there's no self-service reset. The **Forgot password?** link under the password field shows an Info alert in the login card: "Forgot your password? Passwords are managed by your workspace admin. Ask them to reset it, then log in with the new password." (Login screen E7).
 - **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `viewer` (read-only, for the Owner). Enforced by RLS.
+- **Sessions end at 00:00 WIB every day** (decided 2026-11-16). A session that signed in before today's midnight is refused by the server and the database; an open tab signs out at 00:00. Both show Login **E4** ("Your session expired"), email prefilled. Only accounts an admin provisioned with a role are staff (P4).
 - **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Account settings (US-14) and stored in `workspace_settings`.
 - **Storage:** bucket `invoices/` (private) with signed URLs that expire after 10 min.
 - **Design tokens:** export CIR variables → Tailwind 4 `@theme` in `src/styles/tokens.css` (`surface/*`, `text/*`, `accent/*`, `status/*`, `space/*`, `radius/*`), generated from the Figma export (prototype F0).
@@ -401,4 +412,4 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 1. ~~Pending payments?~~ Resolved 2026-11-10: every created invoice counts as paid; status is derived from invoices (Draft → Partially paid → Paid).
 2. Is a per-booking due date needed for remaining balances, for example H-7 before the booking date?
-3. Which bank account details and terms text should go on the PDF? (From the workspace Settings, to be confirmed.)
+3. ~~Which bank account details and terms text should go on the PDF?~~ Resolved 2026-11-16 (D4, user): this module's own `workspace_settings` row for now — `default_payment` (bank / payment instruction) and `default_terms` prefill every new booking; each invoice freezes them in its snapshot. No edit screen in v1: they are changed by an admin in the database (`production/docs/slices/P08.md`). The Invoice module's Payment receiver can replace the source later behind the same `getSettings()`. Business information (US-14) is edited on Account settings; its logo lives in Storage `branding/`.

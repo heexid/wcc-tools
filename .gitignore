@@ -2,3 +2,10 @@
 CREDENTIALS.md
 *.credentials.md
 .env*
+
+# Supabase local stack
+supabase/.branches/
+supabase/.temp/
+
+# macOS
+.DS_Store

@@ -15,14 +15,14 @@ The IDs here are the same ones the other docs use: **US-n** (PRD stories), **scr
 
 ### 0.1 Scope of the prototype
 - **Front end only, real behaviour.** All screens, states and flows from the three docs work in the browser. Data comes from a **mock data layer** (`lib/data/*`), not Supabase. It has the same function signatures as the RPCs in PLAN §2 (`save_booking`, `create_invoice`, `cancel_booking`) and enforces the PRD §2.4 business rules, so Supabase can replace it later without touching the UI.
-- Persistence: in memory + `localStorage`, reset via `/dev/reset`. Seed per PLAN §2.7 (built from Figma in F2): 8 packages (6 active + 2 archived), 6 crew and 40 bookings Oct–Dec 2026, covering every status including Canceled. Each Figma screen also gets a **named fixture** (`?fixture=screen-06`, 58 in total) so the page renders exactly the data shown in that frame. Figma's data inconsistencies and who decides them: `prototype/docs/slices/F02.md`.
+- Persistence: in memory + `localStorage`, reset via `/dev/reset`. Seed per PLAN §2.7 (built from Figma in F2): 8 packages (6 active + 2 archived), 6 crew and 40 bookings Oct–Dec 2026, covering every status including Canceled. Each Figma screen also gets a **named fixture** (`?fixture=screen-06`, 58 in total) so the page renders exactly the data shown in that frame. Figma's data inconsistencies and who decides them: `app/docs/slices/F02.md`.
 - **Desktop 1440 only.** Tablet/mobile and the void-invoice dialog are deferred (PRD §5.1 v1.1, PLAN "Deferred").
 - **Frozen clock.** "Today" is **Tue 10 Nov 2026** (the Today cell in Figma screen 01). `lib/clock.ts` `now()` reads `NEXT_PUBLIC_TODAY`; visual tests always run on that date.
 
 ### 0.2 Stack
 Next.js 16 App Router (`cacheComponents` on) · TypeScript · Tailwind 4 (CSS-first `@theme` generated from CIR variables — no `tailwind.config.ts`) · `react-hook-form` + `zod` · `@react-pdf/renderer` · Vitest (unit) · Playwright (interaction + visual) · npm. Font: self-hosted **Inter 3.19** (Figma renders Inter 3.x; Google's Inter 4 measures differently). Motion: CSS transitions/WAAPI by default; the `motion` package only where the `animate` skill picks it.
 
-Folder: `prototype/` at the repo root.
+Folder: `app/` at the repo root.
 
 ### 0.3 "1:1 pixel perfect" — how it is measured
 Every slice must pass all four gates:
@@ -35,9 +35,9 @@ Every slice must pass all four gates:
 | **G3c Components** | For isolated components (`/dev/components`, one per Figma variant, exported with render bounds): flat areas of the Figma image (fills, interiors, backgrounds) must match exactly; antialiased edge pixels (glyphs, curves) may differ. Figma and Chrome rasterise antialiasing differently, which makes a flat % budget meaningless on small text-dense parts. | 0 flat-area diffs · ≤ 20 % edge diffs · a 1 px shift must fail (self-test). Masks / accepted exceptions only with a written reason in the variants JSON |
 | **G4 Overlay** | Figma PNG overlaid at 50 % on the screenshot (`/dev/overlay?frame=…`). | No visible offset. Reviewed by eye, screenshot of the overlay saved in the slice log |
 
-Figma-faithful building blocks (F1): use `<Txt>` for single-line labels in hug/centred layouts (Figma text-box rounding), `cn()` (tailwind-merge with CIR tokens) for class overrides, `usePresence()` for overlays. Findings list: `prototype/docs/slices/F01.md`.
+Figma-faithful building blocks (F1): use `<Txt>` for single-line labels in hug/centred layouts (Figma text-box rounding), `cn()` (tailwind-merge with CIR tokens) for class overrides, `usePresence()` for overlays. Findings list: `app/docs/slices/F01.md`.
 
-Figma reference PNGs live in `prototype/public/__figma__/<frame>.png` and node specs in `public/__figma__/specs/<slice>.json` (served so `/dev/overlay` can use them). They are exported straight to disk: run `npm run figma:receiver` (port 9232), then in `figma_execute` call `node.exportAsync({format:'PNG', constraint:{type:'SCALE', value:1}})` and `fetch('http://localhost:9232/save?name=<frame>.png', {method:'POST', body})`. Screenshot tests live in `prototype/tests/visual/<slice>.spec.ts`; G3 also fails if the Next.js dev "Issue" toast is on screen.
+Figma reference PNGs live in `app/public/__figma__/<frame>.png` and node specs in `public/__figma__/specs/<slice>.json` (served so `/dev/overlay` can use them). They are exported straight to disk: run `npm run figma:receiver` (port 9232), then in `figma_execute` call `node.exportAsync({format:'PNG', constraint:{type:'SCALE', value:1}})` and `fetch('http://localhost:9232/save?name=<frame>.png', {method:'POST', body})`. Screenshot tests live in `app/tests/visual/<slice>.spec.ts`; G3 also fails if the Next.js dev "Issue" toast is on screen.
 
 ### 0.3a Testing instruction (user, 2026-11-14)
 When asked to **test**, do **not** re-export Figma reference PNGs (`npm run figma:receiver`, `public/__figma__/`) and do **not** re-run the visual tests (G3, `npm run visual`). Run only the unit and behaviour/e2e tests, unless the user explicitly asks for the visual gate or a re-export. If a change affects visual gates, report them as unconfirmed.
@@ -76,7 +76,7 @@ Every slice F0…F17 follows the same loop. Do **not** start the next slice unti
 
 1. **Read.** Open only the sections the slice lists. Note every acceptance criterion as a test case.
 2. **Pull design.** `figma_get_status` (desktop bridge connected) → `figma_navigate` to the page → `figma_search_components` (node IDs are per session; never reuse old ones) → per frame: `figma_get_component_for_development` / `figma_get_file_data` / `figma_execute` for exact values, `figma_get_variables` for tokens, and the 1× PNG + spec JSON exported to `public/__figma__/` through the receiver (§0.3).
-3. **Plan.** Write the slice log header (`prototype/docs/slices/Fxx.md`): frames, components, fixtures, test list.
+3. **Plan.** Write the slice log header (`app/docs/slices/Fxx.md`): frames, components, fixtures, test list.
 4. **Build.** Invoke `build-design` with the frame and the project's tokens/components. New DS components are built once in `components/ds/` and shown on `/dev/components` next to their Figma variants.
 5. **Motion scan.** Invoke `find-animation-opportunities` on the slice's routes/components. Paste its proposals into the slice log with accept/reject.
 6. **Motion build.** Invoke `animate` for each accepted item.
@@ -125,8 +125,8 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 ### F0 — Scaffold, tokens, test harness
 
 **Feature**
-- `prototype/` Next.js App Router + TS + Tailwind 4 + npm. Inter 3.19 self-hosted.
-- CIR variables (Primitives / Semantic / Component / Breakpoint) → `tokens/figma.tokens.json` → `npm run tokens` → `src/styles/tokens.css` (`@theme static`, Tailwind defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). CIR text styles → `text-body`, `text-heading-page`, … Naming table in `prototype/docs/slices/F00.md`.
+- `app/` Next.js App Router + TS + Tailwind 4 + npm. Inter 3.19 self-hosted.
+- CIR variables (Primitives / Semantic / Component / Breakpoint) → `tokens/figma.tokens.json` → `npm run tokens` → `src/styles/tokens.css` (`@theme static`, Tailwind defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). CIR text styles → `text-body`, `text-heading-page`, … Naming table in `app/docs/slices/F00.md`.
 - Test harness: Vitest; Playwright with frozen clock, 1440 viewport, `reducedMotion: 'reduce'`, fixture query param; visual spec helper (G3); G2 measurement helper (compares a JSON of Figma node specs with `getBoundingClientRect` + `getComputedStyle`); `/dev/overlay` page (G4); `/dev/reset`.
 - Lint rule / script for G1 (no raw hex/px outside tokens).
 - **Done when:** a token gallery page `/dev/tokens` renders every variable and text style and passes G3 against a Figma export of the variables, and the harness runs green on it.
@@ -134,7 +134,7 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 **Prompt**
 ```
 Slice F0 of context/PROTOTYPE-PLAN.md. Read §0 and §1 of that file and PLAN.md §0–§1.
-Create prototype/ (Next.js App Router, TypeScript, Tailwind 4, npm, Inter 3.19 self-hosted).
+Create app/ (Next.js App Router, TypeScript, Tailwind 4, npm, Inter 3.19 self-hosted).
 Use figma-console (figma_get_status, figma_get_variables, figma_get_text_styles, figma_export_tokens)
 to export every CIR variable and text style from "bs internal tools" into
 src/styles/tokens.css (Tailwind 4 @theme) — no hand-typed values. Read the "today" date from Booking screen 01 and
@@ -163,7 +163,7 @@ Then run find-animation-opportunities on the harness pages and animate only what
 Slice F1 of context/PROTOTYPE-PLAN.md. Read §0, §1 and PLAN.md §0 "New DS components".
 With figma-console, figma_search_components on the CIR · Design System page, then for each base
 component listed in F1 pull figma_get_component_for_development and figma_get_component_image.
-Use the build-design skill to build them in prototype/components/ds/ using only tokens from F0,
+Use the build-design skill to build them in app/components/ds/ using only tokens from F0,
 with every variant on /dev/components next to its Figma image.
 Run find-animation-opportunities on the components (press, hover, focus, popover, modal, sheet,
 toast, skeleton), then animate the accepted ones and put shared durations/curves in styles/motion.css.
@@ -274,7 +274,7 @@ Standard loop. E2E: Package lanes A (edit + fail), B (create + validation loop),
 ### F6 — Bookings dashboard frame
 
 **Feature**
-- **Decided 2026-11-11 (user): real data.** The KPI shows the true count (18 · −2); Figma's "24 · +4" is masked in G3 with that reason. See `prototype/docs/slices/F06.md`.
+- **Decided 2026-11-11 (user): real data.** The KPI shows the true count (18 · −2); Figma's "24 · +4" is masked in G3 with that reason. See `app/docs/slices/F06.md`.
 - `/bookings` layout (Layout/Dashboard): Page header with **New booking** (1.1) and **Package library** (1.2), KPI row (Bookings this month / Outstanding balance / Collected this month; Canceled excluded per US-12) with ⓘ tooltips (1.23), Calendar / Table tabs with the divider (1.3), toolbar row placeholder (search + filters arrive in F9), **Upcoming** rail (next 7 days, Canceled hidden) with item → detail (1.16, wired in F12), **See all in table** (1.17), insight card actions (1.18).
 - First use (36, 1.32): KPIs 0 "No data yet", "Nothing scheduled in the next 7 days", "No bookings yet" + New booking.
 - URL state skeleton: `view`, `date`, `tab`.
@@ -561,7 +561,7 @@ patterns via figma-console).
 Run find-animation-opportunities over the whole prototype for gaps and inconsistencies between
 slices, then animate the accepted items in styles/motion.css.
 Run the full regression: G1–G4 on every frame, all hi-fi lanes, keyboard/a11y, reduced motion.
-Write the final report in prototype/docs/slices/F17.md and finish with §1 step 9.
+Write the final report in app/docs/slices/F17.md and finish with §1 step 9.
 ```
 
 **Workflow**

@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| **Status** | v1 · 2026-11-14 · nothing started |
+| **Status** | v1 · 2026-11-16 · P0–P11 built; CI on GitHub (branch production/p0-p10); awaiting staging, 2.19 Figma note, D3 (see §4) |
 | **Goal** | Take the finished front-end prototype (F0–F17) to a **live, secure, tested Booking + Package Library + Account module** on Supabase, with **no visual or behavioural change** to what the prototype already does. Built one slice at a time: **build → test → done → next**. |
 | **Companions** | `context/PRD.md` (what + rules) · `context/PLAN.md` (architecture, SQL, RPCs) · `context/INTERACTIONS.md` (96 interaction rows) · `context/PROTOTYPE-PLAN.md` (how the UI was built and gated) |
-| **Starting point** | `prototype/` — Next.js 16 App Router, 59 client components, mock data layer `src/lib/data/*` (`repo.ts`, `store.ts`, `ledger.ts`, `seed.ts`, `fixtures.ts`), pure domain logic `src/lib/booking/calc.ts`, PDF `src/components/pdf/InvoiceDocument.tsx`, 136 unit tests, 19 Playwright specs, gates G1–G4. |
+| **Starting point** | `app/` — Next.js 16 App Router, 59 client components, mock data layer `src/lib/data/*` (`repo.ts`, `store.ts`, `ledger.ts`, `seed.ts`, `fixtures.ts`), pure domain logic `src/lib/booking/calc.ts`, PDF `src/components/pdf/InvoiceDocument.tsx`, 136 unit tests, 19 Playwright specs, gates G1–G4. |
 
 IDs are the same ones the other docs use: **US-n**, **#x.y** (INTERACTIONS rows), **lanes** (hi-fi flows), **F-n** (prototype slices). Production slices are **P0…P14**. If a doc changes, update the matching slice here.
 
@@ -34,7 +34,7 @@ IDs are the same ones the other docs use: **US-n**, **#x.y** (INTERACTIONS rows)
 | `playwright-report/` and `test-results/` are tracked in git | repo root | Git-ignored, removed from history going forward | P0 |
 
 ### 0.3 Stack additions
-`@supabase/supabase-js` + `@supabase/ssr` (cookie sessions in App Router) · Supabase CLI (migrations, local stack, type generation, pgTAP) · Next.js Server Actions / Route Handlers for writes · `@react-pdf/renderer` on the server (Node runtime) · Sentry (errors) · GitHub Actions (CI) · Vercel (hosting, preview per PR). **Confirm hosting and plan in §0.6 before P0.** Docs for Next.js 16 and `@supabase/ssr` change fast: every slice prompt tells the agent to read `prototype/node_modules/next/dist/docs/` (see `prototype/AGENTS.md`) and to fetch current Supabase docs with Context7 first.
+`@supabase/supabase-js` + `@supabase/ssr` (cookie sessions in App Router) · Supabase CLI (migrations, local stack, type generation, pgTAP) · Next.js Server Actions / Route Handlers for writes · `@react-pdf/renderer` on the server (Node runtime) · Sentry (errors) · GitHub Actions (CI) · Vercel (hosting, preview per PR). **Confirm hosting and plan in §0.6 before P0.** Docs for Next.js 16 and `@supabase/ssr` change fast: every slice prompt tells the agent to read `app/node_modules/next/dist/docs/` (see `app/AGENTS.md`) and to fetch current Supabase docs with Context7 first.
 
 Environments: **local** (Supabase CLI docker) · **staging** (own Supabase project, preview deploys) · **production** (own Supabase project). Migrations are SQL files in `supabase/migrations/` applied by CI, never by hand.
 
@@ -67,7 +67,7 @@ Rule for the data source: `DATA_SOURCE=mock|supabase` (default `supabase`). `moc
 | D3 | Auth source | The **existing internal-tools Supabase project/auth** (PRD §4.3). Same project = shared users + workspace membership; separate project = users must be migrated | P4 gets a user-migration step |
 | D4 | Workspace Settings (business profile, bank details, default terms) | Read from the existing Invoice module's *Payment receiver* settings (PRD §4.3, open question 3) | If not reachable: a `workspace_settings` table owned by this module (P8) |
 | D5 | Existing data | Greenfield: production starts empty (no import) | Adds P14b data import |
-| D6 | Repo layout | Keep `prototype/` as the app and rename it to `app/` in P0; add `supabase/` beside it at the repo root | P0 only |
+| D6 | Repo layout | Rename `prototype/` to `app/` in P0 (done 2026-11-16); add `supabase/` beside it at the repo root | P0 only |
 | D7 | Languages / locales | English UI, `id-ID` number + date formats (as prototype) | — |
 | D8 | PDF location | Generated on invoice confirm, stored in Storage, regenerated from the snapshot on demand (PLAN §8) | — |
 | D9 | Due date for remaining balance (PRD open question 2) | Not in v1 | Adds a field + reminders → v1.1 |
@@ -138,7 +138,7 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 
 **Feature**
 - Decide and record D1–D9 (§0.6) in `production/docs/slices/P00.md`.
-- Repo layout (D6): `prototype/` → `app/` (or keep name; pick once), `supabase/` at the root (`config.toml`, `migrations/`, `seed.sql`, `tests/`). Update every path in the docs in the same commit.
+- Repo layout (D6): `prototype/` → `app/` (done), `supabase/` at the root (`config.toml`, `migrations/`, `seed.sql`, `tests/`). Update every path in the docs in the same commit.
 - Hygiene: add `playwright-report/`, `test-results/`, `*.tsbuildinfo` to `.gitignore` and `git rm --cached` them (they are tracked today and bloat the repo).
 - Environments + secrets: `.env.example` documenting `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server only), `DATA_SOURCE`, `SENTRY_DSN`; validated at boot with zod (`src/env.ts`) so a missing variable fails the build, not a request.
 - Production build guard: `/dev/*` routes, `?fixture=`, `?fail=`, `?latency=`, `/dev/reset` and `NEXT_PUBLIC_TODAY` are compiled out or return 404 when `NODE_ENV=production` or `APP_ENV=production`; `lib/clock.ts` returns the real date unless `APP_ENV=test`. A build-time script fails if a `proto:` key or dev route is found in `.next/`.
@@ -147,8 +147,8 @@ Each slice has: **Feature** (scope + done criteria), **Prompt** (paste into Clau
 
 **Prompt**
 ```
-Slice P0 of context/PRODUCTION-PLAN.md. Read §0 and §1 of that file, prototype/AGENTS.md and
-prototype/README.md.
+Slice P0 of context/PRODUCTION-PLAN.md. Read §0 and §1 of that file, app/AGENTS.md and
+app/README.md.
 First write the decisions D1–D9 as they stand (defaults in §0.6) into production/docs/slices/P00.md and
 stop to ask me only for the ones marked as different from default.
 Then: rename/organise the repo per D6, git-ignore and untrack playwright-report/ and test-results/,
@@ -227,6 +227,7 @@ Standard loop; step 5 = pgTAP + parity; run `security-review` on the SQL (SECURI
 
 **Feature**
 - `src/lib/data/` gets a second implementation: `supabase/*` with the **same exported function names and result shapes** as `repo.ts` (`listBookings`, `getBooking`, `saveBooking`, `createInvoice`, `saveBookingAndCreateInvoice`, `cancelBooking`, `listPackages`, `savePackage`, `archivePackage`, `restorePackage`, `listCrew`, `getKpis`, `getUpcoming`, `getCrewSchedule`, `getInvoiceSnapshot`, `getSettings`, profile + auth). `DATA_SOURCE` selects the implementation (§0.4).
+- **Decided 2026-11-16 (P3 slice log):** reads go through the browser client under RLS via SQL read functions; writes through Server Actions → RPCs. Server Components for reads would need UI restructuring (Next 16 Server Functions are sequential and meant for mutations). P11 revisits for caching.
 - Where the prototype passes the whole `Db` into helpers (`computeKpis(d)`, `filterBookings(d, q)`), introduce query-shaped functions (`getKpis(ym)`, `listBookings({ range, filters, sort, page })`) and update the call sites in `app/bookings/page.tsx`, `BookingCalendar`, `MonthCalendar`, `WeekCalendar`, `DayCalendar`, `BookingTable`, `UpcomingRail`, `DayPopover`, `CrewSchedule`. **Rendering and URL contracts stay identical.**
 - Server/client split: reads in Server Components or cached server functions (respect `cacheComponents`), writes as Server Actions that call the RPCs and return typed results; loading states reuse the F17 `Skeleton` / `Loader`; network failures map to the existing `NetworkError` UI (Package 06, Bookings 23 / 37).
 - Row mapping lives in one place (`mappers.ts`): snake_case ↔ camelCase, `bigint` ↔ `number` (money is `bigint`; guard `Number.MAX_SAFE_INTEGER`), `date`/`timestamptz` ↔ `ISODate`.
@@ -559,18 +560,18 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 
 | Slice | Prompt | Build | Review | Unit | DB | E2E | Sec | Perf | Done |
 |---|---|---|---|---|---|---|---|---|---|
-| P0 Foundations & build hygiene | [P0](#p0--foundations-repo-ci-environments-production-build-hygiene) | ☐ | ☐ | ☐ | — | — | — | — | ☐ |
-| P1 Database schema | [P1](#p1--database-schema-triggers-indexes-seed-types) | ☐ | ☐ | — | ☐ | — | — | — | ☐ |
-| P2 RPCs | [P2](#p2--rpcs-save_booking-create_invoice-cancel_booking) | ☐ | ☐ (+security) | ☐ | ☐ | — | — | — | ☐ |
-| P3 Data access layer | [P3](#p3--data-access-layer-supabase-repo-behind-the-prototype-contract) | ☐ | ☐ | ☐ | ☐ | ☐ (smoke) | — | — | ☐ |
-| P4 Auth, roles, Account | [P4](#p4--auth-session-roles-account) | ☐ | ☐ (+security) | ☐ | ☐ | ☐ | ☐ | — | ☐ |
-| P5 Package Library live | [P5](#p5--package-library-live) | ☐ | ☐ | ☐ | ☐ | ☐ | — | — | ☐ |
-| P6 Bookings read path | [P6](#p6--bookings-read-path-dashboard-calendar-table-filters-detail) | ☐ | ☐ | ☐ | ☐ | ☐ | — | ☐ | ☐ |
-| P7 Booking write path | [P7](#p7--booking-write-path-new-edit-cancel) | ☐ | ☐ (+security) | ☐ | ☐ | ☐ | — | — | ☐ |
-| P8 Workspace Settings | [P8](#p8--workspace-settings-integration) | ☐ | ☐ | ☐ | ☐ | ☐ | — | — | ☐ |
-| P9 Invoices + PDF | [P9](#p9--invoices--pdf-create-snapshot-storage-signed-urls) | ☐ | ☐ (+security) | ☐ | ☐ | ☐ | ☐ | — | ☐ |
-| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-viewer-enforcement-pii-headers) | ☐ | ☐ (+security) | — | ☐ | — | ☐ | — | ☐ |
-| P11 Performance | [P11](#p11--performance-10k-seed-indexes-caching-budgets) | ☐ | ☐ | — | ☐ | — | — | ☐ | ☐ |
+| P0 Foundations & build hygiene | [P0](#p0--foundations-repo-ci-environments-production-build-hygiene) | ✅ | ✅ code (5 fixed) | ✅ (150) | — | ⚠ local 157/173, see log | — | — | ☐ |
+| P1 Database schema | [P1](#p1--database-schema-triggers-indexes-seed-types) | ✅ | ✅ code (cancel race fixed) | — | ✅ PGlite + real Supabase (local); types committed | — | — | — | ☐ |
+| P2 RPCs | [P2](#p2--rpcs-save_booking-create_invoice-cancel_booking) | ✅ | ☐ code · ✅ security | ✅ (249) | ✅ pgTAP 130 on real Supabase · parity 99 + 62 · concurrency ✅ | — | — | — | ☐ |
+| P3 Data access layer | [P3](#p3--data-access-layer-supabase-repo-behind-the-prototype-contract) | ✅ | ✅ code (9 fixed, 1 → P6) | ✅ (251) | ✅ parity w 99+62 · r 51 | ✅ smoke 5/5 (local Supabase) | — | — | ☐ |
+| P4 Auth, roles, Account | [P4](#p4--auth-session-roles-account) | ✅ | ✅ security (1 fixed) · ✅ code (10 fixed) | ✅ (262) | ✅ pgTAP 142 (real Supabase) | ✅ auth 6/6 incl. midnight (full suite run) | ✅ staff-only reads | — | ☐ |
+| P5 Package Library live | [P5](#p5--package-library-live) | ✅ | ✅ (with P4) | ✅ (267) | ✅ parity + pgTAP | ✅ lanes A–D 6/6 (local Supabase) | — | — | ☐ |
+| P6 Bookings read path | [P6](#p6--bookings-read-path-dashboard-calendar-table-filters-detail) | ✅ | ✅ code (8 fixed) | ✅ (269) | ✅ read parity 68 | ✅ lanes C–F 7/7 (local Supabase) | — | ☐ (P11) | ☐ |
+| P7 Booking write path | [P7](#p7--booking-write-path-new-edit-cancel) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ parity 102/65/68 · pgTAP 156 | ✅ write lanes 7/7 (local Supabase) | — | — | ☐ |
+| P8 Workspace Settings | [P8](#p8--workspace-settings-integration) | ✅ | ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 010 | ✅ business lane 5/5 (local Supabase) | — | — | ☐ |
+| P9 Invoices + PDF | [P9](#p9--invoices--pdf-create-snapshot-storage-signed-urls) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 174 | ✅ PDF lane 5/5 (local Supabase) | ✅ bucket private, 401/404 | — | ☐ |
+| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-viewer-enforcement-pii-headers) | ✅ | ✅ whole-branch security (none) | — | ✅ RLS matrix 129 cells | — | ✅ PG4 | — | ☐ |
+| P11 Performance | [P11](#p11--performance-10k-seed-indexes-caching-budgets) | ✅ | ☐ | — | ✅ parity 76 | — | — | ✅ DB budgets 8/8 (local, 10k) · ☐ LCP/INP, staging | ☐ |
 | P12 Full regression | [P12](#p12--full-regression-all-lanes-on-staging-a11y-visual-guard) | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 | P13 Operations | [P13](#p13--operations-monitoring-backups-reconciliation-runbook) | ☐ | ☐ | — | ☐ | — | — | — | ☐ |
 | P14 UAT + launch | [P14](#p14--uat-cut-over-and-launch) | ☐ | ☐ | — | — | ☐ (prod smoke) | — | — | ☐ |
@@ -594,7 +595,7 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 
 | Item | Source | Owner slice |
 |---|---|---|
-| F15 marked ⚠: `motion.css` G1 issue "other session" | PROTOTYPE-PLAN §4 F15 | P0 (clean up) |
+| ~~F15 marked ⚠: `motion.css` G1 issue "other session"~~ — fixed in P0: G1 passes (101 files); also cleared `LiquidBackground` / `PaymentInstruction` offenders | PROTOTYPE-PLAN §4 F15 | P0 ✅ |
 | F17: 53 inherited G3 failures; Figma PNGs need re-export after the 2026-11-14 design sync | PROTOTYPE-PLAN §4, §4.1 | P12 |
 | F17: contrast tokens + 2 ARIA fixes open; contrast needs a design decision | PROTOTYPE-PLAN §4 F17 | P12 |
 | F17: G2 column unchecked (`☐`) | PROTOTYPE-PLAN §4 F17 | P12 |

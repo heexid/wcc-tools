@@ -78,6 +78,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 2.16 | Cancel modal **Cancel booking** / **Keep booking** / Esc | Confirm → status Canceled, the Bookings page opens the read-only detail panel + toast "Booking canceled · BK-…"; Keep (default focus) / Esc / scrim → back, nothing changes; a failure keeps the modal and the reason ("Couldn’t cancel the booking") | ✅ | **34**, **35** · Flow H3 → H4 |
 | 2.17 | Package dropdown (archived / empty library) | Archived packages hidden + note; empty library → "No packages yet" + link to Package Library | ✅ | **39**, **40** |
 | 2.18 | Edit booking with an archived package | Package card "Archived" tag + helper; kept at its saved price | ✅ | **38** |
+| 2.19 | **Save changes** after someone else saved the same booking | Save is refused (nothing written). Warning alert at the top of the rail: **"This booking was changed by someone else"** — "Reload to see their changes. Your edits here haven’t been saved." — with **Reload booking** (reloads without the leave prompt). Copy approved 2026-11-16 (user) | ✅ | P7 · optimistic concurrency (`updatedAt`) · Figma note pending |
 
 ## 3. Invoice modal (04 · 04c · 05b · 09 · 10 · 22 · 23)
 
@@ -134,7 +135,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 6.2 | Success toasts | ✅ | 05, 05c, B5 |
 | 6.3 | Loading | ✅ | Skeleton rows (table, 8 + footer), skeleton date cells (calendar; week / day 3–4 blocks), KPI value + rail skeletons, DS `Loader` (5×5 orchid dots) in the detail panel — appears only after 250 ms so fast loads never flash it. Filters, search and view switch stay interactive. Figma: CIR · Design System → Pattern · Data & content (`Skeleton`, `Loader`). Package library has no skeleton yet |
 | 6.4 | `viewer` role (read-only) | ✅ | Hide New booking (header, empty states, quick-add targets), Edit booking, Create invoice, the Cancel booking section, Archive / Restore, New package and Edit package. `/bookings/new` → `/bookings`; `/bookings/[id]/edit` → read-only view. Everything else stays visible. Prototype switch: `/dev/role` |
-| 6.5 | Login **Forgot password?** | ✅ | Info alert "contact your workspace admin" — Login **E7**. Other login states: required (E1), email format (E2), wrong credentials (E3, password cleared + focused), session expired (E4, `?expired=1`, email prefilled), Caps Lock (E5), server unreachable (E6, "Try again") |
+| 6.5 | Login **Forgot password?** | ✅ | Info alert "contact your workspace admin" — Login **E7**. Other login states: required (E1), email format (E2), wrong credentials (E3, password cleared + focused), session expired (E4, `?expired=1`, email prefilled; also every day at 00:00 WIB — sessions end at midnight, decided 2026-11-16), Caps Lock (E5), server unreachable (E6, "Try again") |
 | 6.6 | **Profile** (header) → Account menu | Popover: Account Setting · Log out; ↑ ↓ move between items; Esc / outside / profile again closes (focus back to the profile) | ✅ | Launchpad & Profile **AC1** · Profile flow A |
 | 6.7 | **Account Setting** → Account settings page | Profile (name, email, role) + Security (password) | ✅ | **AC2** · flow A |
 | 6.8 | **Edit name** → modal → Save | 2–50 chars; error "Enter 2–50 characters."; toast "Name updated", header updates | ✅ | **AC3**, **AC3b**, **AC4** · flow B |
