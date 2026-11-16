@@ -1,0 +1,174 @@
+# wcc-tools · bs.moment Booking module
+
+A **Booking & Invoice Management** module for the bs.moment internal-tools shell. One record per booking (client, package, extra items, date, crew), live money calculation, and invoices that never change once issued (DP / Full / Partial / Paid). Bookings show in a Calendar (month / week / day) and a Table. A Package Library and Account settings come with it.
+
+**Why:** bookings, prices, deposits and follow-up payments were tracked across chats, spreadsheets and one-off invoices. Totals were added up by hand, deposits got mixed up with full payment, and editing a booking quietly changed what old invoices said.
+
+**Built in two phases:**
+1. **Prototype (F0–F18):** front end only, pixel-matched to Figma at 1440 px, running on a mock data layer in the browser.
+2. **Production (P0–P14):** the same UI on Supabase (Postgres, Auth, Storage), with no visual or behaviour change.
+
+---
+
+## Repo layout
+
+| Path | What it is |
+|---|---|
+| `app/` | The Next.js app (it was `prototype/` until 2026-11-16). UI, domain logic, mock and Supabase data layers, PDF, tests. |
+| `app/docs/slices/Fxx.md` | Prototype slice logs: decisions, gate results, motion lists. |
+| `supabase/` | Migrations, seeds (`seed.sql`, `perf-seed.sql`, `seed.local-users.sql`), pgTAP tests, and `setup-production.sql` (one-shot setup). |
+| `production/docs/slices/Pxx.md` | Production slice logs (P00–P11 so far). |
+| `context/` | The source-of-truth docs. See [Documentation](#documentation). |
+| `references/` | Reference images. |
+| `DEPLOY.md` | Step-by-step deploy to Supabase and Vercel (about 15 minutes). |
+| `.github/workflows/ci.yml` | CI: typecheck, lint, G1, unit tests, build, Supabase stack and pgTAP. |
+| `CREDENTIALS.md` | Local only and gitignored. Never commit it. |
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 (tokens generated from the CIR design system) · react-hook-form + zod · `@react-pdf/renderer` · Supabase (`@supabase/ssr`, Postgres, Auth, Storage) · Vitest · Playwright · Vercel.
+
+Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. The only layout is desktop at 1440 px.
+
+## Run it locally
+
+```bash
+cd app
+npm install
+npm run dev            # http://localhost:3000
+```
+
+| Command | What it does |
+|---|---|
+| `npm test` | Unit tests (Vitest) |
+| `npm run e2e` | Playwright interaction tests, on mock data |
+| `npm run e2e:supabase` | Playwright against the local Supabase stack |
+| `npm run visual` | Pixel gates (G2 / G3) against the Figma PNGs. Only run when asked (see below). |
+| `npm run g1` | Token check: no raw hex or px outside `tokens.css` |
+| `npm run typecheck` · `npm run lint` · `npm run build` | Static checks |
+| `npm run db:test` · `npm run test:rls` · `npm run test:parity` · `npm run perf` | Database tests (pgTAP), the RLS matrix, mock ⇄ SQL parity, and performance budgets |
+
+- **Data source:** `DATA_SOURCE=mock|supabase`. The mock source keeps the prototype runnable and backs the visual tests. A production build can't select it.
+- **Frozen clock:** test builds treat "today" as **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY`).
+- **Testing rule (2026-11-14):** when asked to test, run unit, DB and e2e tests only. Don't re-export the Figma PNGs or re-run the visual tests unless explicitly asked.
+
+To deploy, follow [`DEPLOY.md`](DEPLOY.md).
+
+## Product at a glance
+
+| Area | What it does | PRD |
+|---|---|---|
+| Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. | §4.3 |
+| App launcher | ⋮⋮ popover to switch between Booking and Package Lib (Bookmark is "Coming soon"). | US-11 |
+| Package Library | Create, edit, archive and restore packages. Duplicate active names are blocked. Description up to 1000 characters. | US-0 |
+| New / Edit booking | One form: client, phone (`+62…`), package, items, date, crew, T&C (up to 255 characters), live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
+| Invoices | The first invoice is **DP** (% or fixed) or **Full**. Later ones are **Partial** or **Paid**. Each invoice is a frozen snapshot, counts as paid straight away, and is numbered `INV-YYYY-NNNN`. | US-2, US-3, US-5 |
+| Status | Derived from the invoices: **Draft** → **Partially paid** → **Paid**. **Canceled** is the one manual status: final, and allowed only from Draft or Partially paid. | §2.5, US-12 |
+| Dashboard | KPIs, Calendar (month / week / day), Table (sort, pagination), search, filters (status, crew, package, date), Upcoming rail, "Needs attention" cards. | US-6–US-8 |
+| Booking detail | Read-only side sheet with invoice cards, PDF downloads, and a crew schedule popover. | US-9 |
+| Invoice PDF | A4, built from the snapshot only. The brand row (business name, logo, address, contact) always uses the current business information. | US-10 |
+| Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
+| Roles | `admin` can do everything. `viewer` (the Owner) is read-only, enforced in the UI and by RLS. | §4.3 |
+
+**Out of scope for v1:** tablet and mobile layouts, voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
+
+---
+
+## Progress tracker
+
+*Last updated from `context/` on 2026-11-16.*
+
+### Overall
+
+| Phase | Status |
+|---|---|
+| Design (Figma `bs internal tools`) | ✅ All screens, interaction states and hi-fi flows done. 96 of 96 interactions defined. |
+| Prototype F0–F18 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
+| Production P0–P11 | ✅ Built and tested on **local** Supabase. CI on GitHub (branch `production/p0-p10`). |
+| Production P12–P14 | ☐ Not started: full regression on staging, operations, UAT and launch. |
+| Release gates PG1–PG7 | ☐ Not yet signed off. They need a staging environment. |
+
+### Prototype slices (F0–F18)
+
+✅ done · ⚠ done with open items · 🟡 partly done
+
+| Slice | Scope | Status |
+|---|---|---|
+| F0 | Scaffold, tokens, test harness | ✅ 2026-11-11 |
+| F1 | Base CIR components and motion tokens | ✅ 2026-11-11 |
+| F2 | Domain logic and mock data layer (122 tests) | ✅ 2026-11-11 |
+| F3 | Login (P1–P3, E1–E7) | ✅ 2026-11-11 |
+| F4 | App shell, App launcher, Account menu | ✅ 2026-11-11 |
+| F5 | Package Library | ✅ 2026-11-11 |
+| F6 | Bookings dashboard frame (KPIs, rail, tabs) | ✅ 2026-11-11 |
+| F7 | Calendar · Month | ✅ 2026-11-11 |
+| F8 | Calendar · Week and Day | ✅ 2026-11-11 |
+| F9 | Table, search, filters | ✅ 2026-11-11 |
+| F10 | New booking form and leave guard | ✅ 2026-11-11 |
+| F11 | Invoice modal · first invoice | ✅ 2026-11-11 |
+| F12 | Booking detail panel and crew schedule | ✅ 2026-11-11 |
+| F13 | Edit booking and follow-up invoice | ✅ 2026-11-12 |
+| F14 | Cancel booking | ✅ 2026-11-12 |
+| F15 | Invoice PDF | ⚠ 2026-11-14: one PNG still needs re-exporting (dialog 37) |
+| F16 | Account settings and log out | ✅ 2026-11-12 |
+| F17 | Viewer role, loading states, full regression | 🟡 2026-11-14: 53 inherited visual failures waiting on a PNG re-export; a11y open |
+| F18 | Business information → PDF brand row | ⚠ 2026-11-14: PNG re-export pending |
+
+### Production slices (P0–P14)
+
+Every test result below is from a **local** Supabase. Staging hasn't been set up yet.
+
+| Slice | Scope | Build | Review | Tests | Done |
+|---|---|---|---|---|---|
+| P0 | Foundations: repo, CI, environments, build hygiene | ✅ | ✅ | Unit 150 · e2e ⚠ 157/173 (see log) | ☐ |
+| P1 | Database: schema, triggers, indexes, seed, types | ✅ | ✅ | DB ✅ (PGlite and Supabase) | ☐ |
+| P2 | RPCs: `save_booking`, `create_invoice`, `cancel_booking` | ✅ | Security ✅ · code ☐ | pgTAP 130 · parity · concurrency ✅ | ☐ |
+| P3 | Data access layer behind the prototype contract | ✅ | ✅ | Parity ✅ · smoke 5/5 | ☐ |
+| P4 | Auth, sessions, roles, Account | ✅ | ✅ | pgTAP 142 · auth e2e 6/6 (including the midnight cut-off) | ☐ |
+| P5 | Package Library live | ✅ | ✅ | Lanes A–D 6/6 | ☐ |
+| P6 | Bookings read path (dashboard, calendar, table, detail) | ✅ | ✅ | Read parity 68 · lanes C–F 7/7 | ☐ |
+| P7 | Booking write path (new, edit, cancel, stale-save notice) | ✅ | ✅ | pgTAP 156 · write lanes 7/7 | ☐ |
+| P8 | Workspace settings and business information | ✅ | ✅ | Business lane 5/5 | ☐ |
+| P9 | Invoices and PDF (server render, Storage, signed URLs) | ✅ | ✅ | pgTAP 174 · PDF lane 5/5 · private bucket ✅ | ☐ |
+| P10 | Security hardening (RLS audit, viewer, PII, headers) | ✅ | ✅ | RLS matrix 129 cells ✅ | ☐ |
+| P11 | Performance (10k seed, indexes, budgets) | ✅ | ☐ | DB budgets 8/8 ✅ · LCP/INP on staging ☐ | ☐ |
+| P12 | Full regression on staging, a11y, visual guard | ☐ | ☐ | ☐ | ☐ |
+| P13 | Operations: monitoring, backups, reconciliation, runbook | ☐ | ☐ | ☐ | ☐ |
+| P14 | UAT, cut-over, launch | ☐ | ☐ | ☐ | ☐ |
+
+**Release readiness:** PG1–PG7, a backup restore, a reconciliation check that catches a planted error, and UAT sign-off are all ☐. Each one must be ✅ before launch.
+
+### Open items and blockers
+
+| Item | Owner | Needs |
+|---|---|---|
+| Staging environment (a Supabase project and a Vercel preview) | P12 | Setting up. Every "Done" tick and PG5 / PG7 wait on it. |
+| D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
+| Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
+| Re-export the Figma PNGs after the 2026-11-14 design sync (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
+| Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
+| P2 and P11 code review | P2, P11 | Running `code-review` |
+
+### Decisions on record
+
+- **Bank details and default terms:** stored in this module's own `workspace_settings` table and changed in SQL for now. There's no edit screen in v1 (decided 2026-11-16).
+- **Sessions:** end at 00:00 WIB every day (decided 2026-11-16).
+- **Hosting:** Vercel, plus separate Supabase projects for staging and production.
+- **Starting data:** production starts empty, with no data import.
+- **Where the design moved past Figma:** the prototype wins and Figma was updated to match (2026-11-14). That covers centred dialogs, the login background, Skeleton and Loader.
+- **KPIs:** always computed from real data. Figma's "24 · +4" is sample content (decided 2026-11-11).
+
+---
+
+## Documentation
+
+| Doc | Read it for |
+|---|---|
+| [`context/PRD.md`](context/PRD.md) | What and why: user stories US-0 to US-14, business rules 1–14, data model, security and performance requirements, roadmap |
+| [`context/PLAN.md`](context/PLAN.md) | How: mapping from design to code, database and RPC design, domain logic, the list of Figma deliverables |
+| [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (96 rows, 1.1–6.12) with its Figma frame |
+| [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F18, pixel gates G1–G4, motion rules, the prototype tracker |
+| [`context/PRODUCTION-PLAN.md`](context/PRODUCTION-PLAN.md) | Production slices P0–P14, gates PG1–PG7, the RLS matrix, the production tracker, a paste-ready prompt for each slice |
+| [`DEPLOY.md`](DEPLOY.md) | Going live on Supabase and Vercel |
+
+**Keeping it current:** the trackers in `PROTOTYPE-PLAN.md` §4 and `PRODUCTION-PLAN.md` §4 are the source of truth. Update this README's tracker when either of them changes.
