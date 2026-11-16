@@ -231,7 +231,7 @@ function Dashboard() {
           )}
         </div>
 
-        <div className="flex items-start gap-base">
+        <div className="flex items-stretch gap-base">
           <MetricCard
             className={cn("min-w-0 flex-1", rise(1))}
             label="Bookings this month"
