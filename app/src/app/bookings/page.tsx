@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ds/Button";
 import { MetricCard } from "@/components/ds/Surfaces";
 import { Txt } from "@/components/ds/Txt";
@@ -50,29 +50,31 @@ type Kpis = Awaited<ReturnType<typeof getKpis>>;
  *  Goes through the data layer's latency (?latency=…) so the loading state (6.3) can be held on screen. */
 function useDashboardData() {
   const [data, setData] = useState<null | { count: number; week: BookingRow[]; upcoming: BookingRow[]; crew: Map<string, Crew>; packages: Package[]; kpis: Kpis; today: ISODate }>(null);
-  const load = useCallback(() => {
-    const today = isoToLocalDate(now().toISOString());
-    const from = weekStart(today);
-    // Every crew member (incl. inactive — a past booking keeps their avatar) and every package, as before.
-    void withRetry(() => Promise.all([loadCatalog(), getKpis(today.slice(0, 7)), countBookings(), listAllBookings({ from, to: addDays(from, 6) }), getUpcoming(7)])).then(
-      ([catalog, kpis, count, week, upcoming]) =>
-        setData({ count, week, upcoming, crew: new Map(catalog.crew.map((c) => [c.id, c])), packages: catalog.packages, kpis, today }),
-      (e) => {
-        console.error("Bookings dashboard: data source unavailable", e);
-        if (mounted.current) retry.current = setTimeout(load, 10_000); // keep trying, like the lists (review P8 #3)
-      },
-    );
-  }, []);
-  const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mounted = useRef(true);
+  // One effect owns the load and its retries: a failed round tries again 10 s later (review P8 #3); leaving the
+  // page stops it, including an attempt still in flight (P9 review #6).
   useEffect(() => {
-    mounted.current = true;
+    let live = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const load = () => {
+      const today = isoToLocalDate(now().toISOString());
+      const from = weekStart(today);
+      // Every crew member (incl. inactive — a past booking keeps their avatar) and every package, as before.
+      void withRetry(() => Promise.all([loadCatalog(), getKpis(today.slice(0, 7)), countBookings(), listAllBookings({ from, to: addDays(from, 6) }), getUpcoming(7)])).then(
+        ([catalog, kpis, count, week, upcoming]) => {
+          if (live) setData({ count, week, upcoming, crew: new Map(catalog.crew.map((c) => [c.id, c])), packages: catalog.packages, kpis, today });
+        },
+        (e) => {
+          console.error("Bookings dashboard: data source unavailable", e);
+          if (live) timer = setTimeout(load, 10_000);
+        },
+      );
+    };
+    load();
     return () => {
-      mounted.current = false; // an attempt still in flight won't schedule another (P9 review #6)
-      if (retry.current) clearTimeout(retry.current);
+      live = false;
+      if (timer) clearTimeout(timer);
     };
   }, []);
-  useEffect(load, [load]);
   return data;
 }
 
