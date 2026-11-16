@@ -1,0 +1,522 @@
+{
+  "$comment": "PG3 parity vectors for save_booking (PRODUCTION-PLAN P2): validateBookingInput + saveBookingTx, PRD §2.4 rules 2, 9, 10, 12, 13. Packages are created per case by `key`. `existing` is saved first (and may get invoices / a cancel / a package re-price); then `input` is saved — as an edit of `existing` when present. `expect.errors` must equal the BookingErrors object exactly; `expect.booking` lists fields of the saved row. `expectedUpdatedAt` tokens: \"$current\" = the existing booking's updatedAt, \"$stale\" = an older one (P7 optimistic concurrency).",
+  "base": {
+    "clientName": "Sari Wulandari",
+    "clientPhone": "0812-3456-7890",
+    "bookingName": "",
+    "packageKey": "gold",
+    "bookingDate": "2026-12-05",
+    "items": [],
+    "crewKeys": [],
+    "terms": "Remaining balance is due H-3."
+  },
+  "packages": [
+    {
+      "key": "gold",
+      "price": 10000000,
+      "active": true
+    },
+    {
+      "key": "silver",
+      "price": 3000000,
+      "active": true
+    },
+    {
+      "key": "classic",
+      "price": 8000000,
+      "active": false
+    }
+  ],
+  "crew": [
+    "raka",
+    "dinda"
+  ],
+  "cases": [
+    {
+      "name": "valid new booking → draft, total = package + items, phone normalised, default booking name",
+      "input": {
+        "items": [
+          {
+            "name": "Extra hour",
+            "price": 500000,
+            "qty": 2
+          }
+        ],
+        "crewKeys": [
+          "raka",
+          "raka",
+          "dinda"
+        ]
+      },
+      "expect": {
+        "booking": {
+          "status": "draft",
+          "total": 11000000,
+          "totalPaid": 0,
+          "clientPhone": "+6281234567890",
+          "bookingName": "Sari Wulandari · gold",
+          "packagePriceSnapshot": 10000000,
+          "crewCount": 2
+        }
+      }
+    },
+    {
+      "name": "names are trimmed",
+      "input": {
+        "clientName": "  Sari  ",
+        "bookingName": "  Wedding  ",
+        "items": [
+          {
+            "name": "  Album ",
+            "price": 1,
+            "qty": 1
+          }
+        ]
+      },
+      "expect": {
+        "booking": {
+          "clientName": "Sari",
+          "bookingName": "Wedding",
+          "total": 10000001
+        }
+      }
+    },
+    {
+      "name": "empty items → total = package price",
+      "input": {},
+      "expect": {
+        "booking": {
+          "total": 10000000
+        }
+      }
+    },
+    {
+      "name": "client name required",
+      "input": {
+        "clientName": "   "
+      },
+      "expect": {
+        "errors": {
+          "clientName": "required"
+        }
+      }
+    },
+    {
+      "name": "client name 1 char → length",
+      "input": {
+        "clientName": "S"
+      },
+      "expect": {
+        "errors": {
+          "clientName": "length"
+        }
+      }
+    },
+    {
+      "name": "client name 81 chars → length",
+      "input": {
+        "clientName": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "expect": {
+        "errors": {
+          "clientName": "length"
+        }
+      }
+    },
+    {
+      "name": "phone required",
+      "input": {
+        "clientPhone": " "
+      },
+      "expect": {
+        "errors": {
+          "clientPhone": "required"
+        }
+      }
+    },
+    {
+      "name": "phone too short → invalid",
+      "input": {
+        "clientPhone": "0812345"
+      },
+      "expect": {
+        "errors": {
+          "clientPhone": "invalid"
+        }
+      }
+    },
+    {
+      "name": "phone +62 form accepted",
+      "input": {
+        "clientPhone": "+62 21-555-0100"
+      },
+      "expect": {
+        "booking": {
+          "clientPhone": "+62215550100"
+        }
+      }
+    },
+    {
+      "name": "package required",
+      "input": {
+        "packageKey": null
+      },
+      "expect": {
+        "errors": {
+          "packageId": "required"
+        }
+      }
+    },
+    {
+      "name": "newly picked archived package → archived (rule 13)",
+      "input": {
+        "packageKey": "classic"
+      },
+      "expect": {
+        "errors": {
+          "packageId": "archived"
+        }
+      }
+    },
+    {
+      "name": "date required",
+      "input": {
+        "bookingDate": null
+      },
+      "expect": {
+        "errors": {
+          "bookingDate": "required"
+        }
+      }
+    },
+    {
+      "name": "terms 255 ok",
+      "input": {
+        "terms": "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+      },
+      "expect": {
+        "booking": {
+          "status": "draft"
+        }
+      }
+    },
+    {
+      "name": "terms 256 → too_long",
+      "input": {
+        "terms": "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"
+      },
+      "expect": {
+        "errors": {
+          "terms": "too_long"
+        }
+      }
+    },
+    {
+      "name": "payment instruction with letters in the account → invalid",
+      "input": {
+        "paymentInstruction": {
+          "receiptName": "Bank BCA",
+          "accountNumber": "12ab5",
+          "accountName": "Studio"
+        }
+      },
+      "expect": {
+        "errors": {
+          "paymentInstruction": "invalid"
+        }
+      }
+    },
+    {
+      "name": "custom payment instruction is stored trimmed",
+      "input": {
+        "paymentInstruction": {
+          "receiptName": " Bank Mandiri ",
+          "accountNumber": "99887766",
+          "accountName": " Sari "
+        }
+      },
+      "expect": {
+        "booking": {
+          "paymentInstruction": {
+            "receiptName": "Bank Mandiri",
+            "accountNumber": "99887766",
+            "accountName": "Sari"
+          }
+        }
+      }
+    },
+    {
+      "name": "item errors keyed by row",
+      "input": {
+        "items": [
+          {
+            "name": "ok",
+            "price": 1,
+            "qty": 1
+          },
+          {
+            "name": " ",
+            "price": null,
+            "qty": 1000
+          },
+          {
+            "name": "x",
+            "price": -1,
+            "qty": null
+          },
+          {
+            "name": "y",
+            "price": 1.5,
+            "qty": 0
+          }
+        ]
+      },
+      "expect": {
+        "errors": {
+          "items": {
+            "1": {
+              "name": "required",
+              "price": "required",
+              "qty": "invalid"
+            },
+            "2": {
+              "price": "invalid",
+              "qty": "required"
+            },
+            "3": {
+              "price": "invalid",
+              "qty": "invalid"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "qty 999 ok (rule 9)",
+      "input": {
+        "items": [
+          {
+            "name": "Print",
+            "price": 1000,
+            "qty": 999
+          }
+        ]
+      },
+      "expect": {
+        "booking": {
+          "total": 10999000
+        }
+      }
+    },
+    {
+      "name": "several errors at once",
+      "input": {
+        "clientName": "",
+        "clientPhone": "",
+        "packageKey": null,
+        "bookingDate": null
+      },
+      "expect": {
+        "errors": {
+          "clientName": "required",
+          "clientPhone": "required",
+          "packageId": "required",
+          "bookingDate": "required"
+        }
+      }
+    },
+    {
+      "name": "edit keeps an archived package it already has (rule 13)",
+      "existing": {
+        "input": {
+          "packageKey": "silver"
+        },
+        "archive": "silver"
+      },
+      "input": {
+        "packageKey": "silver",
+        "clientName": "Sari W"
+      },
+      "expect": {
+        "booking": {
+          "clientName": "Sari W",
+          "packagePriceSnapshot": 3000000,
+          "total": 3000000
+        }
+      }
+    },
+    {
+      "name": "edit keeps the price snapshot when the package price changed",
+      "existing": {
+        "input": {
+          "packageKey": "silver"
+        },
+        "reprice": {
+          "silver": 3500000
+        }
+      },
+      "input": {
+        "packageKey": "silver"
+      },
+      "expect": {
+        "booking": {
+          "packagePriceSnapshot": 3000000,
+          "total": 3000000
+        }
+      }
+    },
+    {
+      "name": "re-picking a package takes its current price",
+      "existing": {
+        "input": {
+          "packageKey": "silver"
+        }
+      },
+      "input": {
+        "packageKey": "gold"
+      },
+      "expect": {
+        "booking": {
+          "packagePriceSnapshot": 10000000,
+          "total": 10000000,
+          "packageNameSnapshot": "gold"
+        }
+      }
+    },
+    {
+      "name": "edit that drops the total below paid → below_paid + minimumTotal (rule 10)",
+      "existing": {
+        "input": {
+          "packageKey": "silver",
+          "items": [
+            {
+              "name": "Extra",
+              "price": 1000000,
+              "qty": 1
+            }
+          ]
+        },
+        "invoices": [
+          {
+            "type": "dp",
+            "dp": {
+              "method": "fixed",
+              "value": 3500000
+            }
+          }
+        ]
+      },
+      "input": {
+        "packageKey": "silver",
+        "items": []
+      },
+      "expect": {
+        "errors": {
+          "total": "below_paid",
+          "minimumTotal": 3500000
+        }
+      }
+    },
+    {
+      "name": "edit down to exactly the paid amount is fine",
+      "existing": {
+        "input": {
+          "packageKey": "silver",
+          "items": [
+            {
+              "name": "Extra",
+              "price": 1000000,
+              "qty": 1
+            }
+          ]
+        },
+        "invoices": [
+          {
+            "type": "dp",
+            "dp": {
+              "method": "fixed",
+              "value": 3500000
+            }
+          }
+        ]
+      },
+      "input": {
+        "packageKey": "silver",
+        "items": [
+          {
+            "name": "Extra",
+            "price": 500000,
+            "qty": 1
+          }
+        ]
+      },
+      "expect": {
+        "booking": {
+          "total": 3500000,
+          "totalPaid": 3500000,
+          "status": "paid"
+        }
+      }
+    },
+    {
+      "name": "editing a canceled booking → booking: canceled (rule 12)",
+      "existing": {
+        "input": {},
+        "cancel": true
+      },
+      "input": {
+        "clientName": "Sari W"
+      },
+      "expect": {
+        "errors": {
+          "booking": "canceled"
+        }
+      }
+    },
+    {
+      "name": "stale version → booking: conflict (P7)",
+      "existing": {
+        "input": {}
+      },
+      "input": {
+        "clientName": "Sari W",
+        "expectedUpdatedAt": "$stale"
+      },
+      "expect": {
+        "errors": {
+          "booking": "conflict"
+        }
+      }
+    },
+    {
+      "name": "current version saves (P7)",
+      "existing": {
+        "input": {}
+      },
+      "input": {
+        "clientName": "Sari W",
+        "expectedUpdatedAt": "$current"
+      },
+      "expect": {
+        "booking": {
+          "clientName": "Sari W"
+        }
+      }
+    },
+    {
+      "name": "canceled wins over a stale version",
+      "existing": {
+        "input": {},
+        "cancel": true
+      },
+      "input": {
+        "expectedUpdatedAt": "$stale"
+      },
+      "expect": {
+        "errors": {
+          "booking": "canceled"
+        }
+      }
+    }
+  ]
+}

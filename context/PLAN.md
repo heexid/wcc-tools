@@ -28,7 +28,7 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
 ## 1. Foundations (Day 1–2)
 
 1. Export CIR variables → `tokens/figma.tokens.json` → `src/styles/tokens.css` (Tailwind 4 `@theme`, defaults cleared: `bg-surface-accent`, `text-text-secondary`, `rounded-card`, `gap-group`, …). Font: self-hosted Inter 3.19 to match Figma's Inter 3.x metrics. *(Done in prototype slice F0.)*
-2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField. *(Done in prototype slice F1 — `prototype/src/components/ds/`; Tooltip, Side sheet, Skeleton and Loader followed in F6 / F12 / F17. Figma `Skeleton` was added 2026-11-14; `Loader` fixed to a 5×5 grid, 104 × 104.)*
+2. Port base components: Button, InputField, Select, DateInput, Tab, StatusBadge, MetricCard, DataTable, Pagination, Modal, Alert, Toast, Avatar, SearchField. *(Done in prototype slice F1 — `app/src/components/ds/`; Tooltip, Side sheet, Skeleton and Loader followed in F6 / F12 / F17. Figma `Skeleton` was added 2026-11-14; `Loader` fixed to a 5×5 grid, 104 × 104.)*
 3. Formatting utilities in `lib/format.ts`: `formatIDR(n) → "Rp 1.250.000"`, `parseIDR("1.250.000") → 1250000`, `formatDate(id-ID)`.
 
 ## 2. Database (Day 2–3)
@@ -43,7 +43,7 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
 4. RPC `cancel_booking(booking_id, reason?)`: `FOR UPDATE`, allowed only when status ∈ {draft, partially_paid}; sets `canceled_at/by/cancel_reason` (≤ 255) and status `canceled`. `save_booking` and `create_invoice` reject canceled bookings; `save_booking` rejects a newly picked archived package.
 5. RPC `save_booking(payload)`: upsert the booking + replace items + replace `booking_crew` rows in one transaction (new bookings start as `draft`, no invoice). Rejects `total < total_paid`. Returns the booking with its derived fields.
 6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `viewer`.
-7. Seed: 8 packages (6 active, 2 archived — as in Figma Package Lib), 6 crew and 40 bookings across Oct–Dec covering every status, including Canceled. *(Built in prototype slice F2 from the Figma data: `prototype/src/lib/data/seed.ts`.)*
+7. Seed: 8 packages (6 active, 2 archived — as in Figma Package Lib), 6 crew and 40 bookings across Oct–Dec covering every status, including Canceled. *(Built in prototype slice F2 from the Figma data: `app/src/lib/data/seed.ts`.)*
 
 ## 3. Domain logic (Day 3) — `lib/booking/calc.ts` (pure, 100% unit-tested) *(done in prototype slice F2)*
 

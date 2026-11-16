@@ -1,0 +1,39 @@
+# Supabase CLI local stack (PRODUCTION-PLAN P0). Schema: migrations/20261116000001_booking.sql (P1).
+# Regenerate the full commented template with `supabase init --force` if more options are needed.
+project_id = "wcc-tools-booking"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.seed]
+enabled = true
+# seed.local-users.sql has known passwords: local stack + CI only (hosted projects are not seeded from here).
+sql_paths = ["./seed.sql", "./seed.local-users.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["http://127.0.0.1:3000"]
+# No self-signup: accounts are created by an admin (PRD §4.3).
+enable_signup = false
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[analytics]
+# Off: the log collector mounts the Docker socket, which Colima (local, no Docker Desktop) cannot provide.
+enabled = false
