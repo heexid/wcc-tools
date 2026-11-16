@@ -13,6 +13,7 @@ export default defineConfig({
   // A production build against a Docker stack is slower than the mock dev server; generous waits keep a busy
   // machine (or CI runner) from turning into false failures. Real hangs still fail.
   timeout: 60_000,
+  globalTimeout: 40 * 60_000, // the whole run (CI step limit is 45 min)
   expect: { timeout: 15_000 },
   workers: 1,
   reporter: [["list"]],

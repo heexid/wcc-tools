@@ -106,6 +106,7 @@ jobs:
           cache-dependency-path: app/package-lock.json
       - name: Supabase smoke (e2e)
         working-directory: app
+        timeout-minutes: 45 # a hang must fail the run, not hold the runner for 6 h
         run: |
           npm ci
           npx playwright install --with-deps chromium
