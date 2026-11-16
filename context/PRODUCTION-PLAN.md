@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | v1 · 2026-11-16 · P0–P9 built; verified on a local Supabase stack; awaiting CI, P9 reviews, 2.19 Figma note, D3 (see §4) |
+| **Status** | v1 · 2026-11-16 · P0–P11 built; CI on GitHub (branch production/p0-p10); awaiting staging, 2.19 Figma note, D3 (see §4) |
 | **Goal** | Take the finished front-end prototype (F0–F17) to a **live, secure, tested Booking + Package Library + Account module** on Supabase, with **no visual or behavioural change** to what the prototype already does. Built one slice at a time: **build → test → done → next**. |
 | **Companions** | `context/PRD.md` (what + rules) · `context/PLAN.md` (architecture, SQL, RPCs) · `context/INTERACTIONS.md` (96 interaction rows) · `context/PROTOTYPE-PLAN.md` (how the UI was built and gated) |
 | **Starting point** | `app/` — Next.js 16 App Router, 59 client components, mock data layer `src/lib/data/*` (`repo.ts`, `store.ts`, `ledger.ts`, `seed.ts`, `fixtures.ts`), pure domain logic `src/lib/booking/calc.ts`, PDF `src/components/pdf/InvoiceDocument.tsx`, 136 unit tests, 19 Playwright specs, gates G1–G4. |
@@ -569,9 +569,9 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 | P6 Bookings read path | [P6](#p6--bookings-read-path-dashboard-calendar-table-filters-detail) | ✅ | ✅ code (8 fixed) | ✅ (269) | ✅ read parity 68 | ✅ lanes C–F 7/7 (local Supabase) | — | ☐ (P11) | ☐ |
 | P7 Booking write path | [P7](#p7--booking-write-path-new-edit-cancel) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ parity 102/65/68 · pgTAP 156 | ✅ write lanes 7/7 (local Supabase) | — | — | ☐ |
 | P8 Workspace Settings | [P8](#p8--workspace-settings-integration) | ✅ | ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 010 | ✅ business lane 5/5 (local Supabase) | — | — | ☐ |
-| P9 Invoices + PDF | [P9](#p9--invoices--pdf-create-snapshot-storage-signed-urls) | ✅ | ☐ running | ✅ (272) | ✅ pgTAP 174 | ✅ PDF lane 5/5 (local Supabase) | ✅ bucket private, 401/404 | — | ☐ |
-| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-viewer-enforcement-pii-headers) | ☐ | ☐ (+security) | — | ☐ | — | ☐ | — | ☐ |
-| P11 Performance | [P11](#p11--performance-10k-seed-indexes-caching-budgets) | ☐ | ☐ | — | ☐ | — | — | ☐ | ☐ |
+| P9 Invoices + PDF | [P9](#p9--invoices--pdf-create-snapshot-storage-signed-urls) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 174 | ✅ PDF lane 5/5 (local Supabase) | ✅ bucket private, 401/404 | — | ☐ |
+| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-viewer-enforcement-pii-headers) | ✅ | ✅ whole-branch security (none) | — | ✅ RLS matrix 129 cells | — | ✅ PG4 | — | ☐ |
+| P11 Performance | [P11](#p11--performance-10k-seed-indexes-caching-budgets) | ✅ | ☐ | — | ✅ parity 76 | — | — | ✅ DB budgets 8/8 (local, 10k) · ☐ LCP/INP, staging | ☐ |
 | P12 Full regression | [P12](#p12--full-regression-all-lanes-on-staging-a11y-visual-guard) | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 | P13 Operations | [P13](#p13--operations-monitoring-backups-reconciliation-runbook) | ☐ | ☐ | — | ☐ | — | — | — | ☐ |
 | P14 UAT + launch | [P14](#p14--uat-cut-over-and-launch) | ☐ | ☐ | — | — | ☐ (prod smoke) | — | — | ☐ |

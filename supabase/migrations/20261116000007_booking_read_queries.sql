@@ -78,6 +78,8 @@ as $$
            coalesce(q -> 'packageIds', '[]') as pkg,
            q ->> 'from' as d_from,
            q ->> 'to' as d_to,
+           public.try_date(q ->> 'from') as from_date,   -- parsed once per query, not per row (P11)
+           public.try_date(q ->> 'to') as to_date,
            q ->> 'view' as v,
            (q -> 'sort' is null and q ->> 'today' is not null) as by_today,
            public.try_date(q ->> 'today') as t,
@@ -98,10 +100,10 @@ as $$
        and (jsonb_array_length(p.pkg) = 0 or p.pkg ? b.package_id::text)
        -- Valid ISO dates compare as dates (index-friendly); anything else compares as the prototype's strings do,
        -- so a URL like from=2026-02-31 filters instead of failing (review P7 #3).
-       and (p.d_from is null or case when public.try_date(p.d_from) is not null then b.booking_date >= public.try_date(p.d_from)
-                                     else to_char(b.booking_date, 'YYYY-MM-DD') >= p.d_from end)
-       and (p.d_to is null or case when public.try_date(p.d_to) is not null then b.booking_date <= public.try_date(p.d_to)
-                                   else to_char(b.booking_date, 'YYYY-MM-DD') <= p.d_to end)
+       and (p.d_from is null or (p.from_date is not null and b.booking_date >= p.from_date)
+                             or (p.from_date is null and to_char(b.booking_date, 'YYYY-MM-DD') >= p.d_from))
+       and (p.d_to is null or (p.to_date is not null and b.booking_date <= p.to_date)
+                           or (p.to_date is null and to_char(b.booking_date, 'YYYY-MM-DD') <= p.d_to))
   )
   select f.id,
          row_number() over (order by
@@ -118,16 +120,56 @@ as $$
     from f, p;
 $$;
 
+-- Same JSON as booking_row() (004), built set-based for many rows (P11: the month calendar was 0.4 ms per row).
+-- Read parity proves the two are identical.
 create or replace function public.filter_bookings(q jsonb)
 returns setof jsonb
 language sql
 stable
 set search_path = ''
 as $$
-  select public.booking_row(b)
-    from public.ordered_booking_ids(q) o
-    join public.bookings b on b.id = o.id
-   order by o.n;
+  with o as (select id, n from public.ordered_booking_ids(q)),
+  it as (
+    select i.booking_id, jsonb_agg(jsonb_build_object('id', i.id, 'name', i.name, 'price', i.price, 'qty', i.qty) order by i.position, i.id) as j
+      from public.booking_items i join o on o.id = i.booking_id group by i.booking_id
+  ),
+  cr as (
+    select c.booking_id, jsonb_agg(c.crew_id order by c.position, c.crew_id) as j
+      from public.booking_crew c join o on o.id = c.booking_id group by c.booking_id
+  ),
+  iv as (
+    select v.booking_id, v.type, max(v.issued_at) as last_at, count(*) as cnt
+      from public.invoices v join o on o.id = v.booking_id where v.voided_at is null group by v.booking_id, v.type
+  ),
+  ivs as (
+    select booking_id, sum(cnt)::int as cnt, (array_agg(type order by last_at desc))[1] as latest,
+           jsonb_agg(type order by last_at desc) as types
+      from iv group by booking_id
+  )
+  select jsonb_build_object(
+    'id', b.id, 'ref', b.ref, 'bookingName', b.booking_name, 'clientName', b.client_name, 'clientPhone', b.client_phone,
+    'packageId', b.package_id, 'packageNameSnapshot', b.package_name_snapshot, 'packagePriceSnapshot', b.package_price_snapshot,
+    'bookingDate', to_char(b.booking_date, 'YYYY-MM-DD'), 'terms', b.terms, 'paymentInstruction', b.payment_instruction,
+    'items', coalesce(it.j, '[]'),
+    'crewIds', coalesce(cr.j, '[]'),
+    'total', b.total, 'totalPaid', b.total_paid, 'status', b.status,
+    'canceledAt', case when b.canceled_at is null then null else public.iso_utc(b.canceled_at) end,
+    'canceledBy', case when b.canceled_at is null then null else coalesce(px.display_name, '') end,
+    'cancelReason', b.cancel_reason,
+    'createdBy', coalesce(pc.display_name, ''),
+    'createdAt', public.iso_utc(b.created_at), 'updatedAt', public.iso_utc(b.updated_at),
+    'remaining', b.total - b.total_paid,
+    'latestInvoiceType', ivs.latest,
+    'invoiceTypes', coalesce(ivs.types, '[]'),
+    'invoiceCount', coalesce(ivs.cnt, 0))
+  from o
+  join public.bookings b on b.id = o.id
+  left join it on it.booking_id = b.id
+  left join cr on cr.booking_id = b.id
+  left join ivs on ivs.booking_id = b.id
+  left join public.profiles pc on pc.id = b.created_by
+  left join public.profiles px on px.id = b.canceled_by
+  order by o.n;
 $$;
 
 create or replace function public.list_bookings(q jsonb default '{}')

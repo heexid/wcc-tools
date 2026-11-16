@@ -11,7 +11,7 @@ declare
   pkg_ids uuid[];
   pkg_prices bigint[];
   crew_ids uuid[];
-  i int; k int; n_inv int; b uuid; pkg int; total bigint; paid bigint; amt bigint;
+  i int; k int; n_inv int; b uuid; pkg int; v_total bigint; v_paid bigint; amt bigint;
   inv_seq int := 10000;
   d date;
   client text;
@@ -48,16 +48,16 @@ begin
     end loop;
 
     -- 0–5 invoices (≈ 2.5 on average): DP or Full first, then Partial(s), maybe a final Paid.
-    select total into total from public.bookings where id = b;
+    select bk.total into v_total from public.bookings bk where bk.id = b;
     n_inv := (i * 7) % 6;
-    paid := 0;
+    v_paid := 0;
     for k in 1..n_inv loop
-      exit when paid >= total;
+      exit when v_paid >= v_total;
       inv_seq := inv_seq + 1;
-      if k = 1 and n_inv = 1 then amt := total;                   -- Full
-      elsif k = 1 then amt := total * 3 / 10;                     -- DP 30 %
-      elsif k = n_inv then amt := total - paid;                   -- Paid
-      else amt := least(total / 10, total - paid - 1);            -- Partial
+      if k = 1 and n_inv = 1 then amt := v_total;                   -- Full
+      elsif k = 1 then amt := v_total * 3 / 10;                     -- DP 30 %
+      elsif k = n_inv then amt := v_total - v_paid;                   -- Paid
+      else amt := least(v_total / 10, v_total - v_paid - 1);            -- Partial
       end if;
       exit when amt <= 0;
       insert into public.invoices (booking_id, number, type, dp_method, dp_percentage, amount, snapshot, snapshot_hash, issued_at)
@@ -66,7 +66,7 @@ begin
               case when k = 1 and n_inv > 1 then 'percentage' end,
               case when k = 1 and n_inv > 1 then 30 end,
               amt, '{"perf":true}', public.snapshot_hash('{"perf":true}'), (d - 20 + k)::timestamptz);
-      paid := paid + amt;
+      v_paid := v_paid + amt;
     end loop;
   end loop;
 end $$;
