@@ -45,16 +45,22 @@ test("download: server render from the snapshot, stored, then reused; a business
   const changed = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
   expect(changed.text).toContain("Studio Baru");
   expect(changed.text).toContain("Rp 3.000.000"); // figures are the snapshot's
-  expect(sql("select pdf_path from invoices where number = 'INV-2026-0187'")).not.toBe(path1);
-  expect(objects("INV-2026-0187/")).toBe(2);
+  const path2 = sql("select pdf_path from invoices where number = 'INV-2026-0187'");
+  expect(path2).not.toBe(path1);
+  expect(objects("INV-2026-0187/")).toBe(1); // the superseded file is removed once the new one is stored (P9 review #10)
 
-  // Regenerating an old invoice gives identical figures (missing file → rendered again from the snapshot).
+  // Back to the original business: re-rendered (its old file is gone) with text identical to the first render.
   sql("update workspace_settings set business_name = 'bs.moment'");
+  const back = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
+  expect(back.text).toBe(first.text);
+  expect(sql("select pdf_path from invoices where number = 'INV-2026-0187'")).toBe(path1);
+
+  // A stored file that went missing is regenerated from the snapshot, identical again.
   const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
   expect((await admin.storage.from("invoices").remove([path1])).error).toBeNull(); // Storage API (direct SQL deletes are blocked)
-  sql(`update invoices set pdf_path = '${path1}' where number = 'INV-2026-0187'`); // point back at the now-missing file
   const again = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
   expect(again.text).toBe(first.text);
+  expect(objects("INV-2026-0187/")).toBe(1);
 });
 
 test("a new invoice's PDF is generated on confirm (quietly) and downloads", async ({ page }) => {
