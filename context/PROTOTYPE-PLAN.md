@@ -372,7 +372,7 @@ Standard loop. E2E: lane C (C1 → C2), lane D (D3, D4).
 ### F10 — New booking form + leave guard
 
 **Feature**
-- `/bookings/new` (Layout/Editor, 03): client name, phone (+62 normalise), booking name default, Package select (13, 2.5; Manage library 2.6; archived hidden + note 39; empty library 40, 2.17), Booking date picker (14, 2.7; prefill from calendar), additional items with live subtotal (2.8, `Line item row`), Crew select + chips (03b, 2.9), Terms & Conditions text area 255 (2.10).
+- `/bookings/new` (Layout/Editor, 03): client name, phone (+62 normalise), booking name default, Package select (13, 2.5; Manage library ghost button in the Package header 2.6, opens `/packages` in a new tab; archived hidden + note 39; empty library 40, 2.17), Booking date picker (14, 2.7; prefill from calendar), additional items with live subtotal (2.8, `Line item row`), Crew select + chips (03b, 2.9), Terms & Conditions text area 255 (2.10).
 - Right column: sticky Summary card (live, < 50 ms) + Invoices (0) empty state; **Create invoice** disabled with tooltip while invalid (15, 2.12; opens the modal in F11).
 - Save booking → Draft, toast, switch to edit mode (2.2). Validation summary "2 fields need attention" + scroll to first error (15, 2.4).
 - Leave guard (32, 2.1b, lane G): "Discard this new booking?" from ‹ / Cancel / breadcrumb / module link / app launcher / log out; Keep editing default focus (Esc, scrim); `beforeunload`; no prompt when pristine or after save. Fill the F4 `useLeaveGuard`.

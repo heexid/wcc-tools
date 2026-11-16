@@ -67,7 +67,7 @@ test("canceled full page (H5): every field read-only, no edit actions; /edit and
   await expect(main.getByLabel("Client name", { exact: true })).toHaveValue("Sari Wulandari");
   await expect(main.getByRole("row")).toHaveCount(4); // header + 3 items
   await expect(main.getByRole("button")).toHaveCount(0); // no trash, Add item, pickers or Cancel booking
-  await expect(main.getByRole("link", { name: "Manage library" })).toHaveCount(0);
+  await expect(main.getByRole("button", { name: "Manage library (opens in new tab)" })).toHaveCount(0);
   for (const name of ["Save changes", "Cancel", "Create invoice", "Edit booking"]) await expect(page.getByRole("button", { name, exact: true })).toHaveCount(0);
   const totals = page.getByRole("region", { name: "Totals" });
   await expect(totals).toContainText(/Total booking\s*Rp 12\.500\.000/);

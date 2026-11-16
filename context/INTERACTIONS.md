@@ -65,7 +65,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 2.3 | **Save changes** (edit) | Saves, recalculates, toast "Changes saved"; the diff strip clears; existing invoices unchanged | ✅ | Flow B3 |
 | 2.4 | Save with missing / invalid fields | Inline field errors + summary alert "n fields need attention" (counts every invalid field, item cells included; updates as fields are fixed); scroll to and focus the first error | ✅ | **15** |
 | 2.5 | **Package** select | Dropdown with search; rows show name · description · price; ✓ on the selected one | ✅ | **13** |
-| 2.6 | **Manage library** | Opens Package Library in a new tab (the form is kept) | ✅ | **13** (dropdown footer) |
+| 2.6 | **Manage library** button (Package section header, top right; ghost button, 32 high) | Opens the Package module (Package Library, `/packages`) in a new tab; the form is kept. Used on every editable booking form. Not on the read-only Canceled page (H5) | ✅ | Section header `Show action` on all 40 editable-form frames: Screens 03, 03b, 04, 04c, 05, 05c, 07, 08, 09 · Hi-fi flow A2–A4b, B3–B6, E1, E3, G1–G2, H2–H3, I1–I2e · Interaction states 12–15, 22–23, 32–34, 38–40 · dropdown footer link in **13** unchanged |
 | 2.7 | **Booking date** | Month picker: today ringed, selected filled, Today shortcut. Past dates allowed with a warning | ✅ | **14** |
 | 2.8 | **Add item** / fields / **remove** | Adds a row (focus in its name; the row fades in); price takes digits only with a thousands mask (Rp 1.500.000); qty 1–999; subtotal and summary live; trash removes it (no confirm) | ✅ | PRD US-1 · 03 |
 | 2.9 | **Crew** select / chip × | Dropdown (opens above the box) with search by name or role, instant apply; chip × removes; helper "3 crew assigned" | ✅ | 03b |

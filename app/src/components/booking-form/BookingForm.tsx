@@ -615,9 +615,9 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
                 id="sec-package"
                 title="Package"
                 meta={
-                  <a href="/packages" target="_blank" rel="noopener" className="flex rounded-small outline-none hover:underline focus-visible:shadow-focus-ring">
-                    <Txt>Manage library</Txt>
-                  </a>
+                  <Button variant="ghost" aria-label="Manage library (opens in new tab)" onClick={() => window.open("/packages", "_blank", "noopener")}>
+                    Manage library
+                  </Button>
                 }
               />
               <Controller

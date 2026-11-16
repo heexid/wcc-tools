@@ -166,6 +166,16 @@ test("package: search, pick → card + summary; Manage library opens a new tab (
   await expect(dlg.getByRole("link", { name: "Manage package library (opens in new tab)" })).toHaveAttribute("target", "_blank");
 });
 
+test("package header: Manage library is a button that opens the Package module in a new tab (2.6)", async ({ page }) => {
+  await open(page, "?fixture=screen-03");
+  const btn = main(page).getByRole("button", { name: "Manage library (opens in new tab)" });
+  await expect(btn).toBeVisible();
+  await expect(main(page).getByRole("link", { name: "Manage library" })).toHaveCount(0);
+  const [popup] = await Promise.all([page.waitForEvent("popup"), btn.click()]);
+  await expect(popup).toHaveURL(/\/packages$/);
+  await expect(page.getByRole("heading", { name: "New booking" })).toBeVisible();
+});
+
 test("archived packages hidden + note (39); empty library (40) (2.17)", async ({ page }) => {
   await open(page, "?fixture=screen-39");
   await main(page).getByRole("button", { name: "Package" }).click();

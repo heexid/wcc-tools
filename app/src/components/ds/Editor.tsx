@@ -28,10 +28,11 @@ export function EditorPageHeader({ title, status, onBack, backLabel = "Back", ac
   );
 }
 
-/** Section header: Heading/Section title · optional meta (Caption text/secondary; "*" in text/danger), space-between. */
+/** Section header: Heading/Section title · optional meta (Caption text/secondary; "*" in text/danger), space-between.
+ *  Meta can be an action Button (Figma: Section header · Show action) — the row then grows to 32. */
 export function SectionHeader({ title, meta, required, id }: { title: string; meta?: ReactNode; required?: boolean; id?: string }) {
   return (
-    <div className="flex h-24 w-full items-center justify-between">
+    <div className="flex min-h-24 w-full items-center justify-between">
       <h2 id={id} className="flex text-heading-section text-text-primary">
         <Txt>{title}</Txt>
       </h2>
