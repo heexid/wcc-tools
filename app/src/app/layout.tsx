@@ -15,7 +15,7 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "bs.moment · Booking",
+  title: "CIR · Booking",
   description: "Booking & Invoice prototype",
 };
 
