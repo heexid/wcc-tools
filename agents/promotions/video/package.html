@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CIR Package Library Promo</title>
+<!--
+  CIR Package Library promo, 1080×1920 (9:16) at 30 fps. Storyboard: ../VIDEO-SCENES-PACKAGE.md
+  Motion follows references/linkedin-video-801kbps.mp4; colours, type and components come from the
+  Figma file "bs internal tools" (CIR · Design System). Screens are Figma exports of the Bookings page.
+  Deterministic: window.render(t) draws the frame at time t (seconds).
+  Camera regions and highlight rects are in Figma frame units (frames are 1440 wide; the PDF is 922).
+-->
+<style>
+  :root {
+    --neutral-100: #f4f5f7;
+    --neutral-200: #e8eaf0;
+    --neutral-300: #dcdfe6;
+    --text-primary: #202938;
+    --text-secondary: #7c8492;
+    --orchid-500: #b23ad4;
+    --orchid-600: #8c03b3;
+    --orchid-700: #8200a6;
+    --pink-200: #fdb5df;
+    --berry-500: #b92e72;
+    --teal-50: #effbfc;
+    --teal-500: #41b7c4;
+    --scrim: #202938;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--neutral-100); }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--neutral-100); }
+  .abs { position: absolute; left: 0; top: 0; }
+  .scene { position: absolute; inset: 0; }
+  img { display: block; }
+
+  #brand { left: 60px; top: 80px; display: flex; align-items: center; gap: 14px; }
+  #brand .mascot { width: 52px; height: 52px; }
+
+  /* Animated mascot: expression frames from the Figma "References" sheet, swapped per frame */
+  .mascot { position: relative; }
+  .mascot .body { position: absolute; inset: 0; }
+  .mascot .body img { position: absolute; display: none; filter: url(#clean); max-width: none; }
+  #brand b { font-weight: 600; font-size: 30px; letter-spacing: -0.01em; }
+  #brand span { font-size: 26px; color: var(--text-secondary); margin-left: 4px; }
+
+  .gh { height: 0; border-top: 2px dashed #a4abb6; width: 1080px; transform-origin: 0 0; opacity: .6; }
+  .gv { width: 0; border-left: 2px dashed #a4abb6; transform-origin: 0 0; opacity: .6; }
+
+  .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+  .wi { display: inline-block; will-change: transform; }
+
+  .head { left: 60px; top: 176px; width: 960px; }
+  .head h1 { font-weight: 500; font-size: 80px; line-height: 1.06; letter-spacing: -0.035em; }
+  .head p { font-size: 34px; line-height: 1.3; color: var(--text-secondary); margin-top: 18px; }
+
+  .tile { overflow: hidden; }
+  .tile > img { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .grain::after { content: ""; position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+  #win { left: 60px; top: 440px; width: 960px; height: 1396px; background: #fff; border: 2px solid var(--neutral-200); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 80px rgba(32, 41, 56, .14); }
+  #win .bar { height: 64px; background: var(--neutral-100); border-bottom: 2px solid var(--neutral-200); position: relative; }
+  #win .bar i { position: absolute; top: 25px; width: 14px; height: 14px; border-radius: 50%; background: var(--neutral-300); }
+  #win .url { position: absolute; left: 50%; top: 13px; transform: translateX(-50%); width: 360px; height: 38px; border-radius: 999px; background: #fff; border: 2px solid var(--neutral-200); font-size: 20px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; }
+  #vp { position: relative; width: 956px; height: 1330px; overflow: hidden; background: #fff; }
+  #vp .shot { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform, opacity; }
+
+  /* Orchid focus ring, as on a focused input in the app */
+  .ring { border: 3px solid var(--orchid-500); border-radius: 14px; box-shadow: 0 0 0 8px rgba(178, 58, 212, .16); }
+  .ring::after { content: ""; position: absolute; inset: 0; border-radius: 11px; background: rgba(178, 58, 212, var(--press, 0)); }
+
+  .btn { background: linear-gradient(180deg, var(--orchid-500), var(--orchid-700)); border: 2px solid var(--orchid-600); color: #fff; font-weight: 500; font-size: 34px; padding: 24px 56px 24px 44px; border-radius: 999px; white-space: nowrap; display: flex; align-items: center; gap: 14px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="clean"><feComponentTransfer><feFuncA type="linear" slope="1.13" intercept="-0.125" /></feComponentTransfer></filter></svg>
+<div id="stage">
+
+  <!-- Scene 1 · Open: tile collage -->
+  <div class="scene" id="open">
+    <div class="abs tile grain" data-t="0,l" style="left:0; top:0; width:540px; height:560px; background: radial-gradient(circle at 50% 54%, #fff 0 118px, transparent 120px), linear-gradient(135deg, var(--orchid-500), var(--orchid-700))"></div>
+    <div class="abs tile" data-t="1,t" data-crop="dash-calendar,1440,380,620,540" style="left:540px; top:0; width:540px; height:560px; background:#fff"></div>
+    <div class="abs tile" data-t="2,l" data-crop="k-new-filled,1440,412,150,360" style="left:0; top:1300px; width:360px; height:620px; background:#fff"></div>
+    <div class="abs tile grain" data-t="3,b" style="left:360px; top:1300px; width:360px; height:310px; background: linear-gradient(180deg, var(--pink-200), #fff)"><div id="mOpen" class="abs mascot" data-ball="130" style="left:110px; top:80px; width:140px; height:140px"></div></div>
+    <div class="abs tile grain" data-t="4,b" style="left:360px; top:1610px; width:360px; height:310px; background: radial-gradient(circle at 50% 55%, #fff 0 86px, transparent 88px), linear-gradient(160deg, var(--teal-500), var(--teal-50))"></div>
+    <div class="abs tile" data-t="5,r" data-crop="k-l2,1440,28,68,360" style="left:720px; top:1300px; width:360px; height:620px; background:#fff"></div>
+    <div class="abs gh" style="top:560px" data-g="0"></div>
+    <div class="abs gh" style="top:1300px" data-g="1"></div>
+    <div class="abs gv" style="left:540px; height:560px" data-g="2"></div>
+    <div class="abs gv" style="left:360px; top:1300px; height:620px" data-g="3"></div>
+    <div class="abs gv" style="left:720px; top:1300px; height:620px" data-g="4"></div>
+    <div id="openCap" class="abs" style="left:66px; top:640px; font-size:32px; display:flex; gap:14px"><span>→</span><span>CIR · Package Library</span></div>
+    <div id="openH" class="abs reveal" style="left:60px; top:730px; font-weight:500; font-size:124px; line-height:1.02; letter-spacing:-0.045em">Your packages.<br>One library.</div>
+  </div>
+
+  <!-- Per-scene headlines (filled from SCENES) -->
+  <div id="heads"></div>
+  <div id="kpiCaps"></div>
+
+  <!-- Browser window with the camera viewport -->
+  <div id="win" class="abs">
+    <div class="bar"><i style="left:24px"></i><i style="left:48px"></i><i style="left:72px"></i><div class="url">cir</div></div>
+    <div id="vp"></div>
+  </div>
+
+  <!-- Close -->
+  <div class="scene" id="close">
+    <div class="abs" id="glow" style="left:240px; top:420px; width:600px; height:600px; border-radius:50%; background: radial-gradient(circle, rgba(253,181,223,.75), rgba(253,181,223,0) 68%)"></div>
+    <div id="logo" class="abs mascot" data-ball="210" style="left:420px; top:600px; width:240px; height:240px"></div>
+    <div id="closeH" class="abs reveal" style="left:0; width:1080px; top:900px; text-align:center; font-weight:600; font-size:104px; line-height:1.05; letter-spacing:-0.035em">CIR Bookings</div>
+    <div id="closeSub" class="abs" style="left:0; width:1080px; top:1040px; text-align:center; font-size:36px; color:var(--text-secondary)">Bookings, invoices, crew and packages in one workspace.</div>
+    <div id="closeBtn" class="abs btn" style="left:540px; top:1220px; translate:-50% -50%">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New booking
+    </div>
+  </div>
+
+  <!-- End card -->
+  <div class="scene" id="end" style="background:var(--scrim)">
+    <div id="mEnd" class="abs mascot" data-ball="150" style="left:455px; top:650px; width:170px; height:170px"></div>
+    <div id="endT" class="abs" style="left:0; width:1080px; top:860px; text-align:center; color:#fff">
+      <div style="font-weight:600; font-size:120px; line-height:1.05; letter-spacing:-0.035em">CIR</div>
+      <div style="font-size:40px; margin-top:20px; color:rgba(255,255,255,.72)">Clarity for every invoice</div>
+    </div>
+  </div>
+
+  <div id="brand" class="abs"><div id="mBrand" class="mascot" data-ball="46"></div><b>CIR</b><span>Bookings</span></div>
+</div>
+
+<script>
+// Pacing: SHOTS, RINGS, captions and beats below are written in "design" seconds (body 4.3–69.0).
+// D() maps them onto the shared story clock (body 4.3–45.5, where the close and end card live),
+// and WARP stretches story time into real time so the body plays 1.45× slower than the design.
+const D = d => (d <= 4.3 ? d : 4.3 + (d - 4.3) * 41.2 / 64.7);
+const BODY_END_REAL = 4.3 + 64.7 * 1.45;
+const WARP = [[0, 0], [4.3, 4.3], [BODY_END_REAL, 45.5], [BODY_END_REAL + 5, 50.5]];
+const DURATION = BODY_END_REAL + 5;
+const VW = 956, VH = 1330;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, s, d) => clamp((t - s) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eOut = x => 1 - Math.pow(1 - x, 4);
+const eIn = x => x * x * x;
+const eInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eBack = x => { const c1 = 1.3, c3 = c1 + 1; return x <= 0 ? 0 : 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const $ = id => document.getElementById(id);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const tf = (el, { x = 0, y = 0, s = 1, o = 1 } = {}) => { el.style.transform = `translate(${x}px, ${y}px) scale(${s})`; el.style.opacity = o; };
+const story = r => { for (let i = 0; i < WARP.length - 1; i++) { const [r0, s0] = WARP[i], [r1, s1] = WARP[i + 1]; if (r <= r1) return s0 + (r - r0) * (s1 - s0) / (r1 - r0); } return 50.5 + r - WARP[WARP.length - 1][0]; };
+const show = (el, on) => { el.style.display = on ? '' : 'none'; return on; };
+
+// ── Scene headlines ───────────────────────────────────────────
+const SCENES = [
+  [4.3, 14.0, 'Open the Package Library.', ''],
+  [14.0, 30.0, 'Know your packages.', ''],
+  [30.0, 40.5, 'Create a package.', ''],
+  [40.5, 51.0, 'Edit a package.', ''],
+  [51.0, 64.0, 'Archive a package.', ''],
+  [64.0, 69.0, 'Manage from a booking.', ''],
+].map(([a, b, h, x]) => [D(a), D(b), h, x]);
+// Captions: name the step, then explain it (design seconds)
+const KPI_CAPS = [
+  [4.4, 7.4, 'Start on Bookings.', 'After you log in, you land on the Bookings dashboard. Open Menu, top left.'],
+  [7.4, 10.6, 'The launchpad.', 'Every CIR app lives here. Choose Package Lib.'],
+  [10.6, 14.0, 'Package Library.', 'Every package you sell, with its price, description and how often it’s booked.'],
+  [14.0, 16.5, 'One rule up front.', 'Packages are used when creating bookings. Price changes never alter existing bookings.'],
+  [16.5, 19.5, 'Name and description.', 'What the client gets, shown in the package picker and on the booking.'],
+  [19.5, 22.0, 'Price.', 'The current price. Each new booking takes a snapshot of it.'],
+  [22.0, 25.0, 'Bookings and last updated.', 'How many bookings use each package, and when it last changed.'],
+  [25.0, 28.0, 'Status and actions.', 'Active packages can be booked. Edit or archive from the row, or search for any package.'],
+  [28.0, 30.0, 'Active and Archived.', 'Archived packages move to their own tab: out of the way, never lost.'],
+  [30.0, 32.0, 'New package.', 'Top right of the library.'],
+  [32.0, 34.2, 'Name and price.', 'Only these two are required. Price is whole Rupiah.'],
+  [34.2, 36.5, 'Description.', 'What’s included. It shows in the package picker and on every booking.'],
+  [36.5, 40.5, 'Created.', 'Prewedding Story is live: Active and ready to pick on any new booking.'],
+  [40.5, 42.5, 'Edit.', 'Open any package from its row.'],
+  [42.5, 45.5, 'Update the details.', 'Change the name, price or description.'],
+  [45.5, 49.0, 'Only new bookings change.', 'Gold Package is used in 23 bookings. They keep their saved price; the new one applies to new bookings.'],
+  [49.0, 51.0, 'Save.', 'The library updates straight away.'],
+  [51.0, 53.0, 'Archive.', 'When a package isn’t available any more, archive it from its row.'],
+  [53.0, 56.5, 'Archive “Gold Package”?', 'It leaves the booking forms. The 23 bookings that use it keep their package and price.'],
+  [56.5, 59.5, 'Archived tab.', 'Gold Package moves here, and you can restore it any time.'],
+  [59.5, 61.5, 'Gone from booking forms.', 'New bookings can’t pick it: Gold Package is no longer in the list.'],
+  [61.5, 64.0, 'Existing bookings keep it.', 'Bookings that already use Gold Package keep it at the saved price, marked Archived.'],
+  [64.0, 66.5, 'Manage library.', 'In any booking form, Manage library opens the Package Library in a new tab.'],
+  [66.5, 69.0, 'Done.', 'Packages stay tidy, and every booking keeps the price it was sold at.'],
+].map(([a, b, t, x]) => [D(a), D(b), t, x]);
+KPI_CAPS.forEach(([, , title, body], i) => $('kpiCaps').insertAdjacentHTML('beforeend',
+  `<div class="abs kcap" id="k${i}" style="left:60px; top:286px; width:960px; font-size:34px; line-height:1.32; color:var(--text-secondary)"><b style="font-weight:600; color:var(--text-primary)">${title}</b> ${body}</div>`));
+SCENES.forEach(([, , h, s], i) => $('heads').insertAdjacentHTML('beforeend',
+  `<div class="abs head" id="h${i}"><h1 class="reveal">${h}</h1><p>${s}</p></div>`));
+
+// ── Camera shots: [time, x, y, w] keys in Figma units ─────────
+const IMG = { 'k-lib7': 1440, 'k-final': 1440, 'k-l1': 1440, 'k-l2': 1440, 'k-l3': 1440, 'k-p1': 1440, 'k-new-filled': 1440, 'k-created': 1440, 'k-edit': 1440, 'k-arch': 1440, 'k-archtab2': 1440, 'k-dd-hidden': 1440, 'k-kept': 1440 };
+const SHOTS = [
+  /* 0 dashboard */   { img: 'k-l1', from: 3.7, keys: [[4.4, 440, 0, 1000], [5.2, 440, 0, 1000], [5.9, 0, 0, 560]] },
+  /* 1 launcher */    { img: 'k-l2', from: 7.4, keys: [[7.4, 0, 0, 560]] },
+  /* 2 library */     { img: 'k-l3', from: 10.6, slide: true, keys: [[10.6, 0, 40, 720]] },
+  /* 3 tour */        { img: 'k-p1', from: 13.95, keys: [[14.0, 0, 40, 720], [19.3, 0, 40, 720], [19.9, 0, 40, 900], [21.9, 0, 40, 900], [22.5, 380, 40, 900], [24.9, 380, 40, 900], [25.4, 720, 40, 720], [27.9, 720, 40, 720], [28.5, 0, 40, 720], [29.9, 0, 40, 720], [30.5, 720, 40, 720]] },
+  /* 4 new filled */  { img: 'k-new-filled', bg: '#b9bcc0', from: 32.0, keys: [[32.0, 380, 0, 680]] },
+  /* 5 created */     { img: 'k-created', from: 36.5, keys: [[36.5, 300, 40, 720]] },
+  /* 6 row edit */    { img: 'k-lib7', from: 40.5, keys: [[40.5, 720, 40, 720]] },
+  /* 7 edit modal */  { img: 'k-edit', bg: '#b9bcc0', from: 42.5, keys: [[42.5, 380, 0, 680]] },
+  /* 8 row archive */ { img: 'k-lib7', from: 51.0, slide: true, keys: [[51.0, 720, 40, 720]] },
+  /* 9 confirm */     { img: 'k-arch', bg: '#b9bcc0', from: 53.0, keys: [[53.0, 380, 0, 680]] },
+  /* 10 archived */   { img: 'k-archtab2', from: 56.5, keys: [[56.5, 0, 100, 720], [58.0, 0, 100, 720], [58.6, 720, 100, 720]] },
+  /* 11 form */       { img: 'k-dd-hidden', from: 59.5, slide: true, keys: [[59.5, 0, 400, 700]] },
+  /* 12 kept */       { img: 'k-kept', from: 61.5, keys: [[61.5, 0, 400, 700]] },
+  /* 13 form */       { img: 'k-dd-hidden', from: 64.0, keys: [[64.0, 0, 400, 700]] },
+  /* 14 library */    { img: 'k-final', from: 66.5, slide: true, keys: [[66.5, 0, 40, 720]] },
+];
+SHOTS.forEach(s => { s.from = D(s.from); s.keys.forEach(k => { k[0] = D(k[0]); }); });
+const FADE = .45;
+SHOTS.forEach((s, i) => {
+  s.to = i < SHOTS.length - 1 ? SHOTS[i + 1].from + FADE + .05 : 99;
+  s.el = document.createElement('img');
+  s.el.className = 'shot';
+  s.el.src = `assets/figma/${s.img}.png`;
+  s.el.style.width = IMG[s.img] + 'px';
+  // Solid fill below each frame so a newer, shorter frame fully covers the one underneath it
+  s.el.style.background = s.bg || '#fff';
+  s.el.style.paddingBottom = '3000px';
+  $('vp').appendChild(s.el);
+});
+function cam(shot, t) {
+  const k = shot.keys;
+  if (t <= k[0][0]) return k[0].slice(1);
+  for (let i = 0; i < k.length - 1; i++) {
+    if (t <= k[i + 1][0]) {
+      const x = eInOut(p(t, k[i][0], k[i + 1][0] - k[i][0]));
+      return [1, 2, 3].map(j => lerp(k[i][j], k[i + 1][j], x));
+    }
+  }
+  return k[k.length - 1].slice(1);
+}
+const toScreen = (shot, t, [x, y, w, h]) => { const [cx, cy, cw] = cam(shot, t); const s = VW / cw; return [(x - cx) * s, (y - cy) * s, w * s, h * s]; };
+
+// ── Focus rings and row reveals (Figma units, tied to a shot) ─
+const RINGS = [
+  { shot: 0, t0: 6.0, t1: 7.3, r: [26, 20, 76, 36], press: 6.6 },
+  { shot: 1, t0: 7.6, t1: 8.9, r: [28, 68, 444, 282] },
+  { shot: 1, t0: 9.0, t1: 10.5, r: [186, 188, 130, 126], press: 9.8 },
+  { shot: 2, t0: 11.0, t1: 13.9, r: [32, 290, 668, 400] },
+  { shot: 3, t0: 14.2, t1: 16.4, r: [28, 108, 504, 60] },
+  { shot: 3, t0: 16.7, t1: 19.4, r: [44, 412, 640, 64] },
+  { shot: 3, t0: 20.0, t1: 21.9, r: [676, 284, 132, 404] },
+  { shot: 3, t0: 22.8, t1: 24.9, r: [866, 284, 110, 404] },
+  { shot: 3, t0: 23.6, t1: 24.9, r: [1004, 284, 120, 404] },
+  { shot: 3, t0: 25.5, t1: 26.6, r: [1166, 284, 96, 404] },
+  { shot: 3, t0: 26.4, t1: 27.9, r: [1296, 284, 104, 404] },
+  { shot: 3, t0: 26.9, t1: 27.9, r: [1124, 190, 288, 42] },
+  { shot: 3, t0: 28.7, t1: 29.9, r: [34, 188, 168, 40] },
+  { shot: 3, t0: 30.6, t1: 32.0, r: [1270, 118, 140, 40], press: 31.4 },
+  { shot: 4, t0: 32.3, t1: 33.2, r: [420, 188, 600, 46] },
+  { shot: 4, t0: 33.2, t1: 34.2, r: [420, 266, 600, 66] },
+  { shot: 4, t0: 34.4, t1: 35.6, r: [420, 348, 600, 120] },
+  { shot: 4, t0: 35.6, t1: 36.5, r: [890, 530, 136, 42], press: 36.0 },
+  { shot: 5, t0: 36.8, t1: 37.8, r: [562, 86, 316, 56] },
+  { shot: 5, t0: 37.8, t1: 40.4, r: [310, 664, 700, 66] },
+  { shot: 6, t0: 40.8, t1: 42.4, r: [1302, 426, 48, 38], press: 41.8 },
+  { shot: 7, t0: 42.8, t1: 43.8, r: [420, 188, 600, 46] },
+  { shot: 7, t0: 43.8, t1: 45.4, r: [420, 266, 600, 46] },
+  { shot: 7, t0: 45.6, t1: 46.8, r: [420, 312, 600, 30] },
+  { shot: 7, t0: 46.8, t1: 48.9, r: [420, 512, 600, 74] },
+  { shot: 7, t0: 49.2, t1: 50.9, r: [902, 616, 122, 42], press: 49.9 },
+  { shot: 8, t0: 51.3, t1: 52.9, r: [1354, 424, 44, 42], press: 52.2 },
+  { shot: 9, t0: 53.3, t1: 55.2, r: [560, 280, 380, 140] },
+  { shot: 9, t0: 55.3, t1: 56.4, r: [782, 440, 138, 38], press: 55.9 },
+  { shot: 10, t0: 56.8, t1: 57.6, r: [106, 188, 100, 40] },
+  { shot: 10, t0: 57.4, t1: 58.0, r: [34, 292, 666, 66] },
+  { shot: 10, t0: 58.7, t1: 59.4, r: [1306, 304, 92, 42] },
+  { shot: 11, t0: 59.8, t1: 61.4, r: [30, 512, 630, 330] },
+  { shot: 12, t0: 61.8, t1: 63.9, r: [30, 512, 630, 160] },
+  { shot: 13, t0: 64.3, t1: 66.4, r: [548, 450, 100, 30], press: 65.6 },
+  { shot: 14, t0: 66.8, t1: 68.8, r: [32, 290, 668, 400] },
+];
+RINGS.forEach(r => { r.t0 = D(r.t0); r.t1 = D(r.t1); if (r.press != null) r.press = [].concat(r.press).map(D); });
+RINGS.forEach(r => { r.el = document.createElement('div'); r.el.className = 'abs ring'; $('vp').appendChild(r.el); });
+
+// Collage crops: data-crop="img,frameWidth,x,y,regionWidth"
+$$('[data-crop]').forEach(el => {
+  const [img, fw, x, y, w] = el.dataset.crop.split(',');
+  const s = el.offsetWidth / +w;
+  el.insertAdjacentHTML('beforeend', `<img src="assets/figma/${img}.png" style="width:${fw}px; transform: translate(${-x * s}px, ${-y * s}px) scale(${s})">`);
+});
+
+// Word reveal
+$$('.reveal').forEach(el => {
+  el.innerHTML = el.innerHTML.split(/<br\s*\/?>/i).map(line =>
+    line.trim().split(/\s+/).map(w => `<span class="w"><span class="wi">${w}</span></span>`).join(' ')).join('<br>');
+});
+function words(el, t, start, end, stagger = .06) {
+  const out = eIn(p(t, end - .35, .3));
+  $$('.wi', el).forEach((w, i) => {
+    const x = eOut(p(t, start + i * stagger, .55));
+    w.style.transform = `translateY(${(1 - x) * 110 - out * 110}%)`;
+  });
+}
+
+// ── Mascot ────────────────────────────────────────────────────
+// Frames are cut from the Figma References sheet (270×275 crops, ball Ø≈200 centred at 135,125).
+const MFRAMES = ['idle', 'blink', 'happy', 'excited', 'surprised', 'alert', 'curious', 'look-left', 'look-right', 'look-up', 'look-down', 'look-up-right', 'look-down-left', 'shy', 'small', 'normal'];
+$$('.mascot').forEach(el => {
+  const ball = +el.dataset.ball, k = ball / 200, W = el.offsetWidth, H = el.offsetHeight;
+  const body = document.createElement('div');
+  body.className = 'body';
+  body.style.transformOrigin = `50% ${H / 2 + ball / 2}px`;
+  el.appendChild(body);
+  el._f = {};
+  MFRAMES.forEach(n => {
+    const i = document.createElement('img');
+    i.src = `assets/figma/mascot/${n}.png`;
+    Object.assign(i.style, { width: `${270 * k}px`, left: `${W / 2 - 135 * k}px`, top: `${H / 2 - 125 * k}px`, clipPath: `inset(${12 * k}px ${14 * k}px 0 ${14 * k}px)` });
+    body.appendChild(i);
+    el._f[n] = i;
+  });
+  el._body = body;
+  el._ball = ball;
+});
+
+// One beat of a mascot script: [start, frame, duration?, hop?]. Between beats it idles.
+function mascot(el, t, { base = 'idle', beats = [], blinkEvery = 3.2, blinkOffset = 0, phase = 0 } = {}) {
+  let frame = base, hopY = 0, sx = 1, sy = 1;
+  for (const [t0, f, dur = .6, hop = 0] of beats) {
+    if (t >= t0 && t < t0 + dur) {
+      frame = f;
+      if (hop) {
+        const k = p(t, t0, .55);
+        hopY = -Math.sin(Math.PI * k) * hop * el._ball;
+        const land = p(t, t0 + .5, .25), squash = Math.sin(Math.PI * land) * .07, take = Math.sin(Math.PI * p(t, t0, .12)) * .05;
+        sx += squash + take; sy -= squash + take;
+        sy += Math.sin(Math.PI * k) * .04; sx -= Math.sin(Math.PI * k) * .03;
+      }
+    }
+  }
+  const idleLike = !['blink', 'happy', 'excited', 'shy'].includes(frame);
+  if (idleLike && ((t + blinkOffset) % blinkEvery) < .13) frame = 'blink';
+  const br = Math.sin(2 * Math.PI * (t + phase) / 1.8);
+  sy *= 1 + .022 * br; sx *= 1 - .016 * br;
+  for (const n in el._f) el._f[n].style.display = n === frame ? 'block' : 'none';
+  el._body.style.transform = `translateY(${hopY}px) scale(${sx}, ${sy})`;
+}
+
+const BRAND_BEATS = [
+  [5.0, 'look-left', 1.0], [6.6, 'excited', .5, .22], [7.6, 'curious', 1.0], [9.8, 'excited', .5, .22], [11.0, 'happy', 1.2],
+  [14.2, 'look-down', 1.5], [16.7, 'look-down-left', 1.4], [19.7, 'curious', 1.0], [22.8, 'look-right', 1.4], [25.1, 'look-right', 1.4],
+  [28.7, 'look-left', 1.0], [31.4, 'excited', .5, .22], [32.3, 'look-down', 1.5], [36.0, 'excited', .5, .22], [36.8, 'happy', 1.4, .3],
+  [41.8, 'excited', .5, .22], [42.8, 'look-down', 1.4], [45.6, 'curious', 1.2], [46.8, 'surprised', 1.0], [49.9, 'excited', .5, .22],
+  [52.2, 'excited', .5, .22], [53.3, 'surprised', 1.2], [55.9, 'excited', .5, .22], [56.8, 'happy', 1.0], [59.8, 'look-down', 1.4],
+  [61.8, 'happy', 1.4], [65.6, 'excited', .5, .22], [66.8, 'happy', 1.6, .3],
+].map(([t, ...rest]) => [D(t), ...rest]);
+
+function renderStory(t) {
+  mascot($('mBrand'), t, { base: 'look-down', beats: BRAND_BEATS, blinkEvery: 3.4, blinkOffset: 1.1 });
+  if (t < 4.3) mascot($('mOpen'), t, { beats: [[0, 'surprised', 1.1, .35], [2.2, 'look-up', .5], [2.7, 'happy', 1.6, .3]], blinkOffset: 1.4, phase: .3 });
+  if (t >= 45.5 && t < 48.6) mascot($('logo'), t, { beats: [[45.6, 'surprised', .6], [46.2, 'look-left', .4], [46.6, 'look-right', .4], [47.0, 'look-down', .5], [47.55, 'excited', .55, .3], [48.1, 'happy', 1]], blinkOffset: 1.85 });
+  if (t >= 48.5) mascot($('mEnd'), t, { beats: [[48.5, 'happy', .9], [49.4, 'idle', .5], [50.05, 'happy', 1, .2]], blinkOffset: 1.3 });
+
+  // Brand row
+  $('brand').style.opacity = clamp(Math.min(p(t, 4.2, .4), 1 - p(t, 45.3, .3)));
+
+  // Open
+  if (show($('open'), t < 4.3)) {
+    $$('[data-t]', $('open')).forEach(el => {
+      const [i, dir] = el.dataset.t.split(',');
+      const x = eOut(p(t, .1 + i * .09, .8));
+      const w = el.offsetWidth, h = el.offsetHeight;
+      const off = { l: [-w, 0], r: [w, 0], t: [0, -h], b: [0, h] }[dir];
+      el.style.transform = `translate(${off[0] * (1 - x)}px, ${off[1] * (1 - x)}px)`;
+    });
+    $$('[data-g]', $('open')).forEach(g => {
+      const x = eOut(p(t, .6 + .08 * g.dataset.g, .6));
+      g.style.transform = g.classList.contains('gh') ? `scaleX(${x})` : `scaleY(${x})`;
+    });
+    const c = eOut(p(t, .7, .5));
+    tf($('openCap'), { y: (1 - c) * 20, o: c });
+    words($('openH'), t, .8, 99, .12);
+    const q = eInOut(p(t, 3.6, .6));
+    tf($('open'), { y: -260 * q, o: 1 - q });
+  }
+
+  // Headlines
+  SCENES.forEach(([a, b], i) => {
+    const el = $(`h${i}`);
+    if (!show(el, t >= a && t < b)) return;
+    words($('h' + i).querySelector('h1'), t, a + .1, b);
+    const sub = el.querySelector('p');
+    sub.style.opacity = eOut(p(t, a + .45, .4)) * (1 - p(t, b - .35, .25));
+    sub.style.transform = `translateY(${(1 - eOut(p(t, a + .45, .4))) * 16}px)`;
+  });
+
+  KPI_CAPS.forEach(([a, b], i) => {
+    const el = $(`k${i}`);
+    if (!show(el, t >= a && t < b)) return;
+    const x = eOut(p(t, a, .3)), out = p(t, b - .2, .2);
+    tf(el, { y: (1 - x) * 18 - out * 10, o: x * (1 - out) });
+  });
+
+  // Window
+  const winIn = eOut(p(t, 3.7, .9)), winOut = eIn(p(t, 45.2, .6));
+  if (show($('win'), t >= 3.7 && t < 45.9)) tf($('win'), { y: 1400 * (1 - winIn) + 1500 * winOut });
+
+  let vpBg = '#fff';
+  SHOTS.forEach((s, i) => {
+    const on = t >= s.from && t < s.to;
+    s.el.style.display = on ? '' : 'none';
+    if (!on) return;
+    const [cx, cy, cw] = cam(s, t);
+    const sc = VW / cw;
+    const f = i === 0 ? 1 : eOut(p(t, s.from, FADE));
+    const dy = s.slide ? (1 - f) * 260 : 0;
+    s.el.style.transform = `translate(${-cx * sc}px, ${-cy * sc + dy}px) scale(${sc})`;
+    s.el.style.opacity = f;
+    if (f > .5) vpBg = s.bg || '#fff'; // the top shot decides the fill below short modal frames
+  });
+  $('vp').style.background = vpBg;
+
+  RINGS.forEach(r => {
+    const on = t >= r.t0 && t < r.t1;
+    r.el.style.display = on ? '' : 'none';
+    if (!on) return;
+    const [x, y, w, h] = toScreen(SHOTS[r.shot], t, r.r);
+    const pad = 8;
+    Object.assign(r.el.style, { left: `${x - pad}px`, top: `${y - pad}px`, width: `${w + pad * 2}px`, height: `${h + pad * 2}px` });
+    const o = Math.min(eOut(p(t, r.t0, .25)), 1 - p(t, r.t1 - .25, .25));
+    let s = lerp(1.06, 1, eOut(p(t, r.t0, .3))), press = 0;
+    [].concat(r.press ?? []).forEach(pt => { const k = p(t, pt, .35); const b = Math.sin(Math.PI * k); s -= .04 * b; press = Math.max(press, .14 * b); });
+    r.el.style.opacity = o;
+    r.el.style.transform = `scale(${s})`;
+    r.el.style.setProperty('--press', press);
+  });
+
+  // Close
+  if (show($('close'), t >= 45.5 && t < 48.6)) {
+    $('close').style.opacity = 1 - p(t, 48.3, .3);
+    const l = eBack(p(t, 45.7, .6));
+    $('logo').style.transformOrigin = 'center';
+    tf($('logo'), { s: lerp(.5, 1, l), o: clamp(l * 1.6) });
+    const g = eOut(p(t, 45.6, .9));
+    $('glow').style.transformOrigin = 'center';
+    tf($('glow'), { s: lerp(.6, 1, g), o: g });
+    words($('closeH'), t, 46.0, 99, .1);
+    const sb = eOut(p(t, 46.4, .5));
+    tf($('closeSub'), { y: (1 - sb) * 20, o: sb });
+    const bt = eBack(p(t, 46.8, .5));
+    tf($('closeBtn'), { s: lerp(.8, 1, bt) - .05 * Math.sin(Math.PI * p(t, 47.45, .3)), o: clamp(bt * 1.6) });
+  }
+
+  // End card
+  if (show($('end'), t >= 48.5)) {
+    const m = eBack(p(t, 48.6, .55));
+    $('mEnd').style.transformOrigin = 'center';
+    tf($('mEnd'), { s: lerp(.4, 1, m), o: clamp(m * 1.6) });
+    const e = eOut(p(t, 48.8, .5));
+    tf($('endT'), { y: (1 - e) * 16, o: e });
+  }
+}
+window.render = tr => renderStory(story(tr));
+
+window.ready = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map(i => i.decode().catch(() => {})),
+]).then(() => { window.render(0); return true; });
+
+if (location.hash.startsWith('#t=')) window.ready.then(() => window.render(parseFloat(location.hash.slice(3))));
+if (location.hash === '#play') window.ready.then(() => { const t0 = performance.now(); const loop = n => { window.render(((n - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>

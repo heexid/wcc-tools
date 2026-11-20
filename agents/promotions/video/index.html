@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CIR Bookings Promo</title>
+<!--
+  CIR Bookings promo, 1080×1920 (9:16) at 30 fps, 50.5 s. Storyboard: ../VIDEO-SCENES-STYLE.md
+  Motion follows references/linkedin-video-801kbps.mp4; colours, type and components come from the
+  Figma file "bs internal tools" (CIR · Design System). Screens are Figma exports of the Bookings page.
+  Deterministic: window.render(t) draws the frame at time t (seconds).
+  Camera regions and highlight rects are in Figma frame units (frames are 1440 wide; the PDF is 922).
+-->
+<style>
+  :root {
+    --neutral-100: #f4f5f7;
+    --neutral-200: #e8eaf0;
+    --neutral-300: #dcdfe6;
+    --text-primary: #202938;
+    --text-secondary: #7c8492;
+    --orchid-500: #b23ad4;
+    --orchid-600: #8c03b3;
+    --orchid-700: #8200a6;
+    --pink-200: #fdb5df;
+    --berry-500: #b92e72;
+    --teal-50: #effbfc;
+    --teal-500: #41b7c4;
+    --scrim: #202938;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--neutral-100); }
+  body { font-family: "Inter", system-ui, sans-serif; color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+  #stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--neutral-100); }
+  .abs { position: absolute; left: 0; top: 0; }
+  .scene { position: absolute; inset: 0; }
+  img { display: block; }
+
+  #brand { left: 60px; top: 80px; display: flex; align-items: center; gap: 14px; }
+  #brand .mascot { width: 52px; height: 52px; }
+
+  /* Animated mascot: expression frames from the Figma "References" sheet, swapped per frame */
+  .mascot { position: relative; }
+  .mascot .body { position: absolute; inset: 0; }
+  .mascot .body img { position: absolute; display: none; filter: url(#clean); max-width: none; }
+  #brand b { font-weight: 600; font-size: 30px; letter-spacing: -0.01em; }
+  #brand span { font-size: 26px; color: var(--text-secondary); margin-left: 4px; }
+
+  .gh { height: 0; border-top: 2px dashed #a4abb6; width: 1080px; transform-origin: 0 0; opacity: .6; }
+  .gv { width: 0; border-left: 2px dashed #a4abb6; transform-origin: 0 0; opacity: .6; }
+
+  .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
+  .wi { display: inline-block; will-change: transform; }
+
+  .head { left: 60px; top: 176px; width: 960px; }
+  .head h1 { font-weight: 500; font-size: 80px; line-height: 1.06; letter-spacing: -0.035em; }
+  .head p { font-size: 34px; line-height: 1.3; color: var(--text-secondary); margin-top: 18px; }
+
+  .tile { overflow: hidden; }
+  .tile > img { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .grain::after { content: ""; position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+  #win { left: 60px; top: 440px; width: 960px; height: 1396px; background: #fff; border: 2px solid var(--neutral-200); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 80px rgba(32, 41, 56, .14); }
+  #win .bar { height: 64px; background: var(--neutral-100); border-bottom: 2px solid var(--neutral-200); position: relative; }
+  #win .bar i { position: absolute; top: 25px; width: 14px; height: 14px; border-radius: 50%; background: var(--neutral-300); }
+  #win .url { position: absolute; left: 50%; top: 13px; transform: translateX(-50%); width: 360px; height: 38px; border-radius: 999px; background: #fff; border: 2px solid var(--neutral-200); font-size: 20px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; }
+  #vp { position: relative; width: 956px; height: 1330px; overflow: hidden; background: #fff; }
+  #vp .shot { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform, opacity; }
+
+  /* Orchid focus ring, as on a focused input in the app */
+  .ring { border: 3px solid var(--orchid-500); border-radius: 14px; box-shadow: 0 0 0 8px rgba(178, 58, 212, .16); }
+  .ring::after { content: ""; position: absolute; inset: 0; border-radius: 11px; background: rgba(178, 58, 212, var(--press, 0)); }
+  .cover { background: #fff; transform-origin: 100% 50%; }
+  #summary { border-radius: 16px; overflow: hidden; border: 2px solid var(--neutral-200); box-shadow: 0 24px 60px rgba(32, 41, 56, .18); background: #fff; }
+  #summary img { position: absolute; transform-origin: 0 0; }
+
+  .btn { background: linear-gradient(180deg, var(--orchid-500), var(--orchid-700)); border: 2px solid var(--orchid-600); color: #fff; font-weight: 500; font-size: 34px; padding: 24px 56px 24px 44px; border-radius: 999px; white-space: nowrap; display: flex; align-items: center; gap: 14px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="clean"><feComponentTransfer><feFuncA type="linear" slope="1.13" intercept="-0.125" /></feComponentTransfer></filter></svg>
+<div id="stage">
+
+  <!-- Scene 1 · Open: tile collage -->
+  <div class="scene" id="open">
+    <div class="abs tile grain" data-t="0,l" style="left:0; top:0; width:540px; height:560px; background: radial-gradient(circle at 50% 54%, #fff 0 118px, transparent 120px), linear-gradient(135deg, var(--orchid-500), var(--orchid-700))"></div>
+    <div class="abs tile" data-t="1,t" data-crop="dash-calendar,1440,380,620,540" style="left:540px; top:0; width:540px; height:560px; background:#fff"></div>
+    <div class="abs tile" data-t="2,l" data-crop="b-crew,1440,30,1060,360" style="left:0; top:1300px; width:360px; height:620px; background:#fff"></div>
+    <div class="abs tile grain" data-t="3,b" style="left:360px; top:1300px; width:360px; height:310px; background: linear-gradient(180deg, var(--pink-200), #fff)"><div id="mOpen" class="abs mascot" data-ball="130" style="left:110px; top:80px; width:140px; height:140px"></div></div>
+    <div class="abs tile grain" data-t="4,b" style="left:360px; top:1610px; width:360px; height:310px; background: radial-gradient(circle at 50% 55%, #fff 0 86px, transparent 88px), linear-gradient(160deg, var(--teal-500), var(--teal-50))"></div>
+    <div class="abs tile" data-t="5,r" data-crop="b-pdf,922,450,640,360" style="left:720px; top:1300px; width:360px; height:620px; background:#fff"></div>
+    <div class="abs gh" style="top:560px" data-g="0"></div>
+    <div class="abs gh" style="top:1300px" data-g="1"></div>
+    <div class="abs gv" style="left:540px; height:560px" data-g="2"></div>
+    <div class="abs gv" style="left:360px; top:1300px; height:620px" data-g="3"></div>
+    <div class="abs gv" style="left:720px; top:1300px; height:620px" data-g="4"></div>
+    <div id="openCap" class="abs" style="left:66px; top:640px; font-size:32px; display:flex; gap:14px"><span>→</span><span>CIR · Bookings</span></div>
+    <div id="openH" class="abs reveal" style="left:60px; top:730px; font-weight:500; font-size:124px; line-height:1.02; letter-spacing:-0.045em">Every booking.<br>One place.</div>
+  </div>
+
+  <!-- Per-scene headlines (filled from SCENES) -->
+  <div id="heads"></div>
+
+  <!-- Browser window with the camera viewport -->
+  <div id="win" class="abs">
+    <div class="bar"><i style="left:24px"></i><i style="left:48px"></i><i style="left:72px"></i><div class="url">cir</div></div>
+    <div id="vp"></div>
+  </div>
+
+  <!-- Close -->
+  <div class="scene" id="close">
+    <div class="abs" id="glow" style="left:240px; top:420px; width:600px; height:600px; border-radius:50%; background: radial-gradient(circle, rgba(253,181,223,.75), rgba(253,181,223,0) 68%)"></div>
+    <div id="logo" class="abs mascot" data-ball="210" style="left:420px; top:600px; width:240px; height:240px"></div>
+    <div id="closeH" class="abs reveal" style="left:0; width:1080px; top:900px; text-align:center; font-weight:600; font-size:104px; line-height:1.05; letter-spacing:-0.035em">CIR Bookings</div>
+    <div id="closeSub" class="abs" style="left:0; width:1080px; top:1040px; text-align:center; font-size:36px; color:var(--text-secondary)">Bookings, invoices, crew and packages in one workspace.</div>
+    <div id="closeBtn" class="abs btn" style="left:540px; top:1220px; translate:-50% -50%">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New booking
+    </div>
+  </div>
+
+  <!-- End card -->
+  <div class="scene" id="end" style="background:var(--scrim)">
+    <div id="mEnd" class="abs mascot" data-ball="150" style="left:455px; top:650px; width:170px; height:170px"></div>
+    <div id="endT" class="abs" style="left:0; width:1080px; top:860px; text-align:center; color:#fff">
+      <div style="font-weight:600; font-size:120px; line-height:1.05; letter-spacing:-0.035em">CIR</div>
+      <div style="font-size:40px; margin-top:20px; color:rgba(255,255,255,.72)">Clarity for every invoice</div>
+    </div>
+  </div>
+
+  <div id="brand" class="abs"><div id="mBrand" class="mascot" data-ball="46"></div><b>CIR</b><span>Bookings</span></div>
+</div>
+
+<script>
+const DURATION = 50.5;
+const VW = 956, VH = 1330;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const p = (t, s, d) => clamp((t - s) / d);
+const lerp = (a, b, x) => a + (b - a) * x;
+const eOut = x => 1 - Math.pow(1 - x, 4);
+const eIn = x => x * x * x;
+const eInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const eBack = x => { const c1 = 1.3, c3 = c1 + 1; return x <= 0 ? 0 : 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const $ = id => document.getElementById(id);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const tf = (el, { x = 0, y = 0, s = 1, o = 1 } = {}) => { el.style.transform = `translate(${x}px, ${y}px) scale(${s})`; el.style.opacity = o; };
+const show = (el, on) => { el.style.display = on ? '' : 'none'; return on; };
+
+// ── Scene headlines ───────────────────────────────────────────
+const SCENES = [
+  [4.3, 9.0, 'Your month at a glance.', 'Bookings, outstanding balance and cash collected.'],
+  [9.0, 14.0, 'See every date.', 'Month or week. Colour shows who has paid.'],
+  [14.0, 18.5, 'Find any booking.', 'Search, then filter by status, crew or package.'],
+  [18.5, 23.0, 'Know what’s due.', 'Upcoming bookings and balances to chase.'],
+  [23.0, 28.0, 'Book it in one form.', 'Client, package and date in one place.'],
+  [28.0, 32.5, 'Add the extras.', 'The total updates as you go.'],
+  [32.5, 36.5, 'Assign the crew.', 'Pick who handles the booking.'],
+  [36.5, 42.0, 'Take the deposit.', 'DP or full price, linked to the booking.'],
+  [42.0, 45.5, 'Invoice, ready to send.', 'A branded PDF in one click.'],
+];
+SCENES.forEach(([, , h, s], i) => $('heads').insertAdjacentHTML('beforeend',
+  `<div class="abs head" id="h${i}"><h1 class="reveal">${h}</h1><p>${s}</p></div>`));
+
+// ── Camera shots: [time, x, y, w] keys in Figma units ─────────
+const IMG = { 'dash-calendar': 1440, 'b-week': 1440, 'dash-table': 1440, 'b-rail': 1440, 'new-booking': 1440, 'b-package': 1440, 'b-crew': 1440, 'b-invoice-modal': 1440, 'b-invoice-created': 1440, 'b-pdf': 922 };
+const SHOTS = [
+  { img: 'dash-calendar', from: 3.7, keys: [[4.4, 440, 0, 1000], [5.4, 440, 0, 1000], [6.3, 14, 100, 706], [7.0, 14, 100, 706], [8.4, 346, 100, 706]] },
+  { img: 'dash-calendar', from: 8.9, keys: [[9.0, 346, 100, 706], [9.8, 26, 466, 733], [10.2, 26, 466, 733], [11.4, 293, 466, 733]] },
+  { img: 'b-week', from: 11.3, keys: [[11.3, 26, 373, 667], [12.0, 26, 373, 667], [13.7, 373, 373, 667]] },
+  { img: 'dash-table', from: 13.9, keys: [[14.0, 20, 346, 640], [16.2, 20, 346, 640], [17.6, 400, 346, 640]] },
+  { img: 'b-rail', from: 18.4, keys: [[18.5, 1020, 80, 413], [20.1, 1020, 80, 413], [21.2, 1020, 546, 413]] },
+  { img: 'dash-calendar', from: 22.9, keys: [[23.0, 600, 40, 560]] },
+  { img: 'new-booking', from: 24.25, slide: true, keys: [[24.25, 14, 70, 680], [25.2, 14, 70, 680], [25.9, 14, 420, 680]] },
+  { img: 'b-package', from: 25.95, keys: [[26, 14, 420, 680]] },
+  { img: 'new-booking', from: 27.9, keys: [[27.9, 14, 420, 680], [28.6, 14, 760, 680], [32.4, 14, 760, 680], [33.0, 14, 1000, 680]] },
+  { img: 'b-crew', from: 33.0, keys: [[33, 14, 1000, 680]] },
+  { img: 'new-booking', from: 34.95, keys: [[34.95, 14, 1000, 680], [36.5, 14, 1000, 680], [37.2, 700, 380, 720]] },
+  { img: 'b-invoice-modal', from: 38.0, keys: [[38, 380, 470, 680]] },
+  { img: 'b-invoice-created', from: 40.2, keys: [[40.2, 300, 40, 840], [40.9, 300, 40, 840], [41.5, 700, 380, 720]] },
+  { img: 'b-pdf', from: 41.95, slide: true, keys: [[42.0, 0, 0, 922], [42.9, 0, 0, 922], [44.2, 300, 560, 600]] },
+];
+const FADE = .45;
+SHOTS.forEach((s, i) => {
+  s.to = i < SHOTS.length - 1 ? SHOTS[i + 1].from + FADE + .05 : 99;
+  s.el = document.createElement('img');
+  s.el.className = 'shot';
+  s.el.src = `assets/figma/${s.img}.png`;
+  s.el.style.width = IMG[s.img] + 'px';
+  $('vp').appendChild(s.el);
+});
+function cam(shot, t) {
+  const k = shot.keys;
+  if (t <= k[0][0]) return k[0].slice(1);
+  for (let i = 0; i < k.length - 1; i++) {
+    if (t <= k[i + 1][0]) {
+      const x = eInOut(p(t, k[i][0], k[i + 1][0] - k[i][0]));
+      return [1, 2, 3].map(j => lerp(k[i][j], k[i + 1][j], x));
+    }
+  }
+  return k[k.length - 1].slice(1);
+}
+const toScreen = (shot, t, [x, y, w, h]) => { const [cx, cy, cw] = cam(shot, t); const s = VW / cw; return [(x - cx) * s, (y - cy) * s, w * s, h * s]; };
+
+// ── Focus rings and row reveals (Figma units, tied to a shot) ─
+const RINGS = [
+  { shot: 3, t0: 14.8, t1: 16.1, r: [26, 452, 600, 44] },
+  { shot: 4, t0: 19.0, t1: 20.0, r: [1080, 156, 300, 104] },
+  { shot: 4, t0: 21.5, t1: 22.7, r: [1080, 684, 300, 146] },
+  { shot: 5, t0: 23.35, t1: 24.3, r: [896, 108, 138, 40], press: 23.8 },
+  { shot: 7, t0: 26.5, t1: 27.8, r: [40, 714, 610, 42] },
+  { shot: 8, t0: 28.6, t1: 30.3, r: [50, 1054, 130, 38], press: [28.85, 29.35, 29.85] },
+  { shot: 9, t0: 33.45, t1: 33.95, r: [36, 1078, 612, 48] },
+  { shot: 9, t0: 33.9, t1: 34.4, r: [36, 1130, 612, 48] },
+  { shot: 9, t0: 34.35, t1: 34.9, r: [36, 1234, 612, 48] },
+  { shot: 10, t0: 35.4, t1: 36.4, r: [30, 1404, 630, 46] },
+  { shot: 10, t0: 37.3, t1: 38.1, r: [994, 712, 140, 34], press: 37.75 },
+  { shot: 11, t0: 38.6, t1: 39.5, r: [424, 1078, 592, 38] },
+  { shot: 11, t0: 39.6, t1: 40.3, r: [808, 1194, 214, 36], press: 40.0 },
+  { shot: 12, t0: 40.3, t1: 40.95, r: [506, 92, 428, 52] },
+  { shot: 12, t0: 41.45, t1: 42.0, r: [742, 566, 646, 130] },
+  { shot: 13, t0: 44.3, t1: 45.3, r: [470, 818, 344, 54] },
+];
+RINGS.forEach(r => { r.el = document.createElement('div'); r.el.className = 'abs ring'; $('vp').appendChild(r.el); });
+const COVERS = [[28.85, [30, 889, 632, 50]], [29.35, [30, 943, 632, 50]], [29.85, [30, 995, 632, 52]]]
+  .map(([t, r]) => { const el = document.createElement('div'); el.className = 'abs cover'; $('vp').appendChild(el); return { t, r, el }; });
+
+// Floating Booking summary card (crop of the New booking screen)
+$('vp').insertAdjacentHTML('beforeend', `<div id="summary" class="abs" style="left:58px; width:840px; height:${Math.round(296 * 840 / 686)}px"><img src="assets/figma/new-booking.png" style="width:1440px; transform: translate(${-724 * 840 / 686}px, ${-194 * 840 / 686}px) scale(${840 / 686})"></div>`);
+
+// Collage crops: data-crop="img,frameWidth,x,y,regionWidth"
+$$('[data-crop]').forEach(el => {
+  const [img, fw, x, y, w] = el.dataset.crop.split(',');
+  const s = el.offsetWidth / +w;
+  el.insertAdjacentHTML('beforeend', `<img src="assets/figma/${img}.png" style="width:${fw}px; transform: translate(${-x * s}px, ${-y * s}px) scale(${s})">`);
+});
+
+// Word reveal
+$$('.reveal').forEach(el => {
+  el.innerHTML = el.innerHTML.split(/<br\s*\/?>/i).map(line =>
+    line.trim().split(/\s+/).map(w => `<span class="w"><span class="wi">${w}</span></span>`).join(' ')).join('<br>');
+});
+function words(el, t, start, end, stagger = .06) {
+  const out = eIn(p(t, end - .35, .3));
+  $$('.wi', el).forEach((w, i) => {
+    const x = eOut(p(t, start + i * stagger, .55));
+    w.style.transform = `translateY(${(1 - x) * 110 - out * 110}%)`;
+  });
+}
+
+// ── Mascot ────────────────────────────────────────────────────
+// Frames are cut from the Figma References sheet (270×275 crops, ball Ø≈200 centred at 135,125).
+const MFRAMES = ['idle', 'blink', 'happy', 'excited', 'surprised', 'alert', 'curious', 'look-left', 'look-right', 'look-up', 'look-down', 'look-up-right', 'look-down-left', 'shy', 'small', 'normal'];
+$$('.mascot').forEach(el => {
+  const ball = +el.dataset.ball, k = ball / 200, W = el.offsetWidth, H = el.offsetHeight;
+  const body = document.createElement('div');
+  body.className = 'body';
+  body.style.transformOrigin = `50% ${H / 2 + ball / 2}px`;
+  el.appendChild(body);
+  el._f = {};
+  MFRAMES.forEach(n => {
+    const i = document.createElement('img');
+    i.src = `assets/figma/mascot/${n}.png`;
+    Object.assign(i.style, { width: `${270 * k}px`, left: `${W / 2 - 135 * k}px`, top: `${H / 2 - 125 * k}px`, clipPath: `inset(${12 * k}px ${14 * k}px 0 ${14 * k}px)` });
+    body.appendChild(i);
+    el._f[n] = i;
+  });
+  el._body = body;
+  el._ball = ball;
+});
+
+// One beat of a mascot script: [start, frame, duration?, hop?]. Between beats it idles.
+function mascot(el, t, { base = 'idle', beats = [], blinkEvery = 3.2, blinkOffset = 0, phase = 0 } = {}) {
+  let frame = base, hopY = 0, sx = 1, sy = 1;
+  for (const [t0, f, dur = .6, hop = 0] of beats) {
+    if (t >= t0 && t < t0 + dur) {
+      frame = f;
+      if (hop) {
+        const k = p(t, t0, .55);
+        hopY = -Math.sin(Math.PI * k) * hop * el._ball;
+        const land = p(t, t0 + .5, .25), squash = Math.sin(Math.PI * land) * .07, take = Math.sin(Math.PI * p(t, t0, .12)) * .05;
+        sx += squash + take; sy -= squash + take;
+        sy += Math.sin(Math.PI * k) * .04; sx -= Math.sin(Math.PI * k) * .03;
+      }
+    }
+  }
+  const idleLike = !['blink', 'happy', 'excited', 'shy'].includes(frame);
+  if (idleLike && ((t + blinkOffset) % blinkEvery) < .13) frame = 'blink';
+  const br = Math.sin(2 * Math.PI * (t + phase) / 1.8);
+  sy *= 1 + .022 * br; sx *= 1 - .016 * br;
+  for (const n in el._f) el._f[n].style.display = n === frame ? 'block' : 'none';
+  el._body.style.transform = `translateY(${hopY}px) scale(${sx}, ${sy})`;
+}
+
+const BRAND_BEATS = [
+  [9.0, 'curious', .9], [14.0, 'look-right', .9], [18.5, 'look-right', 1.2],
+  [23.8, 'excited', .6, .25], [26.6, 'look-down', 1.2], [28.85, 'small', .3], [29.35, 'small', .3], [29.85, 'happy', .9, .2],
+  [33.45, 'look-down-left', 1.4], [35.4, 'happy', .8], [37.75, 'excited', .6, .25], [38.6, 'surprised', .8],
+  [40.0, 'excited', .4], [40.4, 'happy', 1.0, .3], [42.3, 'look-down', 1.0], [44.3, 'happy', 1.0, .2],
+];
+
+window.render = function (t) {
+  mascot($('mBrand'), t, { base: 'look-down', beats: BRAND_BEATS, blinkEvery: 3.4, blinkOffset: 1.1 });
+  if (t < 4.3) mascot($('mOpen'), t, { beats: [[0, 'surprised', 1.1, .35], [2.2, 'look-up', .5], [2.7, 'happy', 1.6, .3]], blinkOffset: 1.4, phase: .3 });
+  if (t >= 45.5 && t < 48.6) mascot($('logo'), t, { beats: [[45.6, 'surprised', .6], [46.2, 'look-left', .4], [46.6, 'look-right', .4], [47.0, 'look-down', .5], [47.55, 'excited', .55, .3], [48.1, 'happy', 1]], blinkOffset: 1.85 });
+  if (t >= 48.5) mascot($('mEnd'), t, { beats: [[48.5, 'happy', .9], [49.4, 'idle', .5], [50.05, 'happy', 1, .2]], blinkOffset: 1.3 });
+
+  // Brand row
+  $('brand').style.opacity = clamp(Math.min(p(t, 4.2, .4), 1 - p(t, 45.3, .3)));
+
+  // Open
+  if (show($('open'), t < 4.3)) {
+    $$('[data-t]', $('open')).forEach(el => {
+      const [i, dir] = el.dataset.t.split(',');
+      const x = eOut(p(t, .1 + i * .09, .8));
+      const w = el.offsetWidth, h = el.offsetHeight;
+      const off = { l: [-w, 0], r: [w, 0], t: [0, -h], b: [0, h] }[dir];
+      el.style.transform = `translate(${off[0] * (1 - x)}px, ${off[1] * (1 - x)}px)`;
+    });
+    $$('[data-g]', $('open')).forEach(g => {
+      const x = eOut(p(t, .6 + .08 * g.dataset.g, .6));
+      g.style.transform = g.classList.contains('gh') ? `scaleX(${x})` : `scaleY(${x})`;
+    });
+    const c = eOut(p(t, .7, .5));
+    tf($('openCap'), { y: (1 - c) * 20, o: c });
+    words($('openH'), t, .8, 99, .12);
+    const q = eInOut(p(t, 3.6, .6));
+    tf($('open'), { y: -260 * q, o: 1 - q });
+  }
+
+  // Headlines
+  SCENES.forEach(([a, b], i) => {
+    const el = $(`h${i}`);
+    if (!show(el, t >= a && t < b)) return;
+    words($('h' + i).querySelector('h1'), t, a + .1, b);
+    const sub = el.querySelector('p');
+    sub.style.opacity = eOut(p(t, a + .45, .4)) * (1 - p(t, b - .35, .25));
+    sub.style.transform = `translateY(${(1 - eOut(p(t, a + .45, .4))) * 16}px)`;
+  });
+
+  // Window
+  const winIn = eOut(p(t, 3.7, .9)), winOut = eIn(p(t, 45.2, .6));
+  if (show($('win'), t >= 3.7 && t < 45.9)) tf($('win'), { y: 1400 * (1 - winIn) + 1500 * winOut });
+
+  SHOTS.forEach((s, i) => {
+    const on = t >= s.from && t < s.to;
+    s.el.style.display = on ? '' : 'none';
+    if (!on) return;
+    const [cx, cy, cw] = cam(s, t);
+    const sc = VW / cw;
+    const f = i === 0 ? 1 : eOut(p(t, s.from, FADE));
+    const dy = s.slide ? (1 - f) * 260 : 0;
+    s.el.style.transform = `translate(${-cx * sc}px, ${-cy * sc + dy}px) scale(${sc})`;
+    s.el.style.opacity = f;
+  });
+
+  RINGS.forEach(r => {
+    const on = t >= r.t0 && t < r.t1;
+    r.el.style.display = on ? '' : 'none';
+    if (!on) return;
+    const [x, y, w, h] = toScreen(SHOTS[r.shot], t, r.r);
+    const pad = 8;
+    Object.assign(r.el.style, { left: `${x - pad}px`, top: `${y - pad}px`, width: `${w + pad * 2}px`, height: `${h + pad * 2}px` });
+    const o = Math.min(eOut(p(t, r.t0, .25)), 1 - p(t, r.t1 - .25, .25));
+    let s = lerp(1.06, 1, eOut(p(t, r.t0, .3))), press = 0;
+    [].concat(r.press ?? []).forEach(pt => { const k = p(t, pt, .35); const b = Math.sin(Math.PI * k); s -= .04 * b; press = Math.max(press, .14 * b); });
+    r.el.style.opacity = o;
+    r.el.style.transform = `scale(${s})`;
+    r.el.style.setProperty('--press', press);
+  });
+
+  COVERS.forEach(c => {
+    const on = t >= 27.9 && t < 33.0;
+    c.el.style.display = on ? '' : 'none';
+    if (!on) return;
+    const [x, y, w, h] = toScreen(SHOTS[8], t, c.r);
+    Object.assign(c.el.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
+    c.el.style.transform = `scaleX(${1 - eInOut(p(t, c.t, .45))})`;
+  });
+
+  const sm = $('summary');
+  if (show(sm, t >= 30.3 && t < 33.0)) {
+    const a = eOut(p(t, 30.3, .6)), b = eIn(p(t, 32.4, .5));
+    tf(sm, { x: 0, y: VH - sm.offsetHeight - 50 + (1 - a) * 500 + b * 600, o: 1 });
+  }
+
+  // Close
+  if (show($('close'), t >= 45.5 && t < 48.6)) {
+    $('close').style.opacity = 1 - p(t, 48.3, .3);
+    const l = eBack(p(t, 45.7, .6));
+    $('logo').style.transformOrigin = 'center';
+    tf($('logo'), { s: lerp(.5, 1, l), o: clamp(l * 1.6) });
+    const g = eOut(p(t, 45.6, .9));
+    $('glow').style.transformOrigin = 'center';
+    tf($('glow'), { s: lerp(.6, 1, g), o: g });
+    words($('closeH'), t, 46.0, 99, .1);
+    const sb = eOut(p(t, 46.4, .5));
+    tf($('closeSub'), { y: (1 - sb) * 20, o: sb });
+    const bt = eBack(p(t, 46.8, .5));
+    tf($('closeBtn'), { s: lerp(.8, 1, bt) - .05 * Math.sin(Math.PI * p(t, 47.45, .3)), o: clamp(bt * 1.6) });
+  }
+
+  // End card
+  if (show($('end'), t >= 48.5)) {
+    const m = eBack(p(t, 48.6, .55));
+    $('mEnd').style.transformOrigin = 'center';
+    tf($('mEnd'), { s: lerp(.4, 1, m), o: clamp(m * 1.6) });
+    const e = eOut(p(t, 48.8, .5));
+    tf($('endT'), { y: (1 - e) * 16, o: e });
+  }
+};
+
+window.ready = Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map(i => i.decode().catch(() => {})),
+]).then(() => { window.render(0); return true; });
+
+if (location.hash.startsWith('#t=')) window.ready.then(() => window.render(parseFloat(location.hash.slice(3))));
+if (location.hash === '#play') window.ready.then(() => { const t0 = performance.now(); const loop = n => { window.render(((n - t0) / 1000) % DURATION); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>
