@@ -1,6 +1,6 @@
 # wcc-tools · Feature guide
 
-This document lists every feature in the bs.moment **Booking & Invoice Management** app and explains what each one does. It is a plain-language guide for people using or reviewing the app. The detailed requirements are in [`context/PRD.md`](context/PRD.md), and the interaction specs are in [`context/INTERACTIONS.md`](context/INTERACTIONS.md).
+This document lists every feature in the WCC & ECC **Booking & Invoice Management** app and explains what each one does. It is a plain-language guide for people using or reviewing the app. The detailed requirements are in [`context/PRD.md`](context/PRD.md), and the interaction specs are in [`context/INTERACTIONS.md`](context/INTERACTIONS.md).
 
 The app has two modules, **Booking** and **Package Library**, plus a login page and an account area. All money is in IDR (`Rp 1.250.000`). The UI is in English, and the desktop layout is built for 1440 px.
 

@@ -1,6 +1,6 @@
-# wcc-tools · bs.moment Booking module
+# wcc-tools · WCC & ECC Booking module
 
-A **Booking & Invoice Management** module for the bs.moment internal-tools shell. One record per booking (client, package, extra items, date and event details, crew), live money calculation, and invoices that never change once issued (DP / Full / Partial / Paid). Bookings show in a Calendar (month / week / day) and a Table. A Package Library and Account settings come with it.
+A **Booking & Invoice Management** module for the WCC & ECC (Wedding Content Creator and Event Content Creator) internal-tools shell. One record per booking (client, package, extra items, date and event details, crew), live money calculation, and invoices that never change once issued (DP / Full / Partial / Paid). Bookings show in a Calendar (month / week / day) and a Table. A Package Library and Account settings come with it.
 
 **Why:** bookings, prices, deposits and follow-up payments were tracked across chats, spreadsheets and one-off invoices. Totals were added up by hand, deposits got mixed up with full payment, and editing a booking quietly changed what old invoices said.
 

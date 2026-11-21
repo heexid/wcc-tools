@@ -1,9 +1,9 @@
-# PRD — Booking & Invoice Management (bs.moment · Booking module)
+# PRD — Booking & Invoice Management (WCC & ECC · Booking module)
 
 | | |
 |---|---|
 | **Status** | Draft v1 · 2026-11-10 |
-| **Owner** | bs.moment internal tools |
+| **Owner** | WCC & ECC internal tools (Wedding Content Creator · Event Content Creator) |
 | **Design source** | Figma `bs internal tools` → page **CIR · Design System** (tokens, components, layouts) · pages **Bookings** (screens 01–11, interaction states 12–40, hi-fi flow lanes A–H), **Package Lib** (01–08, lanes A–D), **Login** (P1–P3, E1–E7), **Launchpad & Profile** (launcher flow, AC1–AC10, LO1–LO2, Profile lanes A–E) |
 | **Companions** | `context/PLAN.md` (build plan, DS mapping) · `context/INTERACTIONS.md` (96 interactions) · `context/PROTOTYPE-PLAN.md` (prototype slices F0–F18) · last synced 2026-11-14 |
 | **Stack** | Next.js (App Router) · Tailwind (CIR tokens) · Supabase (Postgres, Auth, Storage) · `@react-pdf/renderer` |
@@ -15,7 +15,7 @@
 
 **Problem statement.** Bookings, package pricing, deposits and follow-up payments are tracked across chats, spreadsheets and ad-hoc invoices. Totals are recalculated by hand, deposits get confused with full payment, and edits to a booking silently change what past invoices "said".
 
-**Proposed solution.** A new **Booking** module inside the existing bs.moment internal-tools shell (CIR design system). It holds one record per booking (client, package from a Package Library, additional items and date), calculates money in real time, and issues immutable invoice snapshots (DP / Full / Partial / Paid) backed by an append-only payment ledger. Bookings appear in a Calendar view and a Table view.
+**Proposed solution.** A new **Booking** module inside the existing WCC & ECC internal-tools shell (CIR design system). It holds one record per booking (client, package from a Package Library, additional items and date), calculates money in real time, and issues immutable invoice snapshots (DP / Full / Partial / Paid) backed by an append-only payment ledger. Bookings appear in a Calendar view and a Table view.
 
 **Success criteria (measured 60 days after launch).**
 1. **≥ 95%** of new bookings get created in the system, not in spreadsheets (bookings in the system ÷ bookings confirmed with clients).
@@ -226,7 +226,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-14 Business information
 *As an admin, I want to keep my business's name, logo and contact details in one place so that every invoice PDF carries the right brand.*
 - **Where:** a third card on **Account settings** (`/account`), under Security: **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only rows: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials."), **Business name**, **Address**, **Email**, **Phone**. **Viewers** see the card without the Edit button.
-- **Prefilled:** the card and the modal always start from the saved values (seed: bs.moment · Jl. Rawa Mangun No. 12, Jakarta Timur · finance@bs-moment.com · +62 21-555-0100, no logo). The business can never be empty: every field except the logo is required.
+- **Prefilled:** the card and the modal always start from the saved values (seed: a sample business name, address, finance email and phone, no logo). The business can never be empty: every field except the logo is required.
 - **Edit modal** "Business information" (DS Modal, 640 wide, same chrome as *Payment instruction*), opened prefilled:
   - **Business logo** — upload field: 56 px preview + **Upload logo** (or **Replace logo** + ghost **Remove** when one is set) and the helper "PNG, JPG or WebP · up to 1 MB · square works best." Anything else shows the inline error "Use a PNG, JPG or WebP image." or "Logo must be 1 MB or smaller." and keeps the previous logo. The prototype re-encodes the file to ≤ 256 px.
   - **Business name** (input, required, 2–60 characters, trimmed — "Enter 2–60 characters.").
