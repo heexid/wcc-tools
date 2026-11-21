@@ -70,6 +70,10 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 *As an admin, I want to create a booking in one form so that client, package, extras and date are all captured together.*
 - Required: client name (2–80 chars), phone (Indonesian format, normalised to `+62…`, 9–15 digits), package (exactly 1), booking date.
 - Optional: booking name (defaults to `{client name} · {package}`).
+- **Client & schedule** (first section, 2026-11-21): client name · phone, booking name, then **booking date · Event start · Created** in one row, then **Location** and **Notes**. All three event fields are optional:
+  - **Event start**: a time select in 30-minute steps (`08:00`), with "No start time" to clear it. Stored as a time of day (Asia/Jakarta wall clock).
+  - **Location** and **Notes**: text areas, **max 255 characters** each, with live counters. Both are printed on invoices (US-10). Validated server-side too.
+- The **Payment instruction** card is the first item of the *Others* section, above Terms & Conditions (moved from *Package*, 2026-11-21).
 - **Terms & Conditions** (section *Others*): a multi-line text area, **max 255 characters**, with a live counter (`174/255`). It's prefilled from the workspace default terms and can be edited per booking. Typing stops at 255, and pasted text over the limit shows the Error state ("Max 255 characters"). Validated server-side too.
 - **Crew** (section *Crew*): a multi-select of the crew handling the booking. A booking can have **0…n crew**. Selected crew show as removable chips (avatar + name). The dropdown lists active crew with avatar, name and role, has a search, and applies instantly (no footer). The source is the workspace crew list (members flagged as crew, with a role).
 - Additional items: add or remove rows dynamically. Each row has name (required), price (integer ≥ 0) and qty (integer 1–999). Subtotal = price × qty, shown live.
@@ -106,7 +110,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-4 Find & update a booking
 *As an admin, I want to search and edit an existing booking so that changes are reflected and the totals stay correct.*
 - Global search covers booking name, client name and phone (including partial digits). Results update after 250 ms of debounce.
-- Editable fields: client name, phone, package (re-pick), additional items (add, remove, change price or qty), booking date, **crew** and Terms & Conditions.
+- Editable fields: client name, phone, package (re-pick), additional items (add, remove, change price or qty), booking date, event start, location, notes, **crew** and Terms & Conditions.
 - The new total recalculates live. A **diff strip** shows "Total updated: Rp X → Rp Y" and "+/− Rp Z since last invoice · package → …, items updated, date moved to …" (Figma 07). The booking date shows "Moved from <old date>" until saved.
 - Saving an edit **never** changes existing invoices or payments.
 - Changing the date updates the calendar right away (optimistic UI, then revalidation).
@@ -166,8 +170,9 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-10 PDF invoice
 *As an admin, I want a professional PDF so that I can send it directly to the client.*
 - A4 portrait, following the existing *Invoice editor → A4 preview* style.
-- **Brand row** (top of the header): the business **logo** (or the name's initials when there is none), **business name**, **address**, and one line with **phone · email**, then the status tag at the far right. All of it comes from **Business information** (US-14) and always shows the *current* values: change them in Account settings and the next PDF you download has them, for old invoices too. Only the business block is live. Money, items, booking details, payment instructions and terms stay exactly as issued (snapshot). The *From* block repeats name, email and phone.
-- Contents: business name, logo and contact (from Business information, US-14), invoice number `INV-2026-0001`, invoice date, client name and phone, booking ref, booking date, package line, item breakdown (name, price, qty, subtotal), booking total, invoice type, **this payment**, total paid (including this invoice), remaining balance, payment instructions (bank, account no., account name from Settings), and the booking's Terms & Conditions (≤ 255 chars, copied into the invoice snapshot at issue time).
+- **Brand row** (top of the header): the business **logo** (or the name's initials when there is none), **business name**, **address**, and one line with **phone · email**, then the status tag at the far right. All of it comes from **Business information** (US-14) and always shows the *current* values: change them in Account settings and the next PDF you download has them, for old invoices too. Only the business block is live. Money, items, booking details, payment instructions and terms stay exactly as issued (snapshot). (The *From* block was removed 2026-11-21: it repeated the Brand row.)
+- **Header layout (2026-11-21):** the meta block shows *Invoice date* and *Booking ref* only. Below the dashed line, two columns: **Bill to** (client name, phone) and **Event** (booking name — 1 line max; booking date · event start; location — 2 lines max; "Notes: …" in secondary text — 2 lines max). Longer text ends in "…", so the header never grows past a fixed height and the invoice stays on one A4 page. Invoices issued before 2026-11-21 have no event details in their snapshot and show the booking name and date only.
+- Contents: business name, logo and contact (from Business information, US-14), invoice number `INV-2026-0001`, invoice date, client name and phone, booking ref, booking name, booking date and event start, location, notes, package line, item breakdown (name, price, qty, subtotal), booking total, invoice type, **this payment**, total paid (including this invoice), remaining balance, payment instructions (bank, account no., account name from Settings), and the booking's Terms & Conditions (≤ 255 chars, copied into the invoice snapshot at issue time).
 - Generated from the **invoice snapshot only**, never from the live booking. Regenerating an old invoice always produces identical figures.
 - File name: `INV-2026-0001_{client-slug}.pdf`.
 - **Generation failure:** if a PDF can't be generated (on invoice confirm or on download), a dialog reads "Couldn't generate the invoice PDF" ("INV-… is saved — only the PDF file couldn't be created…") with **Try again** and **Cancel**. The invoice itself is never rolled back; Cancel leaves the card without a file until the next download attempt (Bookings screen 37).
@@ -230,7 +235,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
   - **Phone number** (input, required, 8–15 digits, only `+ space - ( )` accepted — "Enter a valid phone number.").
   - Footer **Cancel** · **Save changes**. Save validates every field at once; errors show inline, the modal stays open and each error clears as the field is fixed. Cancel, Esc and × discard the draft (the next open starts from the saved values). A failed save shows "Couldn't save. Check your connection and try again." and keeps the draft.
 - **After saving:** the modal closes, the card shows the new values and the toast "Business information updated" appears. Nothing else changes: existing invoices keep their figures.
-- **Effect on the PDF:** see US-10. The Brand row (logo/initials, name, address, phone · email) and the From block use the current business information every time a PDF is generated.
+- **Effect on the PDF:** see US-10. The Brand row (logo/initials, name, address, phone · email) uses the current business information every time a PDF is generated.
 
 ### 2.4 Business rules (enforced in the DB and service layer)
 
@@ -247,7 +252,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 11. A date change shows in Calendar and Table right away.
 12. **Canceled is terminal.** `cancel_booking` is allowed only from `draft` or `partially_paid`. After it, `save_booking` and `create_invoice` reject the booking, and nothing reverts it.
 13. Archived packages can't be selected for a booking (`save_booking` rejects a newly picked archived package). A booking that already has one keeps it.
-14. **Business information** is one record per workspace, validated in the UI and the service layer (name 2–60, address 1–150, valid email, phone 8–15 digits, logo PNG/JPEG ≤ 1 MB). It is *not* part of the invoice snapshot's frozen figures: the PDF's Brand row and From block read the current value at generation time (US-10, US-14).
+14. **Business information** is one record per workspace, validated in the UI and the service layer (name 2–60, address 1–150, valid email, phone 8–15 digits, logo PNG/JPEG ≤ 1 MB). It is *not* part of the invoice snapshot's frozen figures: the PDF's Brand row reads the current value at generation time (US-10, US-14).
 
 ### 2.5 Booking status derivation
 
@@ -315,6 +320,9 @@ bookings(id uuid pk, ref text unique,               -- BK-2026-0001
          booking_name text, client_name text not null, client_phone text not null,
          package_id uuid fk, package_name_snapshot text, package_price_snapshot bigint,
          booking_date date not null,
+         event_start time null,                      -- optional, Asia/Jakarta wall clock (2026-11-21, migration 013)
+         location text check (char_length(location) <= 255),   -- optional, printed on invoices
+         notes text check (char_length(notes) <= 255),          -- optional, printed on invoices
          terms text check (char_length(terms) <= 255),   -- Terms & Conditions, default from Settings
          payment_instruction jsonb not null,         -- {receiptName ≤60, accountNumber 5–20 digits, accountName ≤80} (lane I, added in P1)
          total bigint not null,                      -- derived, maintained by trigger

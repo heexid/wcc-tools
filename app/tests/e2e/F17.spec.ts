@@ -4,7 +4,7 @@ import { fillSari } from "../helpers/bookingForm";
 import { openEdit } from "../helpers/editBooking";
 
 // F17 — Payment instruction: Figma Bookings · Hi-fi flow lane I (I1 → I2 → I2e → I3), the "Payment instruction card"
-// in the form's Package section, the detail sheet's Payment row and the canceled full page (read-only card).
+// at the top of the form's Others section (moved from Package 2026-11-21), the detail sheet's Payment row and the canceled full page (read-only card).
 // Every booking has one — prefilled with the studio account, editable per booking, never empty.
 
 test.beforeEach(async ({ page }) => signIn(page));
@@ -15,11 +15,11 @@ const sheet = (p: Page) => p.getByRole("dialog", { name: "Booking detail" });
 
 test("lane I · I1 prefilled with the studio account → Edit → I2 prefilled → Save → I3 card updated", async ({ page }) => {
   await page.goto("/bookings/new");
-  // I1: in the Package section, under the package info, prefilled (no empty state).
+  // I1: first in the Others section (2026-11-21), prefilled (no empty state).
   await expect(card(page)).toContainText("Bank BCA");
   await expect(card(page)).toContainText("1234567890 · a.n. bs.moment Studio");
-  const pkgSection = page.getByRole("main").getByRole("region", { name: "Package" });
-  await expect(pkgSection.getByRole("group", { name: "Payment instruction" })).toBeVisible();
+  const others = page.getByRole("main").getByRole("region", { name: "Others" });
+  await expect(others.getByRole("group", { name: "Payment instruction" })).toBeVisible();
 
   // I2: the DS Modal opens with the saved values.
   await card(page).getByRole("button", { name: /Edit payment instruction/ }).click();

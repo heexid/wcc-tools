@@ -2,7 +2,7 @@
 // create_invoice, cancel_booking, plus reads. Every PRD §2.4 business rule is enforced here,
 // independently of the UI. All functions are async (simulated latency) and can be made to fail
 // once via failNext() to drive the error screens (Package 06, Bookings 23, 37).
-import { LIMITS, bookingTotal, validateInvoice, validateTotalAgainstPaid, type DpMethod, type InvoiceError, type InvoiceType } from "@/lib/booking/calc";
+import { EVENT_START_RE, LIMITS, bookingTotal, validateInvoice, validateTotalAgainstPaid, type DpMethod, type InvoiceError, type InvoiceType } from "@/lib/booking/calc";
 import { cleanBusiness, validateBusiness, type BusinessErrors } from "@/lib/booking/business";
 import { cleanPayment, validatePayment } from "@/lib/booking/payment";
 import { now } from "@/lib/clock";
@@ -309,6 +309,10 @@ export type BookingInput = {
   clientPhone: string;
   packageId: string | null;
   bookingDate: ISODate | null;
+  /** "HH:MM" or null. Left out → null (2026-11-21 fields are optional for older callers). */
+  eventStart?: string | null;
+  location?: string;
+  notes?: string;
   items: { name: string; price: number | null; qty: number | null }[];
   crewIds: string[];
   terms: string;
@@ -318,7 +322,7 @@ export type BookingInput = {
   expectedUpdatedAt?: string;
 };
 export type BookingErrorCode = "required" | "length" | "invalid" | "archived" | "too_long" | "below_paid" | "canceled" | "conflict";
-export type BookingErrors = Partial<Record<"clientName" | "clientPhone" | "packageId" | "bookingDate" | "terms" | "paymentInstruction" | "total" | "booking", BookingErrorCode>> & {
+export type BookingErrors = Partial<Record<"clientName" | "clientPhone" | "packageId" | "bookingDate" | "eventStart" | "location" | "notes" | "terms" | "paymentInstruction" | "total" | "booking", BookingErrorCode>> & {
   items?: Record<number, Partial<Record<"name" | "price" | "qty", "required" | "invalid">>>;
   minimumTotal?: number;
 };
@@ -338,6 +342,9 @@ export function validateBookingInput(d: Db, a: BookingInput): BookingErrors {
   else if (!pkg.isActive && existing?.packageId !== pkg.id) e.packageId = "archived"; // §2.4 rule 13
   if (!a.bookingDate) e.bookingDate = "required";
   else if (Number.isNaN(Date.UTC(parseISODate(a.bookingDate).y, 0, 1))) e.bookingDate = "invalid";
+  if (a.eventStart && !EVENT_START_RE.test(a.eventStart)) e.eventStart = "invalid";
+  if ((a.location ?? "").length > LIMITS.locationMax) e.location = "too_long";
+  if ((a.notes ?? "").length > LIMITS.notesMax) e.notes = "too_long";
   if (a.terms.length > LIMITS.termsMax) e.terms = "too_long";
   if (a.paymentInstruction && Object.keys(validatePayment(a.paymentInstruction)).length) e.paymentInstruction = "invalid";
   a.items.forEach((it, i) => {
@@ -385,6 +392,9 @@ function saveBookingTx(d: Db, a: BookingInput): Booking {
     packageNameSnapshot: pkg.name,
     packagePriceSnapshot: pkg.price,
     bookingDate: a.bookingDate!,
+    eventStart: null,
+    location: "",
+    notes: "",
     terms: "",
     paymentInstruction: { ...d.settings.defaultPayment },
     items: [],
@@ -406,6 +416,9 @@ function saveBookingTx(d: Db, a: BookingInput): Booking {
     packageId: pkg.id,
     ...(repick ? { packageNameSnapshot: pkg.name, packagePriceSnapshot: pkg.price } : {}),
     bookingDate: a.bookingDate!,
+    eventStart: a.eventStart || null,
+    location: (a.location ?? "").trim(),
+    notes: (a.notes ?? "").trim(),
     terms: a.terms,
     ...(a.paymentInstruction ? { paymentInstruction: cleanPayment(a.paymentInstruction) } : {}),
     items: a.items.map((it, i) => ({ id: `${b.id}_i${i + 1}`, name: it.name.trim(), price: it.price!, qty: it.qty! })),

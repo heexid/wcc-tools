@@ -75,12 +75,19 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
             </Alert>
           )}
           <section aria-labelledby="ro-client" className="flex flex-col gap-base">
-            <SectionHeader id="ro-client" title="Client" />
+            <SectionHeader id="ro-client" title="Client & schedule" />
             <div className="flex gap-base">
               <InputField label="Client name" required disabled readOnly value={b.clientName} />
               <InputField label="Phone number" required disabled readOnly value={formatPhone(b.clientPhone)} />
             </div>
             <InputField label="Booking name" disabled readOnly value={b.bookingName} />
+            <div className="flex items-start gap-base">
+              <DisabledBox label="Booking date" required leading="calendar" value={formatDate(b.bookingDate)} />
+              <DisabledBox label="Event start" trailing="chevron-down" value={b.eventStart ?? "—"} />
+              <InputField label="Created" disabled readOnly value={formatDateTime(b.createdAt)} helper="Set automatically" />
+            </div>
+            <TextArea label="Location" helper="Venue or meeting point — printed on invoices" maxLength={LIMITS.locationMax} value={b.location} disabled readOnly />
+            <TextArea label="Notes" helper="Printed on invoices for this booking" maxLength={LIMITS.notesMax} value={b.notes} disabled readOnly />
           </section>
           <Divider />
           <section aria-labelledby="ro-package" className="flex flex-col gap-base">
@@ -93,7 +100,6 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
               </span>
               <Txt className="text-body-strong text-text-primary">{formatIDR(b.packagePriceSnapshot)}</Txt>
             </div>
-            <PaymentInstructionField value={b.paymentInstruction} />
           </section>
           <Divider />
           <section aria-labelledby="ro-items" className="flex flex-col gap-base">
@@ -123,14 +129,6 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
             )}
           </section>
           <Divider />
-          <section aria-labelledby="ro-schedule" className="flex flex-col gap-base">
-            <SectionHeader id="ro-schedule" title="Schedule" />
-            <div className="flex items-start gap-base">
-              <DisabledBox label="Booking date" required leading="calendar" value={formatDate(b.bookingDate)} />
-              <InputField label="Created" disabled readOnly value={formatDateTime(b.createdAt)} helper="Set automatically" />
-            </div>
-          </section>
-          <Divider />
           <section aria-labelledby="ro-crew" className="flex flex-col gap-base">
             <SectionHeader id="ro-crew" title="Crew" meta="Handling this booking" />
             <div className="flex w-full flex-col gap-tight">
@@ -148,6 +146,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
           <Divider />
           <section aria-labelledby="ro-others" className="flex flex-col gap-base">
             <SectionHeader id="ro-others" title="Others" />
+            <PaymentInstructionField value={b.paymentInstruction} />
             <TextArea label="Terms & Conditions" helper="Printed on every invoice for this booking" maxLength={LIMITS.termsMax} value={b.terms} disabled readOnly />
           </section>
         </main>

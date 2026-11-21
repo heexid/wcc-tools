@@ -15,7 +15,7 @@ import type { Crew, Package } from "@/lib/data/types";
 import { addDays, formatDate, formatIDR, initials, parseISODate, toISODate, type ISODate } from "@/lib/format";
 
 // Popover fields of the booking form (Figma Bookings 13 / 39 / 40 package, 14 date, 03b crew). Each popover
-// sits 6 px from its box: below (package) or above (date, crew — both near the end of the form in Figma).
+// sits 6 px from its box: below (package, date, event start — near the top since 2026-11-21) or above (crew).
 // Popover shell: pad popover/inset, gap micro, surface/default, 1px border, radius card, Shadow/Floating.
 
 function usePopover() {
@@ -166,7 +166,7 @@ export function PackageSelect({ value, onChange, packages, error, helper, onRefr
 const MONTHS_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 /**
- * Booking date (INTERACTIONS 2.7, Figma 14): DS Date field; month picker 300 wide above the field (pad 12,
+ * Booking date (INTERACTIONS 2.7, Figma 14): DS Date field; month picker 300 wide below the field (pad 12,
  * gap 8): ‹ month › header (Body Strong), Mo–Su Timestamp text/tertiary, 34-tall day pills (Caption; outside
  * month text/tertiary; today 1px border/accent ring; selected accent/primary + Caption Strong on-accent),
  * footer (top border): ghost Today · "Past dates allowed with a warning". Past date → warning helper.
@@ -218,7 +218,7 @@ export function DateField({ value, onChange, today, error, helper }: { value: st
             role="dialog"
             aria-label="Choose booking date"
             {...presence}
-            className={cn(shell, "bottom-[calc(100%+var(--spacing-6))] left-0 w-[calc(var(--spacing-64)*5-var(--spacing-20))] gap-compact p-control [--transform-origin:bottom_left]")}
+            className={cn(shell, "top-[calc(100%+var(--spacing-6))] left-0 w-[calc(var(--spacing-64)*5-var(--spacing-20))] gap-compact p-control [--transform-origin:top_left]")}
           >
             <div className="flex h-[calc(var(--spacing-20)+var(--spacing-2))] items-center">
               <button type="button" aria-label="Previous month" onClick={() => setMonth(toISODate(y, m - 1, 1).slice(0, 7))} className="flex cursor-pointer rounded-small text-text-secondary outline-none hover:text-text-primary focus-visible:shadow-focus-ring">
@@ -359,6 +359,88 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
         )}
       </div>
       <FieldHelper>{picked.length ? `${picked.length} crew assigned` : "Who is handling this booking — select one or more"}</FieldHelper>
+    </div>
+  );
+}
+
+/** 30-minute slots, 00:00 → 23:30. */
+const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => `${String(Math.floor(i / 2)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`);
+
+/**
+ * Event start (Figma Bookings 03 "Client & schedule", 2026-11-21): DS Select field, optional. Listbox of 30-minute
+ * slots below the field, the selected slot scrolled into view (08:00 when empty); "No start time" clears it.
+ */
+export function TimeSelect({ value, onChange, error, disabled }: { value: string; onChange: (v: string) => void; error?: string; disabled?: boolean }) {
+  const { open, setOpen, box, panel, mounted, presence } = usePopover();
+  const id = useId();
+  const list = useRef<HTMLUListElement>(null);
+  const slots = value && !TIME_SLOTS.includes(value) ? [...TIME_SLOTS, value].sort() : TIME_SLOTS;
+  const pick = (v: string) => {
+    onChange(v);
+    setOpen(false);
+  };
+  return (
+    <div className="flex w-full flex-col gap-micro">
+      <FieldLabel htmlFor={id}>Event start</FieldLabel>
+      <div ref={box} className="relative w-full">
+        <FieldBox error={!!error} disabled={disabled} forceFocus={open}>
+          <button
+            id={id}
+            type="button"
+            disabled={disabled}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            aria-describedby={error ? `${id}-msg` : undefined}
+            onClick={() => {
+              setOpen(!open);
+              if (!open)
+                requestAnimationFrame(() => list.current?.querySelector<HTMLElement>(`[data-slot="${value || "08:00"}"]`)?.scrollIntoView({ block: "center" }));
+            }}
+            className="flex h-full min-w-0 flex-1 cursor-pointer items-center gap-tight text-left outline-none disabled:cursor-not-allowed"
+          >
+            <span className={cn("min-w-0 flex-1 truncate text-ui-input", value && !disabled ? "text-text-primary" : "text-text-placeholder")}>{value || "Select time"}</span>
+            <Icon name="chevron-down" className="size-icon-sm text-text-secondary" />
+          </button>
+        </FieldBox>
+        {mounted && (
+          <div ref={panel} role="dialog" aria-label="Event start" {...presence} className={cn(shell, "top-[calc(100%+var(--spacing-6))] left-0 w-full gap-micro p-popover-inset [--transform-origin:top_left]")}>
+            <ul ref={list} role="listbox" aria-label="Start times" className="flex max-h-[calc(var(--spacing-64)*4)] flex-col gap-micro overflow-y-auto">
+              {value && (
+                <li role="option" aria-selected={false}>
+                  <button type="button" onClick={() => pick("")} className="flex w-full cursor-pointer items-center rounded-6 px-[calc(var(--spacing-12)-var(--spacing-2))] py-compact text-left text-caption text-text-secondary outline-none hover:bg-surface-subtle focus-visible:shadow-focus-ring">
+                    No start time
+                  </button>
+                </li>
+              )}
+              {slots.map((t) => {
+                const on = t === value;
+                return (
+                  <li key={t} role="option" aria-selected={on}>
+                    <button
+                      type="button"
+                      data-slot={t}
+                      onClick={() => pick(t)}
+                      className={cn(
+                        "flex w-full cursor-pointer items-center gap-compact rounded-6 px-[calc(var(--spacing-12)-var(--spacing-2))] py-compact text-left outline-none focus-visible:shadow-focus-ring",
+                        "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover)",
+                        on ? "bg-surface-accent" : "hover:bg-surface-subtle",
+                      )}
+                    >
+                      <Txt className={cn("min-w-0 flex-1 text-caption-strong", on ? "text-text-accent" : "text-text-primary")}>{t}</Txt>
+                      <Icon name="check" className={cn("size-icon-sm text-text-accent", !on && "opacity-0")} />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
+      {error && (
+        <FieldHelper id={`${id}-msg`} error>
+          {error}
+        </FieldHelper>
+      )}
     </div>
   );
 }

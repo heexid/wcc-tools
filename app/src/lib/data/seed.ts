@@ -17,8 +17,9 @@ export const at = (local: string) => new Date(`${local.replace(" ", "T")}:00+07:
 
 /** Studio account (Figma lane I) — prefills every booking's payment instruction. */
 /** Saved-data schema version: the store reseeds when localStorage holds another one. Bump on any Db shape change.
- *  2: bookings carry a payment instruction (lane I) · 3: invoice snapshots carry the business + package summary (F15). */
-export const DB_VERSION = 3;
+ *  2: bookings carry a payment instruction (lane I) · 3: invoice snapshots carry the business + package summary (F15)
+ *  · 4: bookings + new snapshots carry eventStart / location / notes (2026-11-21). */
+export const DB_VERSION = 4;
 
 export const DEFAULT_PAYMENT = { receiptName: "Bank BCA", accountNumber: "1234567890", accountName: "bs.moment Studio" };
 
@@ -66,6 +67,8 @@ type BookingDef = {
   created: string;
   inv?: InvDef[];
   canceled?: { at: string; reason: string };
+  /** [eventStart "HH:MM", location, notes] — 2026-11-21 event details (BK-2026-0142 matches Figma). */
+  event?: [string, string, string];
 };
 
 // prettier-ignore
@@ -82,7 +85,7 @@ export const BOOKINGS: BookingDef[] = [
   { ref: "BK-2026-0139", name: "Graduation · Aulia", client: "Aulia Rahma", phone: "+6281277881020", pkg: "pkg_silver", date: "2026-11-10", items: [["Extra hour", 250_000, 1], ["Printed photos 4R", 10_000, 25]], crew: ["crew_rp"], created: "2026-10-28 11:02",
     inv: [{ type: "dp", amount: 1_750_000, at: "2026-11-02 13:20", number: "INV-2026-0179", dp: ["percentage", 50] }] },
   { ref: "BK-2026-0144", name: "Family Session · Hartono", client: "Budi Hartono", phone: "+628165550192", pkg: "pkg_basic", date: "2026-11-10", crew: ["crew_fn"], created: "2026-11-01 08:47" },
-  { ref: "BK-2026-0142", name: "Wedding · Sari & Dimas", client: "Sari Wulandari", phone: "+6281234567890", pkg: "pkg_gold", date: "2026-11-12", items: [["Extra hour", 500_000, 2], ["Printed album 20×30", 750_000, 1], ["Guest photobooth", 750_000, 1]], crew: ["crew_rp", "crew_da", "crew_np"], created: "2026-10-10 09:31",
+  { ref: "BK-2026-0142", name: "Wedding · Sari & Dimas", client: "Sari Wulandari", phone: "+6281234567890", pkg: "pkg_gold", date: "2026-11-12", items: [["Extra hour", 500_000, 2], ["Printed album 20×30", 750_000, 1], ["Guest photobooth", 750_000, 1]], crew: ["crew_rp", "crew_da", "crew_np"], created: "2026-10-10 09:31", event: ["08:00", "Hotel Mulia Senayan, Jl. Asia Afrika No. 8, Jakarta", "Akad 08:00, reception 11:00. Bride prep at room 1204."],
     inv: [{ type: "dp", amount: 3_000_000, at: "2026-10-10 09:48", number: "INV-2026-0187", dp: ["fixed", 3_000_000] }, { type: "partial", amount: 2_000_000, at: "2026-11-01 10:15", number: "INV-2026-0201" }] },
   { ref: "BK-2026-0147", name: "Prewedding · Nadia & Fajar", client: "Nadia Safitri", phone: "+6281190873321", pkg: "pkg_silver", date: "2026-11-14", items: [["Extra hour", 500_000, 2], ["Outdoor location fee", 500_000, 1]], crew: ["crew_rp", "crew_bs"], created: "2026-10-27 15:20",
     inv: [{ type: "dp", amount: 1_350_000, at: "2026-10-30 10:05", dp: ["percentage", 30] }] },
@@ -200,6 +203,9 @@ export function seedDb(): Db {
       packageNameSnapshot: pkg.name,
       packagePriceSnapshot: pkg.price,
       bookingDate: d.date,
+      eventStart: d.event?.[0] ?? null,
+      location: d.event?.[1] ?? "",
+      notes: d.event?.[2] ?? "",
       terms: DEFAULT_TERMS,
       paymentInstruction: { ...DEFAULT_PAYMENT },
       items: (d.items ?? []).map(([name, price, qty], k) => ({ id: `${d.ref.slice(-4)}_i${k + 1}`, name, price, qty })),

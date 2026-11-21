@@ -2,7 +2,7 @@
 // (input masks keep prices / qty numeric); the schema checks them with the PRD rules and the copy from
 // Figma 15. `toBookingInput` converts to the repository's BookingInput (saveBooking re-validates).
 import { z } from "zod";
-import { LIMITS } from "@/lib/booking/calc";
+import { EVENT_START_RE, LIMITS } from "@/lib/booking/calc";
 import type { BookingInput } from "@/lib/data/repo";
 import type { PaymentInstruction } from "@/lib/data/types";
 import { validatePayment } from "./payment";
@@ -19,6 +19,9 @@ export const MSG = {
   itemPrice: "Enter a price",
   itemQty: `Qty ${LIMITS.qtyMin}–${LIMITS.qtyMax}`,
   termsMax: `Max ${LIMITS.termsMax} characters`,
+  locationMax: `Max ${LIMITS.locationMax} characters`,
+  notesMax: `Max ${LIMITS.notesMax} characters`,
+  eventStartInvalid: "Pick a start time",
 };
 
 const digits = (v: string) => v.replace(/\D/g, "");
@@ -46,6 +49,9 @@ export const bookingSchema = z.object({
   bookingName: z.string(),
   packageId: z.string().min(1, MSG.packageRequired),
   bookingDate: z.string().min(1, MSG.dateRequired),
+  eventStart: z.string().refine((v) => v === "" || EVENT_START_RE.test(v), MSG.eventStartInvalid),
+  location: z.string().max(LIMITS.locationMax, MSG.locationMax),
+  notes: z.string().max(LIMITS.notesMax, MSG.notesMax),
   items: z.array(itemSchema),
   crewIds: z.array(z.string()),
   terms: z.string().max(LIMITS.termsMax, MSG.termsMax),
@@ -61,7 +67,7 @@ export type BookingItemValues = BookingFormValues["items"][number];
 export const emptyItem = (): BookingItemValues => ({ name: "", price: "", qty: "1" });
 
 export function emptyBooking(terms: string, date: string | null, paymentInstruction: PaymentInstruction): BookingFormValues {
-  return { clientName: "", clientPhone: "", bookingName: "", packageId: "", bookingDate: date ?? "", items: [], crewIds: [], terms, paymentInstruction: { ...paymentInstruction } };
+  return { clientName: "", clientPhone: "", bookingName: "", packageId: "", bookingDate: date ?? "", eventStart: "", location: "", notes: "", items: [], crewIds: [], terms, paymentInstruction: { ...paymentInstruction } };
 }
 
 /** Rp-free integer from a masked price ("1.500.000" → 1500000); "" → null. */
@@ -80,6 +86,9 @@ export function toBookingInput(v: BookingFormValues, id?: string): BookingInput 
     bookingName: v.bookingName,
     packageId: v.packageId || null,
     bookingDate: (v.bookingDate || null) as ISODate | null,
+    eventStart: v.eventStart || null,
+    location: v.location,
+    notes: v.notes,
     items: v.items.map((i) => ({ name: i.name, price: parseAmount(i.price), qty: parseAmount(i.qty) })),
     crewIds: v.crewIds,
     terms: v.terms,
@@ -103,13 +112,16 @@ export function countErrors(errors: object): number {
 }
 
 /** Saved booking → form values (edit mode). */
-export function bookingToValues(b: { clientName: string; clientPhone: string; bookingName: string; packageId: string; bookingDate: string; items: { name: string; price: number; qty: number }[]; crewIds: string[]; terms: string; paymentInstruction: PaymentInstruction }, phone: (e164: string) => string): BookingFormValues {
+export function bookingToValues(b: { clientName: string; clientPhone: string; bookingName: string; packageId: string; bookingDate: string; eventStart: string | null; location: string; notes: string; items: { name: string; price: number; qty: number }[]; crewIds: string[]; terms: string; paymentInstruction: PaymentInstruction }, phone: (e164: string) => string): BookingFormValues {
   return {
     clientName: b.clientName,
     clientPhone: phone(b.clientPhone),
     bookingName: b.bookingName,
     packageId: b.packageId,
     bookingDate: b.bookingDate,
+    eventStart: b.eventStart ?? "",
+    location: b.location,
+    notes: b.notes,
     items: b.items.map((i) => ({ name: i.name, price: maskAmount(String(i.price)), qty: String(i.qty) })),
     crewIds: b.crewIds,
     terms: b.terms,

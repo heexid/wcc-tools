@@ -109,8 +109,10 @@ Every slice F0…F17 follows the same loop. Do **not** start the next slice unti
 | F16 | Account settings + Log out | US-13 | AC2–AC7, LO1–LO2 | 6.7–6.10 |
 | F17 | Viewer role, loading (+ DS Skeleton, Loader), full-flow E2E | all | all hi-fi flow lanes | 6.3, 6.4 |
 | F18 | Business information (Account settings) → invoice PDF Brand row | US-14, US-10 | AC8–AC10, lane E, PDF 11 / 11b / 11c / A5 / A5b | 6.11, 6.12 |
+| F19 | Booking event details (event start · location · notes) → form "Client & schedule" + invoice PDF "Event" column; payment card to *Others* | US-1, US-10 | Bookings 03 / 41 form frames, PDF 11 / 11b / 11c / A5 / A5b / E4 | — |
 
 F18 was added 2026-11-14 after the MVP slices: a third Account-settings card + modal that feeds the PDF Brand row (see §3b).
+F19 was added 2026-11-21 (prototype + production in one change): see `app/docs/slices/F19.md`.
 
 Why this order: foundations first (F0–F2), then the shell every page sits in (F3–F4), then Package Library because the booking form needs its picker (F5), then read-only views (F6–F9), then the write path in the order a booking lives: create → first invoice → detail → edit + next invoice → cancel → PDF (F10–F15), then account (F16) and a full regression (F17).
 

@@ -45,11 +45,11 @@ out.push(`insert into public.crew (id, name, role, is_active, created_at) values
 ${rows(db.crew.map((c, i) => `(${q(uuid(c.id))}, ${q(c.name)}, ${q(c.role)}, ${c.isActive}, ${seq(i)})`))};
 `);
 
-out.push(`insert into public.bookings (id, ref, booking_name, client_name, client_phone, package_id, package_name_snapshot, package_price_snapshot, booking_date, terms, payment_instruction, canceled_at, cancel_reason, created_at, updated_at) values
+out.push(`insert into public.bookings (id, ref, booking_name, client_name, client_phone, package_id, package_name_snapshot, package_price_snapshot, booking_date, event_start, location, notes, terms, payment_instruction, canceled_at, cancel_reason, created_at, updated_at) values
 ${rows(
   db.bookings.map(
     (b) =>
-      `(${q(uuid(b.id))}, ${q(b.ref)}, ${q(b.bookingName)}, ${q(b.clientName)}, ${q(b.clientPhone)}, ${q(uuid(b.packageId))}, ${q(b.packageNameSnapshot)}, ${b.packagePriceSnapshot}, ${q(b.bookingDate)}, ${q(b.terms)}, ${json(b.paymentInstruction)}, ${q(b.canceledAt)}, ${q(b.cancelReason)}, ${q(b.createdAt)}, ${q(b.updatedAt)})`,
+      `(${q(uuid(b.id))}, ${q(b.ref)}, ${q(b.bookingName)}, ${q(b.clientName)}, ${q(b.clientPhone)}, ${q(uuid(b.packageId))}, ${q(b.packageNameSnapshot)}, ${b.packagePriceSnapshot}, ${q(b.bookingDate)}, ${q(b.eventStart)}, ${q(b.location)}, ${q(b.notes)}, ${q(b.terms)}, ${json(b.paymentInstruction)}, ${q(b.canceledAt)}, ${q(b.cancelReason)}, ${q(b.createdAt)}, ${q(b.updatedAt)})`,
   ),
 )};
 `);

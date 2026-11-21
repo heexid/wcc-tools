@@ -6,6 +6,7 @@ About 15 minutes, all in the browser. Do Supabase first, then Vercel.
 
 1. **Create the project:** [supabase.com](https://supabase.com) → *New project*. Region: **Southeast Asia (Singapore)**. Save the database password somewhere safe.
 2. **Create the database:** *SQL Editor* → *New query* → paste the whole of [`supabase/setup-production.sql`](supabase/setup-production.sql) → **Run**. It should finish with "Success. No rows returned".
+   **Already deployed before 2026-11-21?** Don't re-run the whole file. Run only [`supabase/migrations/20261121000013_booking_event_details.sql`](supabase/migrations/20261121000013_booking_event_details.sql) (adds event start / location / notes). It is safe on live data: the new columns are optional and existing invoices are untouched.
 3. **Turn off public sign-up:** *Authentication → Sign In / Providers* → turn **off** "Allow new users to sign up". Only people you add can log in.
 4. **Add yourself:** *Authentication → Users* → *Add user* → *Create new user* → your email and a password → tick **Auto Confirm User**.
 5. **Make yourself admin:** *SQL Editor* → run (with your email):

@@ -225,7 +225,7 @@ function addBooking(db: Db, d: { ref: string; name: string; client: string; phon
   const created = at(d.created);
   const b: Booking = {
     id: `bk_${d.ref.slice(-4)}`, ref: d.ref, bookingName: d.name, clientName: d.client, clientPhone: d.phone,
-    packageId: p.id, packageNameSnapshot: p.name, packagePriceSnapshot: p.price, bookingDate: d.date, terms: db.settings.defaultTerms, paymentInstruction: { ...db.settings.defaultPayment },
+    packageId: p.id, packageNameSnapshot: p.name, packagePriceSnapshot: p.price, bookingDate: d.date, eventStart: null, location: "", notes: "", terms: db.settings.defaultTerms, paymentInstruction: { ...db.settings.defaultPayment },
     items: [], crewIds: d.crew, total: 0, totalPaid: 0, status: "draft", canceledAt: null, canceledBy: null, cancelReason: null,
     createdBy: "Admin", createdAt: created, updatedAt: created,
   };

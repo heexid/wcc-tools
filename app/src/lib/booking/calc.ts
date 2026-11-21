@@ -12,6 +12,8 @@ export const LIMITS = {
   qtyMin: 1,
   qtyMax: 999,
   termsMax: 255,
+  locationMax: 255,
+  notesMax: 255,
   cancelReasonMax: 255,
   packageDescriptionMax: 1000,
   clientNameMin: 2,
@@ -23,6 +25,9 @@ export const LIMITS = {
   businessAddressMax: 150,
   pctMax: 100,
 };
+
+/** Event start time "HH:MM" (24 h, Asia/Jakarta wall clock). Empty = not set. */
+export const EVENT_START_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const isMoney = (n: number) => Number.isSafeInteger(n) && n >= 0;
 

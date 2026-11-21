@@ -102,6 +102,9 @@ async function bookingCase(pg: PGlite, c: BookingCase) {
       items: v.items,
       crewIds: (v.crewKeys as string[]).map((k) => crewIds[k]),
       terms: v.terms,
+      eventStart: v.eventStart,
+      location: v.location,
+      notes: v.notes,
       paymentInstruction: v.paymentInstruction,
       expectedUpdatedAt: v.expectedUpdatedAt === "$current" ? current : v.expectedUpdatedAt === "$stale" ? "2000-01-01T00:00:00.000Z" : undefined,
     };

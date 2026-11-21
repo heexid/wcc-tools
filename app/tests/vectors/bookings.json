@@ -517,6 +517,55 @@
           "booking": "canceled"
         }
       }
+    },
+    {
+      "name": "event details are stored (start HH:MM, location / notes trimmed)",
+      "input": {
+        "eventStart": "08:00",
+        "location": "  Hotel Mulia Senayan, Jakarta ",
+        "notes": " Akad 08:00 "
+      },
+      "expect": {
+        "booking": {
+          "eventStart": "08:00",
+          "location": "Hotel Mulia Senayan, Jakarta",
+          "notes": "Akad 08:00"
+        }
+      }
+    },
+    {
+      "name": "event details are optional",
+      "input": {},
+      "expect": {
+        "booking": {
+          "eventStart": null,
+          "location": "",
+          "notes": ""
+        }
+      }
+    },
+    {
+      "name": "eventStart out of range → invalid",
+      "input": {
+        "eventStart": "24:00"
+      },
+      "expect": {
+        "errors": {
+          "eventStart": "invalid"
+        }
+      }
+    },
+    {
+      "name": "location 255 ok, notes 256 → too_long",
+      "input": {
+        "location": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "notes": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+      },
+      "expect": {
+        "errors": {
+          "notes": "too_long"
+        }
+      }
     }
   ]
 }

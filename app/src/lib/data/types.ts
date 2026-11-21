@@ -24,8 +24,7 @@ export type Crew = { id: string; name: string; role: string; isActive: boolean }
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
 
-/** Business information (Account settings → Business information, PRD US-14). Printed in the invoice PDF's Brand row and
- *  "From" block. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
+/** Business information (Account settings → Business information, PRD US-14). Printed in the invoice PDF's Brand row. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
 export type Business = { name: string; address: string; phone: string; email: string; logo?: string | null };
 
 export type BookingItem = { id: string; name: string; price: number; qty: number };
@@ -40,6 +39,12 @@ export type Booking = {
   packageNameSnapshot: string;
   packagePriceSnapshot: number;
   bookingDate: ISODate;
+  /** Event start "HH:MM" (Asia/Jakarta), optional — null when not set. */
+  eventStart: string | null;
+  /** Venue / meeting point, ≤ 255, printed on invoices (2 lines max). */
+  location: string;
+  /** Notes for the event, ≤ 255, printed on invoices (2 lines max). */
+  notes: string;
   terms: string;
   paymentInstruction: PaymentInstruction;
   items: BookingItem[];
@@ -71,6 +76,10 @@ export type InvoiceSnapshot = {
     /** The package's one-line summary at issue time (PDF item line "Gold Package — 8-hour coverage · …"). */
     packageSummary: string;
     items: { name: string; price: number; qty: number; subtotal: number }[];
+    /** Event details at issue time (2026-11-21). Optional: invoices issued before then don't carry them. */
+    eventStart?: string | null;
+    location?: string;
+    notes?: string;
     terms: string;
     /** Printed on the invoice (F15). */
     paymentInstruction: PaymentInstruction;

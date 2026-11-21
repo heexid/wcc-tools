@@ -101,6 +101,9 @@ function toInput(fields: Record<string, unknown>, id?: string, current?: string)
     items: v.items as BookingInput["items"],
     crewIds: v.crewKeys as string[],
     terms: v.terms as string,
+    eventStart: v.eventStart as string | null | undefined,
+    location: v.location as string | undefined,
+    notes: v.notes as string | undefined,
     paymentInstruction: v.paymentInstruction as BookingInput["paymentInstruction"],
     expectedUpdatedAt: v.expectedUpdatedAt === "$current" ? current : v.expectedUpdatedAt === "$stale" ? STALE : undefined,
   };

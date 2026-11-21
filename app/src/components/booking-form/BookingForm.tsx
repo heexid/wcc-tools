@@ -28,7 +28,7 @@ import { withRetry } from "@/lib/data/retry";
 import { useIsAdmin } from "@/lib/role";
 import type { Crew, Invoice, Package } from "@/lib/data/types";
 import { formatDate, formatDateTime, formatIDR, formatPhone, isoToLocalDate, normalizePhone, type ISODate } from "@/lib/format";
-import { CrewSelect, DateField, PackageSelect } from "./FormPopovers";
+import { CrewSelect, DateField, PackageSelect, TimeSelect } from "./FormPopovers";
 import { NewInvoiceModal, type InvoiceModalRequest } from "./InvoiceModal";
 import { CancelBookingDialog, CancelBookingSection } from "./CancelBooking";
 import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
@@ -392,7 +392,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
-    defaultValues: initial?.values ?? { clientName: "", clientPhone: "", bookingName: "", packageId: "", bookingDate: date ?? "", items: [], crewIds: [], terms, paymentInstruction: { ...payment } },
+    defaultValues: initial?.values ?? { clientName: "", clientPhone: "", bookingName: "", packageId: "", bookingDate: date ?? "", eventStart: "", location: "", notes: "", items: [], crewIds: [], terms, paymentInstruction: { ...payment } },
     mode: "onSubmit",
     reValidateMode: "onChange",
   });
@@ -423,6 +423,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
     if (df.packageId) parts.push("package");
     if (df.items) parts.push("items");
     if (df.bookingDate) parts.push("booking date");
+    if (df.eventStart || df.location || df.notes) parts.push("event details");
     if (df.crewIds) parts.push("crew");
     if (df.terms) parts.push("terms");
     if (df.paymentInstruction) parts.push("payment instruction");
@@ -590,7 +591,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
         <main className="flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))]">
           <form noValidate onSubmit={onSave} className={cn("contents", entering && cascadeChildren(1))}>
             <section aria-labelledby="sec-client" className="flex flex-col gap-base">
-              <SectionHeader id="sec-client" title="Client" meta="Required fields" required />
+              <SectionHeader id="sec-client" title="Client & schedule" meta="Required fields" required />
               <div className="flex gap-base">
                 <InputField label="Client name" required placeholder="Client name" error={errors.clientName?.message} {...register("clientName")} />
                 <InputField
@@ -608,6 +609,25 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
                 />
               </div>
               <InputField label="Booking name" placeholder={`${clientName.trim() || "Client"} · ${pkgName ?? "Package"}`} helper="Optional — defaults to “Client · Package”" {...register("bookingName")} />
+              <div className="flex items-start gap-base">
+                <Controller control={control} name="bookingDate" render={({ field, fieldState }) => <DateField value={field.value} onChange={field.onChange} today={today} error={fieldState.error?.message} helper={dateMoved} />} />
+                <Controller control={control} name="eventStart" render={({ field, fieldState }) => <TimeSelect value={field.value} onChange={field.onChange} error={fieldState.error?.message} />} />
+                <InputField label="Created" disabled value={created} readOnly helper="Set automatically" />
+              </div>
+              <Controller
+                control={control}
+                name="location"
+                render={({ field, fieldState }) => (
+                  <TextArea label="Location" helper="Venue or meeting point — printed on invoices" maxLength={LIMITS.locationMax} value={field.value} onValueChange={field.onChange} onBlur={field.onBlur} error={field.value.length > LIMITS.locationMax || fieldState.error ? MSG.locationMax : undefined} placeholder="Venue name and address" />
+                )}
+              />
+              <Controller
+                control={control}
+                name="notes"
+                render={({ field, fieldState }) => (
+                  <TextArea label="Notes" helper="Printed on invoices for this booking" maxLength={LIMITS.notesMax} value={field.value} onValueChange={field.onChange} onBlur={field.onBlur} error={field.value.length > LIMITS.notesMax || fieldState.error ? MSG.notesMax : undefined} placeholder="Anything the crew or client should know" />
+                )}
+              />
             </section>
             <Divider />
             <section aria-labelledby="sec-package" className="flex flex-col gap-base">
@@ -635,21 +655,11 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
                 )}
               />
               <PackageInfo pkg={pkg} price={pkg ? priceOf(pkg) : 0} />
-              {/* Payment instruction (lane I): prefilled with the studio account, edited in its modal, never empty. */}
-              <Controller control={control} name="paymentInstruction" render={({ field }) => <PaymentInstructionField value={field.value} onEdit={() => setPaymentOpen(true)} />} />
             </section>
             <Divider />
             <section aria-labelledby="sec-items" className="flex flex-col gap-base">
               <SectionHeader id="sec-items" title="Additional items" meta={`${fields.length} ${fields.length === 1 ? "item" : "items"}`} />
               <LineItems control={control} register={register} errors={errors} fields={fields} onAdd={() => append(emptyItem(), { shouldFocus: true })} onRemove={(i) => remove(i)} />
-            </section>
-            <Divider />
-            <section aria-labelledby="sec-schedule" className="flex flex-col gap-base">
-              <SectionHeader id="sec-schedule" title="Schedule" />
-              <div className="flex items-start gap-base">
-                <Controller control={control} name="bookingDate" render={({ field, fieldState }) => <DateField value={field.value} onChange={field.onChange} today={today} error={fieldState.error?.message} helper={dateMoved} />} />
-                <InputField label="Created" disabled value={created} readOnly helper="Set automatically" />
-              </div>
             </section>
             <Divider />
             <section aria-labelledby="sec-crew" className="flex flex-col gap-base">
@@ -659,6 +669,8 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             <Divider />
             <section aria-labelledby="sec-others" className="flex flex-col gap-base">
               <SectionHeader id="sec-others" title="Others" />
+              {/* Payment instruction (lane I): prefilled with the studio account, edited in its modal, never empty. */}
+              <Controller control={control} name="paymentInstruction" render={({ field }) => <PaymentInstructionField value={field.value} onEdit={() => setPaymentOpen(true)} />} />
               <Controller
                 control={control}
                 name="terms"

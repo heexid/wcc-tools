@@ -8,7 +8,7 @@ import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, 
 
 /** Bump on any change to the PDF's layout, fonts or formatting: stored PDFs are keyed by it, so old files are
  *  re-rendered on their next download instead of being served for good (P9 review #4). */
-export const PDF_TEMPLATE_VERSION = "2026-11-16.1";
+export const PDF_TEMPLATE_VERSION = "2026-11-21.1";
 
 let registered = false;
 /** Inter 3.19 static weights (react-pdf takes TTF / WOFF only, not the variable woff2 the app uses). */
@@ -80,6 +80,18 @@ function wrapGreedy(str: string, widthPx: number, styleName: string, measure?: M
   return lines.join("\n");
 }
 
+/** wrapGreedy capped at `maxLines`; the last kept line ends in "…" (Figma: Text truncation = Ending). */
+function clampGreedy(str: string, widthPx: number, styleName: string, maxLines: number, measure?: Measure): string {
+  if (!measure) return str;
+  const lines = wrapGreedy(str, widthPx, styleName, measure).split("\n");
+  if (lines.length <= maxLines) return lines.join("\n");
+  const t = text(styleName);
+  const style = { fontSize: t.fontSize / 0.75, fontWeight: t.fontWeight };
+  let last = lines[maxLines - 1];
+  while (last && measure(`${last}…`, style) > widthPx) last = last.slice(0, -1);
+  return [...lines.slice(0, maxLines - 1), `${last.trimEnd()}…`].join("\n");
+}
+
 const body = text("Text/Body");
 const { position: _p, top: _t, ...bodyFont } = body;
 /** Footer band (Figma 11: pad base, Timestamp line, top hairline) — pinned to the bottom of every page. */
@@ -91,7 +103,8 @@ const s = StyleSheet.create({
   // Multi-page invoices (many items): every page keeps a top margin (region) and room for the pinned footer, so
   // content flows onto page 2+ instead of being cut. Page 1's header cancels the top margin to stay full-bleed (Figma 11).
   page: { backgroundColor: color("surface/default"), color: color("text/primary"), ...bodyFont, paddingTop: space("region"), paddingBottom: pt(FOOTER_H) },
-  header: { marginTop: -space("region"), backgroundColor: color("surface/accent"), paddingTop: pt(40), paddingBottom: pt(40), paddingHorizontal: space("region"), gap: space("group") },
+  // 2026-11-21 (Figma 11 simplified header): pad section, gap 16 — room for the Event column on one A4 page.
+  header: { marginTop: -space("region"), backgroundColor: color("surface/accent"), paddingTop: space("section"), paddingBottom: space("section"), paddingHorizontal: space("region"), gap: space("16") },
   row: { flexDirection: "row" },
   // Brand row: logo / initials · name + address + "phone · email" · status tag. Hugs its text (44 with one text line,
   // +20 per extra caption line, Figma 11).
@@ -105,7 +118,7 @@ const s = StyleSheet.create({
   dash: { borderTopWidth: pt(1), borderTopColor: color("border/strong"), borderStyle: "dashed", marginBottom: -pt(1) },
   parties: { flexDirection: "row", gap: space("group") },
   party: { flex: 1, gap: space("micro") },
-  body: { paddingVertical: space("section"), paddingHorizontal: space("region"), gap: space("inset") },
+  body: { paddingVertical: space("section"), paddingHorizontal: space("region"), gap: space("16") },
   tr: { flexDirection: "row", alignItems: "center", paddingVertical: pt(10), borderBottomWidth: pt(1), borderBottomColor: color("border/default") },
   th: { ...text("Text/Caption"), color: color("text/secondary") },
   sumRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
@@ -116,6 +129,16 @@ const s = StyleSheet.create({
 
 const Caption = ({ children, c = "text/secondary", strong }: { children: string; c?: string; strong?: boolean }) => (
   <Text style={[text(strong ? "Text/Caption Strong" : "Text/Caption"), { color: color(c) }]}>{children}</Text>
+);
+
+/** Party column width in Figma px: (698 − 24 gap) / 2. */
+const PARTY_W = 337;
+
+/** Caption capped at 2 lines (react-pdf fallback when no measure pre-broke the text). */
+const ClampCaption = ({ children, c = "text/secondary" }: { children: string; c?: string }) => (
+  <Text style={[text("Text/Caption"), { color: color(c), maxLines: 2, textOverflow: "ellipsis" }]}>
+    {children}
+  </Text>
 );
 
 function Meta({ label, value }: { label: string; value: string }) {
@@ -140,6 +163,7 @@ function Sum({ label, value, kind = "default" }: { label: string; value: string;
 
 export function InvoiceDocument({ snapshot: sn, measure }: { snapshot: InvoiceSnapshot; measure?: Measure }) {
   const wrap = (str: string, widthPx: number, styleName: string) => wrapGreedy(str, widthPx, styleName, measure);
+  const clamp = (str: string, widthPx: number, styleName: string, maxLines: number) => clampGreedy(str, widthPx, styleName, maxLines, measure);
   const b = sn.booking;
   const biz = sn.business;
   const tag = TYPE_TAG[sn.type];
@@ -180,22 +204,25 @@ export function InvoiceDocument({ snapshot: sn, measure }: { snapshot: InvoiceSn
             <View style={{ gap: space("micro") }}>
               <Meta label="Invoice date" value={formatDate(isoToLocalDate(sn.issuedAt))} />
               <Meta label="Booking ref" value={b.ref} />
-              <Meta label="Booking date" value={formatDateWithDay(b.bookingDate)} />
             </View>
           </View>
           <View style={s.dash} />
           <View style={s.parties}>
-            <View style={s.party}>
-              <Caption>From</Caption>
-              <Text style={text("Text/Body Strong")}>{biz.name}</Text>
-              <Caption c="text/primary">{biz.email}</Caption>
-              <Caption c="text/primary">{biz.phone}</Caption>
-            </View>
+            {/* Bill to = who pays; Event = what, when, where (Figma 11, 2026-11-21). Event lines are capped so the
+                header has a fixed maximum height: name 1 line, location / notes 2 lines each, ending in "…". */}
             <View style={s.party}>
               <Caption>Bill to</Caption>
               <Text style={text("Text/Body Strong")}>{b.clientName}</Text>
               <Caption c="text/primary">{formatPhone(b.clientPhone)}</Caption>
-              <Caption c="text/primary">{b.bookingName}</Caption>
+            </View>
+            <View style={s.party}>
+              <Caption>Event</Caption>
+              <Text style={[text("Text/Body Strong"), { maxLines: 1, textOverflow: "ellipsis" }]}>
+                {clamp(b.bookingName, PARTY_W, "Text/Body Strong", 1)}
+              </Text>
+              <Caption c="text/primary">{b.eventStart ? `${formatDateWithDay(b.bookingDate)} · ${b.eventStart}` : formatDateWithDay(b.bookingDate)}</Caption>
+              {!!b.location && <ClampCaption c="text/primary">{clamp(b.location, PARTY_W, "Text/Caption", 2)}</ClampCaption>}
+              {!!b.notes && <ClampCaption>{clamp(`Notes: ${b.notes}`, PARTY_W, "Text/Caption", 2)}</ClampCaption>}
             </View>
           </View>
         </View>
