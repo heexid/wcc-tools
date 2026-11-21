@@ -150,14 +150,21 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
             </a>
           </Row>
           <Row icon="calendar" label="Booking date">
-            <Txt className="text-body text-text-primary">{`${formatDateWithDay(b.bookingDate)}${b.bookingDate === today ? " · today" : ""}`}</Txt>
+            <Txt className="text-body text-text-primary">{`${formatDateWithDay(b.bookingDate)}${b.eventStart ? ` · ${b.eventStart}` : ""}${b.bookingDate === today ? " · today" : ""}`}</Txt>
           </Row>
+          {/* Event details (2026-11-21) — same order as the form; empty ones are left out. Full text, wrapped. */}
+          {b.location && (
+            <Row icon="map-pin" label="Location" top>
+              <p className="min-w-0 flex-1 text-body break-words whitespace-pre-line text-text-primary">{b.location}</p>
+            </Row>
+          )}
+          {b.notes && (
+            <Row icon="file-text" label="Notes" top>
+              <p className="min-w-0 flex-1 text-body break-words whitespace-pre-line text-text-primary">{b.notes}</p>
+            </Row>
+          )}
           <Row icon="package" label="Package">
             <Txt className="text-body text-text-primary">{`${b.packageNameSnapshot} · ${formatIDR(b.packagePriceSnapshot)}`}</Txt>
-          </Row>
-          {/* Payment instruction (lane I) — printed on every invoice. */}
-          <Row icon="wallet" label="Payment">
-            <Txt className="text-body text-text-primary">{`${b.paymentInstruction.receiptName} · ${paymentDetail(b.paymentInstruction)}`}</Txt>
           </Row>
           <Row icon="users" label="Crew" top>
             {b.crew.length ? (
@@ -179,6 +186,10 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
             ) : (
               <Txt className="text-body text-text-secondary">No crew assigned</Txt>
             )}
+          </Row>
+          {/* Payment instruction (lane I) — printed on every invoice. */}
+          <Row icon="wallet" label="Payment">
+            <Txt className="text-body text-text-primary">{`${b.paymentInstruction.receiptName} · ${paymentDetail(b.paymentInstruction)}`}</Txt>
           </Row>
           <Row icon="clock" label="Created">
             <Txt className="text-body text-text-secondary">{`${formatDate(isoToLocalDate(b.createdAt))} by ${b.createdBy}`}</Txt>

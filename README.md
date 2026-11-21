@@ -1,6 +1,6 @@
 # wcc-tools · bs.moment Booking module
 
-A **Booking & Invoice Management** module for the bs.moment internal-tools shell. One record per booking (client, package, extra items, date, crew), live money calculation, and invoices that never change once issued (DP / Full / Partial / Paid). Bookings show in a Calendar (month / week / day) and a Table. A Package Library and Account settings come with it.
+A **Booking & Invoice Management** module for the bs.moment internal-tools shell. One record per booking (client, package, extra items, date and event details, crew), live money calculation, and invoices that never change once issued (DP / Full / Partial / Paid). Bookings show in a Calendar (month / week / day) and a Table. A Package Library and Account settings come with it.
 
 **Why:** bookings, prices, deposits and follow-up payments were tracked across chats, spreadsheets and one-off invoices. Totals were added up by hand, deposits got mixed up with full payment, and editing a booking quietly changed what old invoices said.
 
@@ -61,12 +61,12 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 | Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. | §4.3 |
 | App launcher | ⋮⋮ popover to switch between Booking and Package Lib (Bookmark is "Coming soon"). | US-11 |
 | Package Library | Create, edit, archive and restore packages. Duplicate active names are blocked. Description up to 1000 characters. | US-0 |
-| New / Edit booking | One form: client, phone (`+62…`), package, items, date, crew, T&C (up to 255 characters), live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
+| New / Edit booking | One form. **Client & schedule** first: client, phone (`+62…`), booking name, booking date, optional **event start** (30-minute time select), **location** and **notes** (up to 255 characters each). Then package, items, crew, and **Others**: payment instruction and T&C (up to 255 characters). Live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
 | Invoices | The first invoice is **DP** (% or fixed) or **Full**. Later ones are **Partial** or **Paid**. Each invoice is a frozen snapshot, counts as paid straight away, and is numbered `INV-YYYY-NNNN`. | US-2, US-3, US-5 |
 | Status | Derived from the invoices: **Draft** → **Partially paid** → **Paid**. **Canceled** is the one manual status: final, and allowed only from Draft or Partially paid. | §2.5, US-12 |
 | Dashboard | KPIs, Calendar (month / week / day), Table (sort, pagination), search, filters (status, crew, package, date), Upcoming rail, "Needs attention" cards. | US-6–US-8 |
-| Booking detail | Read-only side sheet with invoice cards, PDF downloads, and a crew schedule popover. | US-9 |
-| Invoice PDF | A4, built from the snapshot only. The brand row (business name, logo, address, contact) always uses the current business information. | US-10 |
+| Booking detail | Read-only side sheet. Booking information follows the form's order (client, phone, date · start time, location, notes, package, crew, payment, created); empty event rows are hidden. Invoice cards, PDF downloads, and a crew schedule popover. | US-9 |
+| Invoice PDF | A4, built from the snapshot only. Header: **Bill to** (client, phone) and **Event** (booking name, date · start time, location and notes, each cut to 2 lines so the invoice stays on one page). The brand row (business name, logo, address, contact) always uses the current business information. | US-10 |
 | Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
 | Roles | `admin` can do everything. `viewer` (the Owner) is read-only, enforced in the UI and by RLS. | §4.3 |
 
@@ -76,19 +76,19 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 
 ## Progress tracker
 
-*Last updated from `context/` on 2026-11-16.*
+*Last updated from `context/` on 2026-11-21.*
 
 ### Overall
 
 | Phase | Status |
 |---|---|
 | Design (Figma `bs internal tools`) | ✅ All screens, interaction states and hi-fi flows done. 96 of 96 interactions defined. |
-| Prototype F0–F18 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
+| Prototype F0–F19 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
 | Production P0–P11 | ✅ Built and tested on **local** Supabase. CI on GitHub (branch `production/p0-p10`). |
 | Production P12–P14 | ☐ Not started: full regression on staging, operations, UAT and launch. |
 | Release gates PG1–PG7 | ☐ Not yet signed off. They need a staging environment. |
 
-### Prototype slices (F0–F18)
+### Prototype slices (F0–F19)
 
 ✅ done · ⚠ done with open items · 🟡 partly done
 
@@ -113,6 +113,7 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 | F16 | Account settings and log out | ✅ 2026-11-12 |
 | F17 | Viewer role, loading states, full regression | 🟡 2026-11-14: 53 inherited visual failures waiting on a PNG re-export; a11y open |
 | F18 | Business information → PDF brand row | ⚠ 2026-11-14: PNG re-export pending |
+| F19 | Booking event details (event start, location, notes): form, detail sheet, invoice PDF, plus Supabase migration 013 | ⚠ 2026-11-21: PNG re-export pending ([log](app/docs/slices/F19.md)) |
 
 ### Production slices (P0–P14)
 
@@ -145,7 +146,8 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | Staging environment (a Supabase project and a Vercel preview) | P12 | Setting up. Every "Done" tick and PG5 / PG7 wait on it. |
 | D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
-| Re-export the Figma PNGs after the 2026-11-14 design sync (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
+| Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
+| Apply migration 013 (event details) to any database deployed before 2026-11-21 | Deploy | Run `supabase/migrations/20261121000013_booking_event_details.sql` (see `agents/DEPLOY.md`) |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
 | P2 and P11 code review | P2, P11 | Running `code-review` |
 
@@ -156,6 +158,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 - **Hosting:** Vercel, plus separate Supabase projects for staging and production.
 - **Starting data:** production starts empty, with no data import.
 - **Where the design moved past Figma:** the prototype wins and Figma was updated to match (2026-11-14). That covers centred dialogs, the login background, Skeleton and Loader.
+- **Event details (2026-11-21):** event start, location and notes are optional. Notes are printed on invoices. Invoices issued before then keep their snapshot and show only the booking name and date.
 - **KPIs:** always computed from real data. Figma's "24 · +4" is sample content (decided 2026-11-11).
 
 ---
@@ -167,7 +170,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | [`context/PRD.md`](context/PRD.md) | What and why: user stories US-0 to US-14, business rules 1–14, data model, security and performance requirements, roadmap |
 | [`context/PLAN.md`](context/PLAN.md) | How: mapping from design to code, database and RPC design, domain logic, the list of Figma deliverables |
 | [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (96 rows, 1.1–6.12) with its Figma frame |
-| [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F18, pixel gates G1–G4, motion rules, the prototype tracker |
+| [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F19, pixel gates G1–G4, motion rules, the prototype tracker |
 | [`context/PRODUCTION-PLAN.md`](context/PRODUCTION-PLAN.md) | Production slices P0–P14, gates PG1–PG7, the RLS matrix, the production tracker, a paste-ready prompt for each slice |
 | [`DEPLOY.md`](DEPLOY.md) | Going live on Supabase and Vercel |
 
