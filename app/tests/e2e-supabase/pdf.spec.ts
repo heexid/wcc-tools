@@ -63,6 +63,13 @@ test("download: server render from the snapshot, stored, then reused; a business
   expect(objects("INV-2026-0187/")).toBe(1);
 });
 
+test("F19 · the PDF header carries the snapshot's event details (Bill to | Event)", async ({ page }) => {
+  await signIn(page);
+  const { text } = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187"); // 0201 must stay unrendered for the integrity test
+  for (const s of ["Bill to", "Event", "Wedding · Sari & Dimas", "Thu, 12 Nov 2026 · 08:00", "Hotel Mulia Senayan", "Notes: Akad 08:00"]) expect(text).toContain(s);
+  expect(text).not.toContain("From");
+});
+
 test("a new invoice's PDF is generated on confirm (quietly) and downloads", async ({ page }) => {
   await signIn(page);
   await page.goto("/bookings/BK-2026-0144/edit"); // Draft, no invoices

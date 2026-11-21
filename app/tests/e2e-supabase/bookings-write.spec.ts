@@ -57,6 +57,26 @@ test("rule 13 · an archived package stays on the booking at its saved price, an
   sql("update packages set is_active = true, archived_at = null where name = 'Gold Package'");
 });
 
+test("F19 · event details: start time, location and notes save to Postgres and come back (Client & schedule)", async ({ page }) => {
+  await signIn(page);
+  await openEdit(page, "BK-2026-0156"); // Draft, seeded without event details
+  const client = main(page).getByRole("region", { name: "Client & schedule" });
+  await expect(client.getByRole("button", { name: "Event start" })).toHaveText("Select time");
+  await client.getByRole("button", { name: "Event start" }).click();
+  await page.getByRole("option", { name: "19:30" }).click();
+  await client.getByLabel("Location").fill("  Gedung Serbaguna, Jakarta Timur ");
+  await client.getByLabel("Notes").fill("Bring the drone.");
+  await page.getByRole("button", { name: "Save changes" }).click();
+  await expect(toast(page, "Changes saved")).toBeVisible();
+  expect(sql("select to_char(event_start, 'HH24:MI') || '|' || location || '|' || notes from bookings where ref = 'BK-2026-0156'")).toBe("19:30|Gedung Serbaguna, Jakarta Timur|Bring the drone.");
+
+  await page.goto("/bookings?booking=BK-2026-0156");
+  const info = page.getByRole("dialog", { name: "Booking detail" }).getByRole("region", { name: "Booking information" });
+  await expect(info).toContainText("· 19:30");
+  await expect(info).toContainText("Gedung Serbaguna, Jakarta Timur");
+  await expect(info).toContainText("Bring the drone.");
+});
+
 test("lane G · leave guard: Keep editing stays; Discard leaves without saving (2.1)", async ({ page }) => {
   await signIn(page);
   await openEdit(page, "BK-2026-0153");
