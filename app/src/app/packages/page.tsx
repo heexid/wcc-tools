@@ -6,6 +6,8 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Alert, Toast, ToastRegion, type ToastTone } from "@/components/ds/Feedback";
 import { Button } from "@/components/ds/Button";
 import { Dialog, FormModal } from "@/components/ds/Dialog";
+import { ActionBar, BottomSheet } from "@/components/ds/BottomSheet";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { Icon } from "@/components/ds/Icon";
 import { InputField } from "@/components/ds/InputField";
 import { Pagination } from "@/components/ds/Pagination";
@@ -147,6 +149,22 @@ function ArchiveDialog({ pkg, onCancel, onConfirm }: { pkg: Draft | null; onCanc
   const [shown, setShown] = useState(pkg); // keep content while the exit animation runs
   if (pkg && pkg !== shown) setShown(pkg);
   const p = pkg ?? shown;
+  const mobile = useIsMobile();
+  if (mobile)
+    // Mobile (Figma MP6): sheet titled with the question · explanation · Cancel / Archive package (44, equal).
+    return (
+      <BottomSheet open={!!pkg} onClose={onCancel} role="alertdialog" title={`Archive “${p?.name ?? ""}”?`} initialFocus="[data-cancel]">
+        <p className="text-body text-text-secondary">
+          It will no longer appear when creating bookings. The {p?.bookings} bookings that use it keep their package and price. You can restore it from the Archived tab.
+        </p>
+        <div className="flex gap-compact pt-4 *:flex-1">
+          <Button variant="secondary" data-cancel onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button onClick={onConfirm}>Archive package</Button>
+        </div>
+      </BottomSheet>
+    );
   return (
     <Dialog open={!!pkg} onClose={onCancel} role="alertdialog" labelledBy={titleId} top="confirm" width="w-[calc(var(--spacing-64)*7-var(--spacing-8))]" initialFocus="[data-cancel]">
       <div className="flex gap-base p-group">
@@ -186,6 +204,7 @@ function PackageLibrary() {
   const setToast = (text: string, tone: ToastTone = "success") => setToastState({ text, tone, open: true });
   const t = usePresence(!!toast?.open);
   const entering = useEntrance(); // module entrance cascade (motion.css)
+  const mobile = useIsMobile();
 
   const load = useCallback(async () => {
     const [all, a, b] = await Promise.all([listPackages({ tab, search }), listPackages({ tab: "active" }), listPackages({ tab: "archived" })]);
@@ -231,7 +250,10 @@ function PackageLibrary() {
   const noMatch = rows !== null && rows.length === 0 && !!search;
 
   return (
-    <main data-cascade className={cn("flex flex-col gap-inset px-section py-section", entering && cascadeChildren())}>
+    <>
+    {/* Mobile (Figma MP1–MP8): pad 20/16/24, gap control; tabs fill the width, search below; cards instead of the table;
+        New package in the sticky action bar. */}
+    <main data-cascade className={cn("flex flex-col gap-inset px-section py-section max-tablet:flex-1 max-tablet:gap-control max-tablet:px-layout-gutter max-tablet:pt-20 max-tablet:pb-group", entering && cascadeChildren())}>
       <div className="flex items-center gap-compact">
         <div className="flex flex-col gap-2">
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
@@ -240,33 +262,48 @@ function PackageLibrary() {
           <p className="text-caption text-text-secondary">Packages used when creating bookings. Price changes never alter existing bookings.</p>
         </div>
         <span className="flex-1" />
-        {!viewer && (
+        {!viewer && !mobile && (
           <Button icon="plus" onClick={() => setEditing(EMPTY)}>
             New package
           </Button>
         )}
       </div>
 
-      <div className="flex items-center gap-compact">
+      <div className="flex items-center gap-compact max-tablet:flex-col max-tablet:items-stretch max-tablet:gap-control">
         <TabList label="Package status" className="flex">
-          <Tab active={tab === "active"} onClick={() => (setTab("active"), setPage(1))}>
+          <Tab active={tab === "active"} onClick={() => (setTab("active"), setPage(1))} className="max-tablet:flex-1">
             Active ({counts.active})
           </Tab>
-          <Tab active={tab === "archived"} onClick={() => (setTab("archived"), setPage(1))}>
+          <Tab active={tab === "archived"} onClick={() => (setTab("archived"), setPage(1))} className="max-tablet:flex-1">
             Archived ({counts.archived})
           </Tab>
         </TabList>
-        <span className="flex-1" />
+        <span className="flex-1 max-tablet:hidden" />
         <SearchField
           aria-label="Search package"
           placeholder="Search package"
           value={search}
           onValueChange={(v) => (setSearch(v), setPage(1))}
-          className="w-[calc(var(--spacing-64)*4+var(--spacing-24))]"
+          className="w-[calc(var(--spacing-64)*4+var(--spacing-24))] max-tablet:w-full"
         />
       </div>
 
-      <section aria-label={tab === "active" ? "Active packages" : "Archived packages"} className="flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default">
+      {mobile && !nothingAtAll && (
+        <p aria-live="polite" className="text-caption text-text-secondary">
+          {rows === null ? "" : noMatch ? `0 of ${tab === "active" ? counts.active : counts.archived} ${tab} packages` : tab === "active" ? `${rows.length} active ${rows.length === 1 ? "package" : "packages"}` : "Archived packages are hidden from New booking but kept on past bookings."}
+        </p>
+      )}
+      {mobile && !nothingAtAll && !noMatch && (
+        <ul aria-label={tab === "active" ? "Active packages" : "Archived packages"} className="flex flex-col gap-control">
+          {(rows ?? []).map((p) => (
+            <li key={p.id}>
+              <PackageCard p={p} viewer={viewer} onEdit={() => setEditing(toDraft(p))} onRestore={() => restore(p)} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <section aria-label={tab === "active" ? "Active packages" : "Archived packages"} className={cn("flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", mobile && !nothingAtAll && !noMatch && "hidden", mobile && "border-0 bg-transparent")}>
         {nothingAtAll ? (
           <div className="flex flex-col items-center gap-base py-region">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -274,7 +311,7 @@ function PackageLibrary() {
             <h2 className="flex text-heading-section text-text-primary">
               <Txt>No packages yet</Txt>
             </h2>
-            <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary">
+            <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary max-tablet:w-full max-tablet:px-base">
               Create the packages your team sells. They appear in the package picker when you add a booking, and their price is copied into each booking.
             </p>
             {!viewer && (
@@ -285,7 +322,7 @@ function PackageLibrary() {
           </div>
         ) : (
           <>
-            <div role="row" className="flex h-table-header-height items-center bg-surface-header px-base text-caption text-text-secondary">
+            <div role="row" className="flex h-table-header-height items-center bg-surface-header px-base text-caption text-text-secondary max-tablet:hidden">
               <span role="columnheader" className={COLS.package}>Package</span>
               <span role="columnheader" className={COLS.price}>Price</span>
               <span role="columnheader" className={COLS.bookings}>Bookings</span>
@@ -301,7 +338,7 @@ function PackageLibrary() {
                 <h2 className="flex text-heading-section text-text-primary">
                   <Txt>{`No packages match “${search.trim()}”`}</Txt>
                 </h2>
-                <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary">Try another name, or check the Archived tab.</p>
+                <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary max-tablet:w-full max-tablet:px-base">Try another name, or check the Archived tab.</p>
                 <Button variant="secondary" onClick={() => setSearch("")}>
                   Clear search
                 </Button>
@@ -342,7 +379,7 @@ function PackageLibrary() {
                 </div>
               ))
             )}
-            {!noMatch && (
+            {!noMatch && !mobile && (
               <div className="flex h-[calc(var(--spacing-48)+var(--spacing-4))] items-center justify-between px-base">
                 <p className="text-ui-input text-text-secondary">
                   {search ? `Showing ${rows?.length ?? 0} of ${tab === "active" ? counts.active : counts.archived} ${tab} packages` : `Showing ${rows?.length ?? 0} ${tab} packages`}
@@ -370,6 +407,50 @@ function PackageLibrary() {
         </ToastRegion>
       )}
     </main>
+    {mobile && !viewer && !nothingAtAll && (
+      <ActionBar className="sticky bottom-0 z-30">
+        <Button icon="plus" onClick={() => setEditing(EMPTY)}>
+          New package
+        </Button>
+      </ActionBar>
+    )}
+    </>
+  );
+}
+
+/** Figma Booking components › Mobile/Package list item (MP1 / MP2): card (radius card, border, pad control, gap tight):
+ *  name Body Strong + Active / Archived pill · description Caption secondary (2 lines) · usage · updated Caption
+ *  secondary + price Body Strong. Active: the card opens Edit package. Archived: Restore (44, full width). */
+function PackageCard({ p, viewer, onEdit, onRestore }: { p: PackageRow; viewer: boolean; onEdit: () => void; onRestore: () => void }) {
+  const body = (
+    <>
+      <span className="flex items-center gap-compact">
+        <Txt className="min-w-0 flex-1 truncate text-body-strong text-text-primary">{p.name}</Txt>
+        <StatusPill tone={p.isActive ? "positive" : "neutral"}>{p.isActive ? "Active" : "Archived"}</StatusPill>
+      </span>
+      <span className="line-clamp-2 text-caption text-text-secondary">{p.summary}</span>
+      <span className="flex items-center gap-compact">
+        <span className="min-w-0 flex-1 truncate text-caption text-text-secondary">{`${p.bookings} bookings · ${p.isActive ? `Updated ${formatDate(p.updatedAt)}` : `Archived ${formatDate(p.archivedAt!)}`}`}</span>
+        <Txt className="shrink-0 text-body-strong text-text-primary">{formatIDR(p.price)}</Txt>
+      </span>
+    </>
+  );
+  const card = "flex w-full flex-col gap-tight rounded-card border border-border-default bg-surface-default p-control text-left";
+  if (p.isActive && !viewer)
+    return (
+      <button type="button" onClick={onEdit} aria-label={`Edit ${p.name}`} className={cn(card, "cursor-pointer outline-none transition-[transform] focus-visible:shadow-focus-ring active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out)")}>
+        {body}
+      </button>
+    );
+  return (
+    <div className={card}>
+      {body}
+      {!p.isActive && !viewer && (
+        <Button variant="secondary" onClick={onRestore} aria-label={`Restore ${p.name}`} className="mt-micro w-full">
+          Restore
+        </Button>
+      )}
+    </div>
   );
 }
 

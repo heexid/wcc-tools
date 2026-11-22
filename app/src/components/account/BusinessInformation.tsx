@@ -3,6 +3,8 @@
 import { useId, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
+import { BottomSheet } from "@/components/ds/BottomSheet";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { Icon } from "@/components/ds/Icon";
 import { InputField } from "@/components/ds/InputField";
 import { TextArea } from "@/components/ds/TextArea";
@@ -58,8 +60,8 @@ export function BusinessRows({ business }: { business: Business }) {
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex w-full items-center gap-16 border-t border-border-default py-16">
-      <span className="w-[calc(var(--spacing-64)*2+var(--spacing-32))] shrink-0 text-body text-text-secondary">{label}</span>
+    <div className="flex w-full items-center gap-16 border-t border-border-default py-16 max-tablet:flex-col max-tablet:items-start max-tablet:gap-6 max-tablet:py-12">
+      <span className="w-[calc(var(--spacing-64)*2+var(--spacing-32))] shrink-0 text-body text-text-secondary max-tablet:w-full">{label}</span>
       <span className="flex min-w-0 flex-1 flex-col gap-2">{children}</span>
     </div>
   );
@@ -116,6 +118,7 @@ function LogoField({ draft, error, onChange, onError }: { draft: Business; error
  */
 export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean; value: Business; onClose: () => void; onSaved: (b: Business) => void }) {
   const titleId = useId();
+  const mobile = useIsMobile();
   const [draft, setDraft] = useState<Business>(value);
   const [errors, setErrors] = useState<BusinessErrors>({});
   const [tried, setTried] = useState(false);
@@ -146,6 +149,35 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
     if (!r.ok) return setErrors(r.errors);
     onSaved(r.business);
   };
+  const fields = (
+    <>
+      <LogoField draft={draft} error={errors.logo} onChange={(l) => set("logo", l)} onError={(m) => setErrors((e) => ({ ...e, logo: m }))} />
+      <InputField label="Business name" required type="text" value={draft.name} onChange={(e) => set("name", e.target.value)} error={errors.name} helper={BUSINESS_HELPER.name} />
+      <TextArea label={<>Address<span aria-hidden className="ml-micro text-text-danger">*</span></>} maxLength={LIMITS.businessAddressMax} value={draft.address} onValueChange={(v) => set("address", v)} error={errors.address} placeholder="Street, city" />
+      <InputField label="Email" required type="email" inputMode="email" autoComplete="off" value={draft.email} onChange={(e) => set("email", e.target.value)} error={errors.email} helper={BUSINESS_HELPER.email} />
+      <InputField label="Phone number" required type="tel" inputMode="tel" autoComplete="off" value={draft.phone} onChange={(e) => set("phone", maskPhone(e.target.value))} error={errors.phone} helper={BUSINESS_HELPER.phone} />
+    </>
+  );
+  const buttons = (
+    <>
+      <Button variant="secondary" disabled={busy} onClick={onClose}>
+        Cancel
+      </Button>
+      <Button type="submit" loading={busy}>
+        Save changes
+      </Button>
+    </>
+  );
+  if (mobile)
+    // Mobile (Figma MA4): sheet "Business information" · logo + 4 fields · Cancel / Save changes (44, equal).
+    return (
+      <BottomSheet open={open} onClose={onClose} locked={busy} title="Business information" initialFocus="[data-business-modal] input[type=text]">
+        <form data-business-modal noValidate onSubmit={(e) => (e.preventDefault(), void save())} className="flex flex-col gap-base">
+          {fields}
+          <div className="flex gap-compact pt-4 *:flex-1">{buttons}</div>
+        </form>
+      </BottomSheet>
+    );
   return (
     <Dialog open={open} onClose={onClose} locked={busy} labelledBy={titleId} width="w-[calc(var(--spacing-64)*10)]" className="bg-surface-header" initialFocus="[data-business-modal] input[type=text]">
       <form
@@ -167,19 +199,10 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
           </h2>
         </header>
         <div className="flex flex-col gap-base rounded-t-card border border-border-default bg-surface-default px-group pt-group pb-section">
-          <LogoField draft={draft} error={errors.logo} onChange={(l) => set("logo", l)} onError={(m) => setErrors((e) => ({ ...e, logo: m }))} />
-          <InputField label="Business name" required type="text" value={draft.name} onChange={(e) => set("name", e.target.value)} error={errors.name} helper={BUSINESS_HELPER.name} />
-          <TextArea label={<>Address<span aria-hidden className="ml-micro text-text-danger">*</span></>} maxLength={LIMITS.businessAddressMax} value={draft.address} onValueChange={(v) => set("address", v)} error={errors.address} placeholder="Street, city" />
-          <InputField label="Email" required type="email" inputMode="email" autoComplete="off" value={draft.email} onChange={(e) => set("email", e.target.value)} error={errors.email} helper={BUSINESS_HELPER.email} />
-          <InputField label="Phone number" required type="tel" inputMode="tel" autoComplete="off" value={draft.phone} onChange={(e) => set("phone", maskPhone(e.target.value))} error={errors.phone} helper={BUSINESS_HELPER.phone} />
+          {fields}
         </div>
         <footer className="flex justify-end gap-tight border-t border-border-default bg-surface-default px-group py-base">
-          <Button variant="secondary" disabled={busy} onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" loading={busy}>
-            Save changes
-          </Button>
+          {buttons}
         </footer>
       </form>
     </Dialog>

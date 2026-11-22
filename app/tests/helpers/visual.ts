@@ -116,7 +116,7 @@ export async function expectMatchesFigma(
   page: Page,
   frame: string,
   target?: Locator,
-  opts: Partial<typeof G3> & { masks?: Rect[]; clip?: Rect; keepPointer?: boolean; label?: string } = {},
+  opts: Partial<typeof G3> & { masks?: Rect[]; clip?: Rect; keepPointer?: boolean; label?: string; /** Keep the frame's own height (bottom-anchored mobile sheets / bars). */ frameViewport?: boolean } = {},
 ) {
   const { threshold, maxDiffPixelRatio } = { ...G3, ...opts };
   let expected: PNG = readFigmaPng(frame);
@@ -126,7 +126,7 @@ export async function expectMatchesFigma(
     // Region of a Figma frame (e.g. the shell header of a page whose body belongs to a later slice).
     const c = opts.clip;
     const full = expected;
-    await page.setViewportSize({ width: full.width, height: Math.max(900, Math.min(full.height, c.y + c.h + 200)) });
+    await page.setViewportSize({ width: full.width, height: opts.frameViewport ? full.height : Math.max(900, Math.min(full.height, c.y + c.h + 200)) });
     expected = new PNG({ width: c.w, height: c.h });
     PNG.bitblt(full, expected, c.x, c.y, c.w, c.h, 0, 0);
     buf = await page.screenshot({ clip: { x: c.x, y: c.y, width: c.w, height: c.h } });

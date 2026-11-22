@@ -14,6 +14,7 @@ import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 // Figma: Login page — P1 empty · P2 filled · P3 logging in · E1 required · E2 email format ·
 // E3 wrong credentials · E4 session expired (?expired=1) · E5 Caps Lock · E6 server unreachable ·
 // E7 forgot password (PRD §4.3: no self-service reset).
+// Mobile (R03, Figma ML1–ML3): card fills the width minus 16 margins, centred between 56 top / safe-area bottom.
 // Card: 420 wide, popover/inset, surface/header, radius card, Shadow/Floating. Header "Login"
 // (Heading/Module, pad base/group). Panel: surface/default + Gradient/Login Glow, 1px border,
 // radius control, pad section/group, gap base, items centred.
@@ -84,12 +85,12 @@ function LoginForm() {
   const n = notice ? NOTICES[notice] : null;
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-surface-default">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-surface-default max-tablet:min-h-dvh max-tablet:px-layout-gutter max-tablet:pt-(--spacing-mobile-header-height) max-tablet:pb-(--safe-area-bottom)">
       {/* Page background: WebGL liquid gradient + grain (components/login/LiquidBackground). */}
       <LiquidBackground />
       <section
         aria-labelledby="login-title"
-        className="flex w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] flex-col overflow-hidden rounded-card bg-surface-header p-popover-inset shadow-floating motion-enter"
+        className="flex w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] flex-col overflow-hidden max-tablet:w-full rounded-card bg-surface-header p-popover-inset shadow-floating motion-enter"
       >
         <header className="flex px-group py-base">
           <h1 id="login-title" className="text-heading-module text-text-primary">

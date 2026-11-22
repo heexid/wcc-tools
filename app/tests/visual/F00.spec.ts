@@ -25,13 +25,15 @@ test.describe("F0 · G2 tokens", () => {
           probe.style.color = `var(${v.css})`;
           return getComputedStyle(probe).color;
         }
+        // Breakpoint › */columns are counts (unitless), not lengths.
+        if (v.css.endsWith("-columns")) return getComputedStyle(document.documentElement).getPropertyValue(v.css).trim();
         probe.style.width = `var(${v.css})`;
         return getComputedStyle(probe).width;
       });
     }, manifest.variables);
     const misses = manifest.variables
       .map((v, i) => {
-        let want = v.type === "color" ? hexToRgb(String(v.value)) : `${v.value}px`;
+        let want = v.type === "color" ? hexToRgb(String(v.value)) : v.css.endsWith("-columns") ? `${v.value}` : `${v.value}px`;
         if (v.type === "color") want = want.replace(/rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/, (_, r, g, b, a) => `rgba(${r}, ${g}, ${b}, ${a})`);
         const got = resolved[i].replace(/rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/, (_, r, g, b, a) => `rgba(${r}, ${g}, ${b}, ${(+a).toFixed(2).replace(/\.?0+$/, "")})`);
         const w = want.replace(/rgba\((\d+), (\d+), (\d+), ([\d.]+)\)/, (_, r, g, b, a) => `rgba(${r}, ${g}, ${b}, ${(+a).toFixed(2).replace(/\.?0+$/, "")})`);

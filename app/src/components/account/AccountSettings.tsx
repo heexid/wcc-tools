@@ -59,8 +59,9 @@ export function AccountSettings() {
   };
 
   return (
-    <div data-cascade className="flex flex-1 flex-col items-center pt-[calc(var(--spacing-32)+var(--spacing-8))] pb-[calc(var(--spacing-64)+var(--spacing-16))]">
-      <main className={cn("flex w-[calc(var(--spacing-64)*12-var(--spacing-8))] flex-col gap-section", entering && cascadeChildren())}>
+    <div data-cascade className="flex flex-1 flex-col items-center pt-[calc(var(--spacing-32)+var(--spacing-8))] pb-[calc(var(--spacing-64)+var(--spacing-16))] max-tablet:px-layout-gutter max-tablet:pt-20 max-tablet:pb-group">
+      {/* Mobile (Figma MA1): cards full width (16 margins), gap base; rows stack label over value + action. */}
+      <main className={cn("flex w-[calc(var(--spacing-64)*12-var(--spacing-8))] flex-col gap-section max-tablet:w-full max-tablet:gap-base", entering && cascadeChildren())}>
         <div className="flex flex-col gap-micro">
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
             <Txt>Account settings</Txt>
@@ -144,13 +145,13 @@ export function AccountSettings() {
 
 function Card({ title, caption, action, children }: { title: string; caption: string; action?: ReactNode; children: ReactNode }) {
   return (
-    <section aria-label={title} className="flex flex-col rounded-card border border-border-default bg-surface-default px-24 pt-20 pb-8">
+    <section aria-label={title} className="flex flex-col rounded-card border border-border-default bg-surface-default px-24 pt-20 pb-8 max-tablet:px-16">
       <div className="flex items-start gap-16 pb-12">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <h2 className="flex text-heading-section text-text-primary">
             <Txt>{title}</Txt>
           </h2>
-          <Txt className="text-caption text-text-secondary">{caption}</Txt>
+          <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{caption}</Txt>
         </div>
         {action}
       </div>
@@ -162,13 +163,13 @@ function Card({ title, caption, action, children }: { title: string; caption: st
 /** `short`: the Password row's value column is 360 (the button sits at the row's end; Figma AC2). */
 function Row({ label, value, note, locked, short, children }: { label: string; value: ReactNode; note: string; locked?: boolean; short?: boolean; children?: ReactNode }) {
   return (
-    <div className="flex w-full items-center gap-16 border-t border-border-default py-16">
-      <span className="w-[calc(var(--spacing-64)*2+var(--spacing-32))] shrink-0 text-body text-text-secondary">{label}</span>
-      <span className={cn("flex min-w-0 flex-1 flex-col gap-2", short && "max-w-[calc(var(--spacing-64)*6-var(--spacing-24))]")}>
-        {typeof value === "string" ? <Txt className="text-body-strong text-text-primary">{value}</Txt> : value}
-        <Txt className="text-caption text-text-tertiary">{note}</Txt>
+    <div className="flex w-full items-center gap-16 border-t border-border-default py-16 max-tablet:flex-wrap max-tablet:gap-x-12 max-tablet:gap-y-6 max-tablet:py-12">
+      <span className="w-[calc(var(--spacing-64)*2+var(--spacing-32))] shrink-0 text-body text-text-secondary max-tablet:w-full">{label}</span>
+      <span className={cn("flex min-w-0 flex-1 flex-col gap-2", short && "max-w-[calc(var(--spacing-64)*6-var(--spacing-24))] max-tablet:max-w-none")}>
+        {typeof value === "string" ? <Txt className="text-body-strong text-text-primary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{value}</Txt> : value}
+        <Txt className="text-caption text-text-tertiary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{note}</Txt>
       </span>
-      {short && <span className="flex-1" />}
+      {short && <span className="flex-1 max-tablet:hidden" />}
       {locked ? <Icon name="lock" label="Locked" className="size-icon-sm shrink-0 text-text-tertiary" /> : children}
     </div>
   );

@@ -143,7 +143,7 @@
   --spacing-template-thumb-width: 180px; /* Template thumbnail */
 
   /* breakpoint (Figma variables) */
-  --spacing-desktop-columns: 12px; /* Column count */
+  --spacing-desktop-columns: 12; /* Column count */
   --spacing-desktop-control-height: 32px; /* Buttons & icon buttons (44 = touch target) */
   --spacing-desktop-gutter: 24px; /* Column gutter */
   --spacing-desktop-header-height: 78px; /* Global header / top bar */
@@ -154,7 +154,7 @@
   --spacing-desktop-rail-width: 352px; /* Insights rail: full · collapsed · bottom sheet */
   --spacing-desktop-safe-area-bottom: 0px; /* Home-indicator inset for sticky bottom bars */
   --spacing-desktop-width: 1440px; /* Reference frame width */
-  --spacing-mobile-columns: 4px; /* Column count */
+  --spacing-mobile-columns: 4; /* Column count */
   --spacing-mobile-control-height: 44px; /* Buttons & icon buttons (44 = touch target) */
   --spacing-mobile-gutter: 12px; /* Column gutter */
   --spacing-mobile-header-height: 56px; /* Global header / top bar */
@@ -165,7 +165,7 @@
   --spacing-mobile-rail-width: 0px; /* Insights rail: full · collapsed · bottom sheet */
   --spacing-mobile-safe-area-bottom: 34px; /* Home-indicator inset for sticky bottom bars */
   --spacing-mobile-width: 390px; /* Reference frame width */
-  --spacing-tablet-columns: 8px; /* Column count */
+  --spacing-tablet-columns: 8; /* Column count */
   --spacing-tablet-control-height: 36px; /* Buttons & icon buttons (44 = touch target) */
   --spacing-tablet-gutter: 16px; /* Column gutter */
   --spacing-tablet-header-height: 64px; /* Global header / top bar */
@@ -176,6 +176,10 @@
   --spacing-tablet-rail-width: 72px; /* Insights rail: full · collapsed · bottom sheet */
   --spacing-tablet-safe-area-bottom: 0px; /* Home-indicator inset for sticky bottom bars */
   --spacing-tablet-width: 768px; /* Reference frame width */
+
+  /* Breakpoints → tablet: desktop: max-tablet: max-desktop: */
+  --breakpoint-tablet: 48rem; /* 768px */
+  --breakpoint-desktop: 80rem; /* 1280px */
 
   /* Text styles */
   --text-display-metric: 28px;
@@ -272,4 +276,45 @@
   --gradient-accent-primary: linear-gradient(180deg, rgb(178 58 212 / 1) 0%, rgb(130 0 166 / 1) 100%);
   --gradient-metric-glow: linear-gradient(180deg, rgb(253 181 223 / 0.15) 0%, rgb(255 255 255 / 0.15) 45.2%), rgb(255 255 255 / 1);
   --gradient-login-glow: linear-gradient(180deg, rgb(253 181 223 / 0.25) 0%, rgb(255 255 255 / 0) 100%);
+
+  /* Per-breakpoint values (desktop defaults; re-pointed in the media queries below) */
+  --input-font-size: var(--spacing-desktop-input-font-size);
+  /* Sticky bottom bars / sheets: the device inset (needs viewport-fit=cover); on mobile at least Figma's 34. */
+  --safe-area-bottom: max(var(--spacing-desktop-safe-area-bottom), env(safe-area-inset-bottom, 0px));
+  --grid-columns: var(--spacing-desktop-columns);
+  --grid-gutter: var(--spacing-desktop-gutter);
+}
+
+@media (width < 80rem) {
+  /* tablet (< 1280px) */
+  :root {
+    --spacing-control-height: var(--spacing-tablet-control-height);
+    --spacing-input-height: var(--spacing-tablet-input-height);
+    --spacing-search-height: var(--spacing-tablet-input-height);
+    --spacing-layout-header-height: var(--spacing-tablet-header-height);
+    --spacing-layout-gutter: var(--spacing-tablet-margin);
+    --spacing-layout-rail-width: var(--spacing-tablet-rail-width);
+    --input-font-size: var(--spacing-tablet-input-font-size);
+    --text-ui-input: var(--spacing-tablet-input-font-size);
+    --grid-columns: var(--spacing-tablet-columns);
+    --grid-gutter: var(--spacing-tablet-gutter);
+    --safe-area-bottom: max(var(--spacing-tablet-safe-area-bottom), env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (width < 48rem) {
+  /* mobile (< 768px) */
+  :root {
+    --spacing-control-height: var(--spacing-mobile-control-height);
+    --spacing-input-height: var(--spacing-mobile-input-height);
+    --spacing-search-height: var(--spacing-mobile-input-height);
+    --spacing-layout-header-height: var(--spacing-mobile-header-height);
+    --spacing-layout-gutter: var(--spacing-mobile-margin);
+    --spacing-layout-rail-width: var(--spacing-mobile-rail-width);
+    --input-font-size: var(--spacing-mobile-input-font-size);
+    --text-ui-input: var(--spacing-mobile-input-font-size);
+    --grid-columns: var(--spacing-mobile-columns);
+    --grid-gutter: var(--spacing-mobile-gutter);
+    --safe-area-bottom: max(var(--spacing-mobile-safe-area-bottom), env(safe-area-inset-bottom, 0px));
+  }
 }

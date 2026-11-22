@@ -7,6 +7,8 @@ import { Icon } from "./Icon";
 import { cn } from "./cn";
 import { useScrollLock } from "./useScrollLock";
 import { usePresence } from "./usePresence";
+import { BottomSheet } from "./BottomSheet";
+import { useIsMobile } from "./useBreakpoint";
 
 // Modal dialogs on a scrim (Figma Package Lib 01–06; later the invoice / cancel / guard dialogs).
 // Scrim: surface/scrim at 35 %. Placement (2026-11-12): every modal is centred in the viewport; when it's taller
@@ -106,7 +108,8 @@ export function Dialog({
       <div aria-hidden data-state={presence["data-state"]} onClick={close} className="motion-scrim fixed inset-0 bg-surface-scrim opacity-35" />
       {/* Centred in the viewport; a modal taller than the viewport minus 80 top / bottom starts 80 from the top and the
           layer scrolls. The wrapper lets clicks through to the scrim; only the panel takes them. */}
-      <div className="pointer-events-none relative flex min-h-full items-center justify-center py-[calc(var(--spacing-64)+var(--spacing-16))]">
+      {/* Below 768 every dialog sits on the bottom edge, full width (DS Mobile rules: overlays become bottom sheets). */}
+      <div className="pointer-events-none relative flex min-h-full items-center justify-center py-[calc(var(--spacing-64)+var(--spacing-16))] max-tablet:items-end max-tablet:pt-48 max-tablet:pb-0">
         <div
           ref={panel}
           role={role}
@@ -114,7 +117,12 @@ export function Dialog({
           aria-label={label}
           aria-labelledby={labelledBy}
           {...presence}
-          className={cn("motion-modal pointer-events-auto relative flex shrink-0 flex-col overflow-hidden rounded-card bg-surface-default shadow-floating", width, className)}
+          className={cn(
+            "motion-modal pointer-events-auto relative flex shrink-0 flex-col overflow-hidden rounded-card bg-surface-default shadow-floating",
+            width,
+            className,
+            "max-tablet:w-full max-tablet:rounded-b-none max-tablet:pb-(--safe-area-bottom)",
+          )}
         >
           {children}
         </div>
@@ -144,6 +152,19 @@ export function FormModal({
   onSubmit: () => void;
 }) {
   const titleId = useId();
+  const mobile = useIsMobile();
+  if (mobile)
+    // Mobile (Figma MP3–MP5): DS sheet title row; the footer becomes a full-width row of equal buttons, the start
+    // slot (e.g. Archive) its own row below.
+    return (
+      <BottomSheet open={open} onClose={onClose} title={title}>
+        <form noValidate onSubmit={(e) => (e.preventDefault(), onSubmit())} className="flex flex-col gap-base">
+          {children}
+          <div className="flex gap-compact pt-4 *:flex-1">{footer}</div>
+          {footerStart && <div className="flex *:flex-1">{footerStart}</div>}
+        </form>
+      </BottomSheet>
+    );
   return (
     <Dialog open={open} onClose={onClose} labelledBy={titleId} width="w-[calc(var(--spacing-64)*10)]">
       <form
@@ -195,6 +216,17 @@ export function PanelModal({
   onSubmit: () => void;
 }) {
   const titleId = useId();
+  const mobile = useIsMobile();
+  if (mobile)
+    // Mobile (Figma MA2–MA4): sheet with the panel's fields and a full-width Cancel / Save row.
+    return (
+      <BottomSheet open={open} onClose={onClose} locked={locked} title={title}>
+        <form noValidate onSubmit={(e) => (e.preventDefault(), onSubmit())} className="flex flex-col gap-base">
+          {children}
+          <div className="flex gap-compact pt-4 *:flex-1">{footer}</div>
+        </form>
+      </BottomSheet>
+    );
   return (
     <Dialog open={open} onClose={onClose} locked={locked} labelledBy={titleId} top="panel" width={width} className="rounded-sheet bg-surface-header px-6 pb-6">
       <form
