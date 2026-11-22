@@ -2,6 +2,9 @@
 
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { BottomSheet } from "@/components/ds/BottomSheet";
+import { cn } from "@/components/ds/cn";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { Button } from "@/components/ds/Button";
 import { Avatar } from "@/components/ds/Feedback";
 import { ScheduleItem } from "@/components/ds/Schedule";
@@ -66,15 +69,25 @@ export function CrewSchedulePopover({
   // room below, and never taller than the viewport (the schedule list scrolls instead). While the trigger is
   // scrolled out of its scroll box or under the sticky global header, the popover hides (it stays open and
   // reappears when the chip is back).
-  const pos = useAnchoredPosition(open ? a : null, panel, data);
+  // Mobile (Figma ME4): the schedule is a bottom sheet — no anchoring, the sheet handles dismissal.
+  const mobile = useIsMobile();
+  const pos = useAnchoredPosition(open && !mobile ? a : null, panel, data);
   const trigger = useMemo(() => ({ current: anchor?.el ?? null }), [anchor]);
 
-  useDismissPopover(open, onClose, panel, trigger);
+  useDismissPopover(open && !mobile, onClose, panel, trigger);
 
-  if (!mounted || !a || !pos || typeof document === "undefined") return null;
-  const s = data?.id === a.crewId ? data.s : null;
   const today = isoToLocalDate(now().toISOString());
   const month = MONTH[parseISODate(today).m - 1];
+  if (mobile) {
+    const s = a && data?.id === a.crewId ? data.s : null;
+    return (
+      <BottomSheet open={open} onClose={onClose} title="Crew schedule" contentClassName="gap-micro">
+        {s && <ScheduleBody s={s} today={today} month={month} currentBookingId={currentBookingId} onOpenBooking={onOpenBooking} onSeeInCalendar={onSeeInCalendar} sheet />}
+      </BottomSheet>
+    );
+  }
+  if (!mounted || !a || !pos || typeof document === "undefined") return null;
+  const s = data?.id === a.crewId ? data.s : null;
   return createPortal(
     <div
       ref={panel}
@@ -84,8 +97,32 @@ export function CrewSchedulePopover({
       style={{ left: pos.left, top: pos.top, maxHeight: pos.maxHeight, visibility: pos.hidden ? "hidden" : undefined, ["--transform-origin" as string]: `${pos.above ? "bottom" : "top"}${a.align === "start" ? " left" : ""}` }}
       className="motion-popover fixed z-50 flex w-[calc(var(--spacing-64)*5+var(--spacing-24))] flex-col gap-micro rounded-card border border-border-default bg-surface-default p-popover-inset shadow-floating"
     >
-      {s && (
-        <>
+      {s && <ScheduleBody s={s} today={today} month={month} currentBookingId={currentBookingId} onOpenBooking={onOpenBooking} onSeeInCalendar={onSeeInCalendar} />}
+    </div>,
+    document.body,
+  );
+}
+
+/** Person header · "Upcoming schedule" · items (this booking highlighted) · See in calendar — popover or sheet body. */
+function ScheduleBody({
+  s,
+  today,
+  month,
+  currentBookingId,
+  onOpenBooking,
+  onSeeInCalendar,
+  sheet,
+}: {
+  s: Schedule;
+  today: string;
+  month: string;
+  currentBookingId: string | null;
+  onOpenBooking: (id: string) => void;
+  onSeeInCalendar: (crewId: string) => void;
+  sheet?: boolean;
+}) {
+  return (
+    <>
           <div className="flex items-center gap-[calc(var(--spacing-12)-var(--spacing-2))] border-b border-border-default px-compact pt-compact pb-[calc(var(--spacing-12)-var(--spacing-2))]">
             <Avatar size={38} initials={initials(s.crew.name)} />
             <span className="flex min-w-0 flex-1 flex-col">
@@ -98,7 +135,7 @@ export function CrewSchedulePopover({
             <span className="flex-1" />
             <Txt className="text-timestamp text-text-tertiary">From today</Txt>
           </div>
-          <div className="flex max-h-[calc(var(--spacing-64)*6+var(--spacing-16))] min-h-0 shrink flex-col gap-2 overflow-y-auto" data-popover-scroll>
+          <div className={cn("flex min-h-0 shrink flex-col gap-2", !sheet && "max-h-[calc(var(--spacing-64)*6+var(--spacing-16))] overflow-y-auto")} data-popover-scroll>
             {s.upcoming.length === 0 && <p className="px-compact py-base text-caption text-text-secondary">Nothing scheduled from today.</p>}
             {s.upcoming.map((b) => {
               const d = parseISODate(b.bookingDate);
@@ -123,10 +160,7 @@ export function CrewSchedulePopover({
             <span className="flex-1" />
             <Txt className="text-timestamp text-text-tertiary">{`Crew: ${s.crew.name}`}</Txt>
           </div>
-        </>
-      )}
-    </div>,
-    document.body,
+            </>
   );
 }
 

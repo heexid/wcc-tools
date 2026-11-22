@@ -33,4 +33,23 @@ describe("F0 · token generation", () => {
     expect(manifest.paints).toHaveLength(3);
     for (const t of manifest.text) expect(css).toContain(`${t.css}--line-height: ${t.lineHeight}px;`);
   });
+
+  it("emits tablet / desktop breakpoints from Figma min-widths (rem)", () => {
+    expect(css).toContain("--breakpoint-tablet: 48rem;");
+    expect(css).toContain("--breakpoint-desktop: 80rem;");
+    expect(css).not.toMatch(/--breakpoint-(sm|md|lg|xl|2xl):/);
+  });
+
+  it("keeps column counts unitless", () => {
+    expect(css).toContain("--spacing-desktop-columns: 12;");
+    expect(css).toContain("--spacing-mobile-columns: 4;");
+  });
+
+  it("re-points component sizes to the tablet and mobile sets", () => {
+    const block = (q: string) => css.slice(css.indexOf(`@media (width < ${q})`)).split("\n}\n")[0];
+    expect(block("80rem")).toContain("--spacing-control-height: var(--spacing-tablet-control-height);");
+    expect(block("48rem")).toContain("--spacing-control-height: var(--spacing-mobile-control-height);");
+    expect(block("48rem")).toContain("--spacing-layout-header-height: var(--spacing-mobile-header-height);");
+    expect(block("48rem")).toContain("--input-font-size: var(--spacing-mobile-input-font-size);");
+  });
 });

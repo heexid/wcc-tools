@@ -12,6 +12,8 @@ import { PROFILE_CHANGED } from "@/lib/data/shared";
 import { nextStudioMidnight } from "@/lib/session-day";
 import { AccountMenu } from "./AccountMenu";
 import { AppLauncher, type ModuleId } from "./AppLauncher";
+import { MobileLogoutSheet, MobileTopBar } from "./MobileTopBar";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { LeaveGuardProvider, useLeaveGuard } from "./LeaveGuard";
 
 // Figma: DS Global header [Type=Module] + Breadcrumb (Launchpad L1/L3, Bookings 01).
@@ -47,72 +49,85 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
     return () => window.removeEventListener(PROFILE_EVENT, refresh);
   }, []);
   const [loggingOut, setLoggingOut] = useState(false);
+  const mobile = useIsMobile();
+  const roleLabel = profile?.role === "viewer" ? "Viewer" : "Admin";
+  const confirmLogout = async () => {
+    await logout();
+    router.push("/login?loggedOut=1");
+  };
+  // 6.10: an unsaved booking asks first (leave guard), then "Log out?" (LO1 desktop / MS3 mobile).
+  const askLogout = () => confirmLeave("/login?loggedOut=1", () => setLoggingOut(true));
   return (
-    <header className="sticky top-0 z-35 flex h-layout-header-height w-full shrink-0 items-center bg-surface-header justify-between gap-base px-layout-gutter py-base">
-      <nav aria-label="Breadcrumb" className="flex items-center gap-base">
-        <AppLauncher current={module} />
-        <Divider />
-        {/* A standalone screen outside any module (Account settings) shows only its own name. */}
-        {!standalone && m && (
-          <a
-            href={m.href}
-            onClick={(e) => {
-              e.preventDefault();
-              navigate(m.href);
-            }}
-            aria-current={page ? undefined : "page"}
-            className="flex items-center gap-micro rounded-small outline-none focus-visible:shadow-focus-ring"
-          >
-            <span className="flex size-24 items-center justify-center rounded-control bg-surface-default">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/assets/module-${m.art}.png`}
-                srcSet={`/assets/module-${m.art}.png 1x, /assets/module-${m.art}@2x.png 2x`}
-                alt=""
-                className="block size-[calc(var(--spacing-16)+var(--spacing-2))]"
-              />
-            </span>
-            <Txt className="text-heading-module text-text-primary">{m.name}</Txt>
-          </a>
-        )}
-        {/* Parent (module root) screens show only the module; child screens add "› Page" (e.g. Booking › New booking). */}
-        {page && (
-          <span className="flex items-center gap-base" aria-current="page">
-            {!standalone && <Icon name="chevron-right" className="size-12 text-text-secondary" />}
-            <Txt className="text-caption text-text-primary">{page}</Txt>
-          </span>
-        )}
-      </nav>
-      {editor ? (
-        // Global header [Type=Editor] (Bookings 03): the page portals its save status · divider · Cancel / Save
-        // into this slot (<EditorActions>), gap inset.
-        <div ref={onSlot} className="motion-page flex items-center gap-inset" />
-      ) : (
-        <div className="flex items-center gap-inset">
-          {/* Language: English only in this release (existing CIR shell, INTERACTIONS 6.1) */}
-          <span className="flex items-center gap-micro text-text-primary">
-            <Icon name="globe" className="size-icon-md" />
-            <Txt className="text-body-strong">English</Txt>
-          </span>
+    <>
+      <header className="sticky top-0 z-35 flex h-layout-header-height w-full shrink-0 items-center bg-surface-header justify-between gap-base px-layout-gutter py-base max-tablet:hidden">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-base">
+          <AppLauncher current={module} />
           <Divider />
-          <AccountMenu
-            name={profile?.displayName ?? ""}
-            role={profile?.role === "viewer" ? "Viewer" : "Admin"}
-            onAccount={() => navigate("/account")}
-            // 6.10: an unsaved booking asks first (leave guard), then "Log out?" (LO1).
-            onLogout={() => confirmLeave("/login?loggedOut=1", () => setLoggingOut(true))}
-          />
-          <LogoutDialog
-            open={loggingOut}
-            onCancel={() => setLoggingOut(false)}
-            onConfirm={async () => {
-              await logout();
-              router.push("/login?loggedOut=1");
-            }}
-          />
-        </div>
+          {/* A standalone screen outside any module (Account settings) shows only its own name. */}
+          {!standalone && m && (
+            <a
+              href={m.href}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(m.href);
+              }}
+              aria-current={page ? undefined : "page"}
+              className="flex items-center gap-micro rounded-small outline-none focus-visible:shadow-focus-ring"
+            >
+              <span className="flex size-24 items-center justify-center rounded-control bg-surface-default">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/assets/module-${m.art}.png`}
+                  srcSet={`/assets/module-${m.art}.png 1x, /assets/module-${m.art}@2x.png 2x`}
+                  alt=""
+                  className="block size-[calc(var(--spacing-16)+var(--spacing-2))]"
+                />
+              </span>
+              <Txt className="text-heading-module text-text-primary">{m.name}</Txt>
+            </a>
+          )}
+          {/* Parent (module root) screens show only the module; child screens add "› Page" (e.g. Booking › New booking). */}
+          {page && (
+            <span className="flex items-center gap-base" aria-current="page">
+              {!standalone && <Icon name="chevron-right" className="size-12 text-text-secondary" />}
+              <Txt className="text-caption text-text-primary">{page}</Txt>
+            </span>
+          )}
+        </nav>
+        {editor ? (
+          // Global header [Type=Editor] (Bookings 03): the page portals its save status · divider · Cancel / Save
+          // into this slot (<EditorActions>), gap inset.
+          <div ref={onSlot} className="motion-page flex items-center gap-inset" />
+        ) : (
+          <div className="flex items-center gap-inset">
+            {/* Language: English only in this release (existing CIR shell, INTERACTIONS 6.1) */}
+            <span className="flex items-center gap-micro text-text-primary">
+              <Icon name="globe" className="size-icon-md" />
+              <Txt className="text-body-strong">English</Txt>
+            </span>
+            <Divider />
+            <AccountMenu name={profile?.displayName ?? ""} role={roleLabel} onAccount={() => navigate("/account")} onLogout={askLogout} />
+          </div>
+        )}
+      </header>
+      {/* Below 768 (R03): Mobile/Top bar replaces the global header (Figma MS1–MS3). After the desktop header in the DOM, so
+          desktop selectors (header nav, header > div) keep finding the visible header first. */}
+      <MobileTopBar
+        // Editor screens (New / Edit booking) draw their own Mobile/Top bar Type=Child (back · title · status · autosave).
+        className={editor ? "hidden" : "tablet:hidden"}
+        module={standalone ? undefined : module}
+        title={standalone ? page : undefined}
+        name={profile?.displayName ?? ""}
+        role={roleLabel}
+        onAccount={() => navigate("/account")}
+        onLogout={askLogout}
+      />
+      {mobile ? (
+        <MobileLogoutSheet open={loggingOut} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
+      ) : (
+        <LogoutDialog open={loggingOut} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
       )}
-    </header>
+    </>
   );
 }
 
@@ -229,7 +244,7 @@ export function AppShell({ module, page, standalone, editor, children }: { modul
               // Standalone screen (Account settings, Figma AC2): no module workspace — the page sits on surface/subtle.
               <div className="motion-page flex flex-1 flex-col bg-surface-subtle">{children}</div>
             ) : (
-              <div className="motion-page flex flex-1 flex-col rounded-t-card border border-border-default bg-surface-default">{children}</div>
+              <div className="motion-page flex flex-1 flex-col rounded-t-card border border-border-default bg-surface-default max-tablet:border-0">{children}</div>
             )}
           </EditorSlot.Provider>
         </CrumbSetter.Provider>

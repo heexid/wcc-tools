@@ -30,6 +30,8 @@ import type { Crew, Package } from "@/lib/data/types";
 import { addDays, formatIDR, isoToLocalDate, type ISODate } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
+import { MobileBookings } from "@/components/bookings/mobile/MobileBookings";
 
 // Figma Bookings 01 (calendar) + 02 / 16 / 18 / 25 / 26 (table) + 36 (first use) — PRD US-6–8, US-12,
 // INTERACTIONS 1.1–1.10, 1.16–1.23, 1.32–1.33. Workspace: content (pad section) + 352 rail, 32 px margins.
@@ -155,6 +157,8 @@ function Dashboard() {
     return () => clearTimeout(t);
   }, [flash]);
   const view: View = params.get("tab") === "table" ? "table" : "calendar";
+  // Below 768 the page is the mobile view (R04, Figma M01–M03); it runs its own list / agenda queries.
+  const mobile = useIsMobile();
   const setView = (v: View) => {
     const p = new URLSearchParams(params);
     if (v === "calendar") p.delete("tab");
@@ -187,8 +191,8 @@ function Dashboard() {
   // runs only for the view on screen, and starts in parallel with the dashboard reads (review P6 #3, #4).
   const [visibleRange, setVisibleRange] = useState<{ from: ISODate; to: ISODate } | null>(null);
   const queryToday = data?.today ?? isoToLocalDate(now().toISOString());
-  const calendarQuery: BookingQuery | null = view === "calendar" && visibleRange ? { ...toQuery(filters, queryToday, "calendar"), ...visibleRange } : null;
-  const tableQuery: BookingQuery | null = view === "table" ? { ...toQuery(filters, queryToday, "table"), page: filters.page, pageSize: filters.size } : null;
+  const calendarQuery: BookingQuery | null = !mobile && view === "calendar" && visibleRange ? { ...toQuery(filters, queryToday, "calendar"), ...visibleRange } : null;
+  const tableQuery: BookingQuery | null = !mobile && view === "table" ? { ...toQuery(filters, queryToday, "table"), page: filters.page, pageSize: filters.size } : null;
   const calendarResult = useQuery(calendarQuery && (() => listAllBookings(calendarQuery)), JSON.stringify(calendarQuery));
   const calendarRows = calendarResult ?? [];
   const table = useQuery(tableQuery && (() => listBookings(tableQuery)), JSON.stringify(tableQuery));
@@ -216,6 +220,17 @@ function Dashboard() {
 
   return (
     <CrewScheduleContext.Provider value={crewCtx}>
+    {mobile ? (
+      <MobileBookings
+        today={today}
+        crew={crewList}
+        packages={packageList}
+        total={data ? data.count : null}
+        loading={loading}
+        onOpen={openBooking}
+        onNew={() => navigate("/bookings/new")}
+      />
+    ) : (
     <div data-cascade className="flex flex-1 gap-group px-section">
       <main className={cn("flex min-w-0 flex-1 flex-col py-section", firstUse || view === "table" ? "gap-inset" : "gap-group")}>
         <div className={cn("flex items-center gap-compact", rise(0))}>
@@ -298,6 +313,7 @@ function Dashboard() {
       </main>
       <UpcomingRail loading={loading} className={rise(1)} upcoming={upcoming} insights={insights} today={today} onOpenBooking={openBooking} onNavigate={(href) => navigate(href)} />
     </div>
+    )}
     <SideSheet open={!!bookingId} onClose={closeBooking} label="Booking detail">
       {bookingId && (
         <BookingDetail

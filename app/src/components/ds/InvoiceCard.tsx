@@ -2,6 +2,7 @@
 
 import { Button } from "./Button";
 import { Icon } from "./Icon";
+import { useIsMobile } from "./useBreakpoint";
 import { Txt } from "./Txt";
 import { cn } from "./cn";
 
@@ -35,6 +36,7 @@ export function InvoiceCard({
   pdfBusy?: boolean;
   className?: string;
 }) {
+  const mobile = useIsMobile();
   return (
     <article
       aria-label={`Invoice ${number}`}
@@ -53,8 +55,9 @@ export function InvoiceCard({
       <div className="flex w-full items-center gap-compact border-t border-border-default pt-control">
         {/* Meta fills the free space and wraps on narrow cards so the button never overflows (Figma 10, 398 wide). */}
         <p className="min-w-0 flex-1 text-caption text-text-secondary">{meta}</p>
-        <Button variant="secondary" icon="download" loading={pdfBusy} onClick={onPdf} aria-label={`Download PDF (${number})`} className="shrink-0">
-          Download PDF
+        {/* Mobile (Figma M04): "Share PDF" — the card action opens the share sheet (M07). */}
+        <Button variant="secondary" icon={mobile ? "share" : "download"} loading={pdfBusy} onClick={onPdf} aria-label={`${mobile ? "Share" : "Download"} PDF (${number})`} className="shrink-0">
+          {mobile ? "Share PDF" : "Download PDF"}
         </Button>
       </div>
     </article>

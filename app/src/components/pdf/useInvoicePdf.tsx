@@ -4,34 +4,69 @@ import { useId, useState, type ReactNode } from "react";
 import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
 import { Icon } from "@/components/ds/Icon";
-import { downloadInvoicePdf } from "@/lib/pdf/download";
+import { BottomSheet } from "@/components/ds/BottomSheet";
+import { MenuItem } from "@/components/ds/Surfaces";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
+import { downloadInvoicePdf, shareInvoicePdf } from "@/lib/pdf/download";
+import { formatDate, formatIDR, isoToLocalDate } from "@/lib/format";
 
 // Invoice PDF downloads for every screen that shows invoices (detail panel, Edit booking, canceled read-only view;
 // INTERACTIONS 2.14 / 4.2 / 4.6). While one generates, its button shows Loading. A failure opens "Couldn’t generate
 // the invoice PDF" (Figma 37, 4.12): Try again retries; Cancel closes — the invoice itself is never rolled back.
 
-type Target = { id: string; number: string };
+type Target = { id: string; number: string; amount?: number; type?: string; issuedAt?: string };
 
-export function useInvoicePdf(): { busyId: string | null; download: (inv: Target) => void; dialog: ReactNode } {
+const TYPE_LABEL: Record<string, string> = { dp: "DP", full: "Full price", partial: "Partial", paid: "Paid" };
+
+/** `download` saves the file; `pick` is the invoice card action — on mobile it opens the Share sheet (Figma M07:
+ *  Share PDF… via the OS share sheet · Download PDF), on desktop it downloads. */
+export function useInvoicePdf(): { busyId: string | null; download: (inv: Target) => void; pick: (inv: Target) => void; dialog: ReactNode } {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failed, setFailed] = useState<Target | null>(null);
-  const run = async (inv: Target) => {
+  const [sharing, setSharing] = useState<Target | null>(null);
+  const mobile = useIsMobile();
+  const run = async (inv: Target, how: "download" | "share" = "download") => {
     setFailed(null);
     setBusyId(inv.id);
     try {
-      await downloadInvoicePdf(inv.id);
+      if (how === "share") await shareInvoicePdf(inv.id, inv.number);
+      else await downloadInvoicePdf(inv.id);
     } catch {
       setFailed(inv);
     } finally {
       setBusyId(null);
     }
   };
+  const go = (inv: Target, how: "download" | "share") => {
+    setSharing(null);
+    if (!busyId) void run(inv, how);
+  };
+  const shown = sharing;
   return {
     busyId,
     download: (inv) => {
       if (!busyId) void run(inv);
     },
-    dialog: <PdfFailedDialog target={failed} onCancel={() => setFailed(null)} onRetry={() => failed && run(failed)} />,
+    pick: (inv) => (mobile ? setSharing(inv) : !busyId && void run(inv)),
+    dialog: (
+      <>
+        <BottomSheet open={!!sharing} onClose={() => setSharing(null)} title={`Share ${shown?.number ?? "invoice"}`}>
+          <div className="flex flex-col gap-control">
+            <MenuItem icon="share" onClick={() => shown && go(shown, "share")}>
+              Share PDF… (WhatsApp, email, files)
+            </MenuItem>
+            <MenuItem icon="download" onClick={() => shown && go(shown, "download")}>
+              Download PDF
+            </MenuItem>
+          </div>
+          <p className="text-caption text-text-secondary">
+            {[shown?.amount !== undefined ? formatIDR(shown.amount) : null, shown?.type ? TYPE_LABEL[shown.type] : null, shown?.issuedAt ? `issued ${formatDate(isoToLocalDate(shown.issuedAt))}` : null].filter(Boolean).join(" · ")}
+            {". The PDF is generated from the invoice snapshot; sharing uses your phone’s share sheet."}
+          </p>
+        </BottomSheet>
+        <PdfFailedDialog target={failed} onCancel={() => setFailed(null)} onRetry={() => failed && run(failed)} />
+      </>
+    ),
   };
 }
 
