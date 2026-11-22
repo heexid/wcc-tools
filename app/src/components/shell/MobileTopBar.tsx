@@ -93,14 +93,14 @@ export function MobileTopBar({
       </BottomSheet>
 
       <BottomSheet open={sheet === "account"} onClose={close} title="Account">
-        {/* Workspace selector (identity) — one workspace in this release, so it isn't a control. */}
-        <div className="flex w-fit items-center gap-[calc(var(--spacing-12)-var(--spacing-2))] rounded-pill bg-surface-default py-micro pr-base pl-compact">
+        {/* Workspace selector (identity), Figma MS2 (updated): full width, no switch chevrons — one workspace in this
+            release, so it isn't a control. */}
+        <div className="flex w-full items-center gap-[calc(var(--spacing-12)-var(--spacing-2))] rounded-pill bg-surface-default py-micro pr-base pl-compact">
           <Avatar initials={initials(name)} size={38} />
-          <span className="flex flex-col">
+          <span className="flex min-w-0 flex-col">
             <Txt className="text-body-strong text-text-primary">{name}</Txt>
             <Txt className="text-caption text-text-primary">{role}</Txt>
           </span>
-          <Icon name="chevrons-up-down" className="size-icon-sm text-text-secondary" />
         </div>
         <div role="menu" aria-label="Account" className="flex flex-col gap-control">
           <MenuItem
