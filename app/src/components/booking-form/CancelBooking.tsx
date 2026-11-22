@@ -3,6 +3,8 @@
 import { useId, useState } from "react";
 import { Button, WarningButton } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
+import { BottomSheet } from "@/components/ds/BottomSheet";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { SectionHeader } from "@/components/ds/Editor";
 import { Alert } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
@@ -19,7 +21,7 @@ export function CancelBookingSection({ onCancel }: { onCancel: () => void }) {
   return (
     <section aria-labelledby="sec-cancel" className="flex flex-col gap-base">
       <SectionHeader id="sec-cancel" title="Cancel booking" />
-      <div className="flex items-center gap-group">
+      <div className="flex items-center gap-group max-tablet:flex-col max-tablet:items-start max-tablet:gap-control">
         <p className="min-w-0 flex-1 text-body text-text-secondary">
           Canceling makes this booking read-only: no edits and no new invoices. Existing invoices stay on record. A canceled booking can’t be reopened.
         </p>
@@ -64,6 +66,50 @@ export function CancelBookingDialog({
   const record = invoiceCount
     ? `The ${invoiceCount} ${invoiceCount === 1 ? "invoice" : "invoices"} (${formatIDR(paid)} paid) stay on record — refunds are handled outside the app.`
     : "There are no invoices on this booking yet.";
+  const mobile = useIsMobile();
+  const body = (
+    <>
+      {failed && (
+        <Alert tone="danger" title="Couldn’t cancel the booking" className="motion-notice">
+          Connection lost. Nothing changed — try again.
+        </Alert>
+      )}
+      <Alert tone="warning" title="This can’t be undone">
+        {`After canceling, the booking becomes read-only: it can’t be edited and no new invoices can be created. ${record}`}
+      </Alert>
+      <TextArea
+        label="Reason (optional)"
+        placeholder="e.g. Client postponed the wedding to next year"
+        helper="Shown on the canceled booking"
+        maxLength={LIMITS.cancelReasonMax}
+        value={reason}
+        onValueChange={setReason}
+        error={tooLong ? "Max 255 characters" : undefined}
+      />
+    </>
+  );
+  const keep = (
+    <Button variant="secondary" data-keep disabled={busy} onClick={onKeep}>
+      Keep booking
+    </Button>
+  );
+  const cancel = (
+    <WarningButton disabled={busy || tooLong} aria-busy={busy || undefined} onClick={() => onConfirm(reason)}>
+      {busy ? "Canceling…" : "Cancel booking"}
+    </WarningButton>
+  );
+  if (mobile)
+    // Mobile (Figma ME2): sheet "Cancel this booking?" · ref · name caption · alert · reason · Keep / Cancel (44, equal).
+    return (
+      <BottomSheet open={open} onClose={onKeep} locked={busy} role="alertdialog" title="Cancel this booking?" initialFocus="[data-keep]" contentClassName="gap-base">
+        <Txt className="text-caption text-text-secondary">{title}</Txt>
+        {body}
+        <div className="flex gap-compact pt-4 *:flex-1 *:h-control-height">
+          {keep}
+          {cancel}
+        </div>
+      </BottomSheet>
+    );
   return (
     <Dialog open={open} onClose={onKeep} locked={busy} role="alertdialog" labelledBy={titleId} top="cancel" width="w-[calc(var(--spacing-64)*8+var(--spacing-8))]" initialFocus="[data-keep]">
       <header className="flex items-center gap-control border-b border-border-default px-group py-inset">
@@ -77,32 +123,10 @@ export function CancelBookingDialog({
           <Txt className="text-caption text-text-secondary">{title}</Txt>
         </div>
       </header>
-      <div className="flex flex-col gap-base px-group py-inset">
-        {failed && (
-          <Alert tone="danger" title="Couldn’t cancel the booking" className="motion-notice">
-            Connection lost. Nothing changed — try again.
-          </Alert>
-        )}
-        <Alert tone="warning" title="This can’t be undone">
-          {`After canceling, the booking becomes read-only: it can’t be edited and no new invoices can be created. ${record}`}
-        </Alert>
-        <TextArea
-          label="Reason (optional)"
-          placeholder="e.g. Client postponed the wedding to next year"
-          helper="Shown on the canceled booking"
-          maxLength={LIMITS.cancelReasonMax}
-          value={reason}
-          onValueChange={setReason}
-          error={tooLong ? "Max 255 characters" : undefined}
-        />
-      </div>
+      <div className="flex flex-col gap-base px-group py-inset">{body}</div>
       <footer className="flex items-center justify-end gap-compact border-t border-border-default bg-surface-subtle px-group py-base">
-        <Button variant="secondary" data-keep disabled={busy} onClick={onKeep}>
-          Keep booking
-        </Button>
-        <WarningButton disabled={busy || tooLong} aria-busy={busy || undefined} onClick={() => onConfirm(reason)}>
-          {busy ? "Canceling…" : "Cancel booking"}
-        </WarningButton>
+        {keep}
+        {cancel}
       </footer>
     </Dialog>
   );

@@ -1,9 +1,11 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { createContext, useContext, useId, useLayoutEffect, useRef, useState } from "react";
 import { PaymentStatusBadge, type BookingStatus } from "@/components/ds/Badges";
 import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
+import { BottomSheet } from "@/components/ds/BottomSheet";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { SummaryRow } from "@/components/ds/Editor";
 import { Alert } from "@/components/ds/Feedback";
 import { InputField } from "@/components/ds/InputField";
@@ -61,6 +63,9 @@ function cleanPct(v: string): string {
 }
 const pctValue = (raw: string) => Number(raw.replace(",", "."));
 
+/** Below 768 the invoice modal is a tall bottom sheet (Figma M06): Shell reads this to render the sheet chrome. */
+const SheetMode = createContext<{ open: boolean } | null>(null);
+
 export function NewInvoiceModal(props: Props) {
   // Each opening starts fresh (3.1: closing creates nothing and keeps nothing).
   const [session, setSession] = useState(0);
@@ -70,6 +75,13 @@ export function NewInvoiceModal(props: Props) {
     if (props.open) setSession((s) => s + 1);
   }
   const titleId = useId();
+  const mobile = useIsMobile();
+  if (mobile)
+    return (
+      <SheetMode.Provider value={{ open: props.open }}>
+        <Configurator key={session} titleId={titleId} {...props} />
+      </SheetMode.Provider>
+    );
   return (
     <Dialog open={props.open} onClose={props.onClose} locked={props.busy} labelledBy={titleId} top="invoice" width="w-[calc(var(--spacing-64)*10)]">
       <Configurator key={session} titleId={titleId} {...props} />
@@ -287,6 +299,50 @@ function Shell({
   confirm: { label: string; icon: "circle-check"; enabled: boolean; onConfirm: () => void };
   children: React.ReactNode;
 }) {
+  const sheet = useContext(SheetMode);
+  const formId = useId();
+  if (sheet)
+    // Mobile (Figma M06): sheet title = invoice title; subtitle caption · balance (2 + 1 wrap) · fields scroll; Cancel /
+    // Confirm & generate in the sticky action bar (submits the form by id).
+    return (
+      <BottomSheet
+        open={sheet.open}
+        onClose={onClose}
+        locked={busy}
+        title={title}
+        contentClassName="gap-base"
+        actions={
+          <>
+            <Button variant="secondary" disabled={busy} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" form={formId} icon={confirm.icon} loading={busy} disabled={!confirm.enabled}>
+              {failed && !busy ? "Try again" : confirm.label.replace(/ invoice$/, "")}
+            </Button>
+          </>
+        }
+      >
+        <form id={formId} noValidate onSubmit={(e) => (e.preventDefault(), confirm.onConfirm())} className="flex flex-col gap-base">
+          <Txt className="text-caption text-text-secondary">{subtitle}</Txt>
+          {failed && (
+            <Alert tone="danger" title="Couldn’t create the invoice" className="motion-notice">
+              Connection lost. Nothing was saved — your entries are kept. Try again.
+            </Alert>
+          )}
+          <dl aria-label="Booking balance" className="flex flex-wrap gap-control rounded-control border border-border-default bg-surface-subtle px-base py-control *:flex-none *:basis-[calc(50%-var(--spacing-6))]">
+            <Balance label="Total booking" value={formatIDR(balance.total)} />
+            <Balance label={`Paid (${balance.count} ${balance.count === 1 ? "invoice" : "invoices"})`} value={formatIDR(balance.paid)} tone="text-status-positive" />
+            <Balance label="Remaining" value={formatIDR(balance.total - balance.paid)} tone="text-text-accent" />
+          </dl>
+          {children}
+          {busy && (
+            <span role="status" className="flex">
+              <Txt className="text-caption text-text-secondary">{caption}</Txt>
+            </span>
+          )}
+        </form>
+      </BottomSheet>
+    );
   return (
     <form
       noValidate

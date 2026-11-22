@@ -186,7 +186,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
                   meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                   latest={i === 0}
                   pdfBusy={pdf.busyId === inv.id}
-                  onPdf={() => pdf.download(inv)}
+                  onPdf={() => pdf.pick(inv)}
                 />
               ))
             ) : (

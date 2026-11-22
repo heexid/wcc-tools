@@ -30,6 +30,8 @@ export function SideSheet({ open, onClose, label, children, className }: { open:
         {...presence}
         className={cn(
           "motion-sheet fixed top-8 right-8 bottom-8 flex w-[calc(var(--spacing-64)*8+var(--spacing-48))] flex-col overflow-hidden rounded-sheet bg-surface-default shadow-floating",
+          // Below 768 the panel takes the whole screen (no 560 panel fits a phone).
+          "max-tablet:inset-0 max-tablet:w-auto max-tablet:rounded-none",
           className,
         )}
       >

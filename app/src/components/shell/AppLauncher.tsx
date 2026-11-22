@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ShellPopover } from "@/components/ds/Surfaces";
 import { Txt } from "@/components/ds/Txt";
 import { Icon } from "@/components/ds/Icon";
@@ -35,12 +35,12 @@ export function AppLauncher({ current }: { current?: ModuleId }) {
   const close = useCallback(() => setOpen(false), []);
   useDismiss(open, close, { panel, trigger });
 
-  // Focus the current module's tile (or the first tile on a standalone screen) when the launcher opens (keyboard users land inside the dialog).
-  // Cancelled on close, so an Esc pressed before the frame can't have focus stolen back to a tile.
-  useEffect(() => {
+  // Focus the current module's tile (or the first tile on a standalone screen) when the launcher opens (keyboard users land
+  // inside the dialog). Layout effect, not a frame later: an arrow key pressed right after opening must already move
+  // between tiles (a rAF left a window where it went to the trigger and Enter closed the launcher).
+  useLayoutEffect(() => {
     if (!open) return;
-    const id = requestAnimationFrame(() => tiles.current[Math.max(0, TILES.findIndex((t) => t.id === current))]?.focus({ preventScroll: true }));
-    return () => cancelAnimationFrame(id);
+    tiles.current[Math.max(0, TILES.findIndex((t) => t.id === current))]?.focus({ preventScroll: true });
   }, [open, current]);
 
   const choose = (t: (typeof TILES)[number]) => {
@@ -97,40 +97,9 @@ export function AppLauncher({ current }: { current?: ModuleId }) {
               <h3 id="launcher-management" className="flex text-heading-module text-text-primary">
                 <Txt>Management</Txt>
               </h3>
-              <div className="flex gap-compact">
-                {TILES.map((t, i) => {
-                  const isCurrent = t.id === current;
-                  const locked = !t.href;
-                  return (
-                    <button
-                      key={t.id}
-                      ref={(el) => {
-                        tiles.current[i] = el;
-                      }}
-                      type="button"
-                      disabled={locked}
-                      aria-disabled={locked || undefined}
-                      aria-current={isCurrent ? "page" : undefined}
-                      aria-label={t.name ?? t.label}
-                      onClick={() => choose(t)}
-                      className={cn(
-                        "flex size-launcher-tile shrink-0 flex-col items-center justify-center gap-compact rounded-card p-inset outline-none",
-                        "transition-[background-color,border-color,transform] duration-(--dur-hover) ease-(--ease-hover) focus-visible:shadow-focus-ring",
-                        "active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out) disabled:active:scale-100",
-                        locked
-                          ? "cursor-not-allowed bg-surface-header"
-                          : isCurrent
-                            ? "cursor-pointer border-2 border-border-accent bg-surface-accent shadow-card"
-                            : "cursor-pointer border border-border-default bg-surface-default shadow-card hover:border-accent-primary hover:bg-surface-subtle",
-                      )}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
-                      <Txt className={cn("text-body", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
-                    </button>
-                  );
-                })}
-              </div>
+              <LauncherTiles current={current} onChoose={choose} tileRef={(i, el) => {
+                  tiles.current[i] = el;
+                }} />
             </section>
           </ShellPopover>
         </div>
@@ -138,3 +107,57 @@ export function AppLauncher({ current }: { current?: ModuleId }) {
     </div>
   );
 }
+
+/** The Management tiles — 124×124 in the desktop popover; `fluid` shares the row equally (mobile sheet, Figma MS1:
+ *  3 × 114 at 390, height launcher/tile). */
+export function LauncherTiles({
+  current,
+  onChoose,
+  tileRef,
+  fluid,
+}: {
+  current?: ModuleId;
+  onChoose: (t: (typeof TILES)[number]) => void;
+  tileRef?: (i: number, el: HTMLButtonElement | null) => void;
+  fluid?: boolean;
+}) {
+  return (
+    <div className="flex gap-compact">
+      {TILES.map((t, i) => {
+        const isCurrent = t.id === current;
+        const locked = !t.href;
+        return (
+          <button
+            key={t.id}
+            ref={(el) => {
+              tileRef?.(i, el);
+            }}
+            type="button"
+            disabled={locked}
+            aria-disabled={locked || undefined}
+            aria-current={isCurrent ? "page" : undefined}
+            aria-label={t.name ?? t.label}
+            onClick={() => onChoose(t)}
+            className={cn(
+              "flex shrink-0 flex-col items-center justify-center gap-compact rounded-card p-inset outline-none",
+              fluid ? "h-launcher-tile min-w-0 flex-1" : "size-launcher-tile",
+              "transition-[background-color,border-color,transform] duration-(--dur-hover) ease-(--ease-hover) focus-visible:shadow-focus-ring",
+              "active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out) disabled:active:scale-100",
+              locked
+                ? "cursor-not-allowed bg-surface-header"
+                : isCurrent
+                  ? "cursor-pointer border-2 border-border-accent bg-surface-accent shadow-card"
+                  : "cursor-pointer border border-border-default bg-surface-default shadow-card hover:border-accent-primary hover:bg-surface-subtle",
+            )}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
+            <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export { TILES as LAUNCHER_TILES };

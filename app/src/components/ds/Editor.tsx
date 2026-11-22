@@ -53,7 +53,7 @@ export function InlineInput({ prefix, error, className, readOnly, ...rest }: Inp
   return (
     <label
       className={cn(
-        "flex h-[calc(var(--spacing-32)+var(--spacing-4))] min-w-0 items-center gap-tight rounded-control border px-control",
+        "flex h-input-height min-w-0 items-center gap-tight rounded-control border px-control",
         "transition-[border-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover)",
         readOnly
           ? "bg-surface-header border-border-default"

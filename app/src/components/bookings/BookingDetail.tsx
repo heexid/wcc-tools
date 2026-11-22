@@ -7,6 +7,9 @@ import { CrewChipButton, DashedBox } from "@/components/ds/Editor";
 import { Alert, Toast } from "@/components/ds/Feedback";
 import { Icon, type IconName } from "@/components/ds/Icon";
 import { InvoiceCard } from "@/components/ds/InvoiceCard";
+import { ActionBar } from "@/components/ds/BottomSheet";
+import { useIsMobile } from "@/components/ds/useBreakpoint";
+import { MobileChildBar } from "@/components/shell/MobileTopBar";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
@@ -50,6 +53,9 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
   const toastPresence = usePresence(!!toast);
   const chips = useRef(new Map<string, HTMLButtonElement>());
   const pdf = useInvoicePdf(); // 4.2 / 4.6 / 4.12
+  // Below 768 the panel is a full screen (Figma M04 / ME3): Child top bar (back · ref · status), title + notice in the
+  // body, Latest PDF / Edit booking in a sticky action bar.
+  const mobile = useIsMobile();
   // Content eases in after the Loader (first open) and when switching to another booking inside the open sheet (4.9).
   const swap = "motion-notice";
 
@@ -89,6 +95,8 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
 
   return (
     <>
+      {mobile && <MobileChildBar title={b.ref} status={b.status} onBack={() => onClose?.()} backLabel="Close booking detail" />}
+      {!mobile && (
       <header key={`h-${id}`} className={cn("flex shrink-0 flex-col gap-control border-b border-border-default px-group py-inset", swap)}>
         <div className="flex h-32 items-center gap-compact">
           <Txt className="text-caption text-text-secondary">{b.ref}</Txt>
@@ -123,10 +131,23 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           </Alert>
         )}
       </header>
+      )}
 
-      <div key={`b-${id}`} className={cn("flex flex-col gap-group px-group py-inset", mode === "sheet" && "min-h-0 flex-1 overflow-y-auto", swap)}>
+      <div key={`b-${id}`} className={cn("flex flex-col gap-group px-group py-inset", mode === "sheet" && "min-h-0 flex-1 overflow-y-auto", mobile && "px-layout-gutter pt-20 pb-group", swap)}>
+        {mobile && (
+          <>
+            <h2 tabIndex={-1} data-sheet-focus className="flex text-heading-panel text-text-primary outline-none">
+              <Txt>{b.bookingName}</Txt>
+            </h2>
+            {canceled && (
+              <Alert tone="danger" title={`Canceled on ${formatDate(isoToLocalDate(b.canceledAt!))} by ${b.canceledBy}`}>
+                {`${b.cancelReason ? `Reason: ${b.cancelReason.replace(/\.?$/, ".")} ` : ""}This booking is read-only — it can’t be edited and no new invoices can be created.`}
+              </Alert>
+            )}
+          </>
+        )}
         <section aria-label="Financial summary" className="flex flex-col gap-control rounded-card border border-border-default bg-surface-subtle p-base">
-          <dl className="flex gap-control">
+          <dl className={cn("flex gap-control", mobile && "flex-wrap *:flex-none *:basis-[calc(50%-var(--spacing-6))]")}>
             <Stat label="Total booking" value={formatIDR(b.total)} />
             <Stat label="Total paid" value={formatIDR(b.totalPaid)} tone="text-status-positive" />
             {canceled ? <Stat label="Not collected" value={formatIDR(b.remaining)} tone="text-text-tertiary" /> : <Stat label="Remaining" value={formatIDR(b.remaining)} tone="text-text-accent" />}
@@ -141,32 +162,32 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <h3 id="bd-info" className="flex text-heading-subsection text-text-primary">
             <Txt>Booking information</Txt>
           </h3>
-          <Row icon="user" label="Client">
-            <Txt className="text-body text-text-primary">{b.clientName}</Txt>
+          <Row icon="user" label="Client" compact={mobile}>
+            <Val wrap={mobile} className="text-body text-text-primary">{b.clientName}</Val>
           </Row>
-          <Row icon="phone" label="Phone">
+          <Row icon="phone" label="Phone" compact={mobile}>
             <a href={waLink(b.clientPhone)} target="_blank" rel="noopener noreferrer" aria-label={`${formatPhone(b.clientPhone)} (WhatsApp, opens in a new tab)`} className="flex rounded-small text-body text-text-accent underline outline-none focus-visible:shadow-focus-ring">
               <Txt>{formatPhone(b.clientPhone)}</Txt>
             </a>
           </Row>
-          <Row icon="calendar" label="Booking date">
-            <Txt className="text-body text-text-primary">{`${formatDateWithDay(b.bookingDate)}${b.eventStart ? ` · ${b.eventStart}` : ""}${b.bookingDate === today ? " · today" : ""}`}</Txt>
+          <Row icon="calendar" label="Booking date" compact={mobile}>
+            <Val wrap={mobile} className="text-body text-text-primary">{`${formatDateWithDay(b.bookingDate)}${b.eventStart ? ` · ${b.eventStart}` : ""}${b.bookingDate === today ? " · today" : ""}`}</Val>
           </Row>
           {/* Event details (2026-11-21) — same order as the form; empty ones are left out. Full text, wrapped. */}
           {b.location && (
-            <Row icon="map-pin" label="Location" top>
+            <Row icon="map-pin" label="Location" top compact={mobile}>
               <p className="min-w-0 flex-1 text-body break-words whitespace-pre-line text-text-primary">{b.location}</p>
             </Row>
           )}
           {b.notes && (
-            <Row icon="file-text" label="Notes" top>
+            <Row icon="file-text" label="Notes" top compact={mobile}>
               <p className="min-w-0 flex-1 text-body break-words whitespace-pre-line text-text-primary">{b.notes}</p>
             </Row>
           )}
-          <Row icon="package" label="Package">
-            <Txt className="text-body text-text-primary">{`${b.packageNameSnapshot} · ${formatIDR(b.packagePriceSnapshot)}`}</Txt>
+          <Row icon="package" label="Package" compact={mobile}>
+            <Val wrap={mobile} className="text-body text-text-primary">{`${b.packageNameSnapshot} · ${formatIDR(b.packagePriceSnapshot)}`}</Val>
           </Row>
-          <Row icon="users" label="Crew" top>
+          <Row icon="users" label="Crew" top compact={mobile}>
             {b.crew.length ? (
               <span className="flex flex-wrap gap-tight">
                 {b.crew.map((c) => (
@@ -188,11 +209,11 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
             )}
           </Row>
           {/* Payment instruction (lane I) — printed on every invoice. */}
-          <Row icon="wallet" label="Payment">
-            <Txt className="text-body text-text-primary">{`${b.paymentInstruction.receiptName} · ${paymentDetail(b.paymentInstruction)}`}</Txt>
+          <Row icon="wallet" label="Payment" compact={mobile}>
+            <Val wrap={mobile} className="text-body text-text-primary">{`${b.paymentInstruction.receiptName} · ${paymentDetail(b.paymentInstruction)}`}</Val>
           </Row>
-          <Row icon="clock" label="Created">
-            <Txt className="text-body text-text-secondary">{`${formatDate(isoToLocalDate(b.createdAt))} by ${b.createdBy}`}</Txt>
+          <Row icon="clock" label="Created" compact={mobile}>
+            <Val wrap={mobile} className="text-body text-text-secondary">{`${formatDate(isoToLocalDate(b.createdAt))} by ${b.createdBy}`}</Val>
           </Row>
         </section>
 
@@ -231,7 +252,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
                 meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                 latest={i === 0}
                 pdfBusy={pdf.busyId === inv.id}
-                onPdf={() => pdf.download(inv)}
+                onPdf={() => pdf.pick(inv)}
               />
             ))
           ) : (
@@ -260,6 +281,20 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           onSeeInCalendar(crewId);
         }}
       />
+      {mobile && (b.invoices.length > 0 || (!canceled && !viewer)) && (
+        <ActionBar className="shrink-0">
+          {b.invoices.length > 0 && (
+            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
+              {canceled || viewer ? "Download latest PDF" : "Latest PDF"}
+            </Button>
+          )}
+          {!canceled && !viewer && (
+            <Button icon="pencil" onClick={onEdit}>
+              Edit booking
+            </Button>
+          )}
+        </ActionBar>
+      )}
       {pdf.dialog}
       {toastPresence.mounted && (
         <div className="pointer-events-none fixed inset-x-0 bottom-section z-50 flex justify-center">
@@ -283,15 +318,21 @@ function Stat({ label, value, tone = "text-text-primary" }: { label: string; val
   );
 }
 
-/** Info row: key column 150 (16 icon text/secondary · Caption secondary, gap tight) · value (gap compact). */
-function Row({ icon, label, top, children }: { icon: IconName; label: string; top?: boolean; children: ReactNode }) {
+/** Info row: key column 150 (16 icon text/secondary · Caption secondary, gap tight) · value (gap compact).
+ *  `compact` (mobile, Figma M04): key column 112 and every row top-aligned (values wrap). */
+function Row({ icon, label, top, compact, children }: { icon: IconName; label: string; top?: boolean; compact?: boolean; children: ReactNode }) {
   return (
-    <div className={cn("flex w-full gap-compact", top ? "items-start" : "items-center")}>
-      <span className="flex w-[calc(var(--spacing-64)*2+var(--spacing-24)-var(--spacing-2))] shrink-0 items-center gap-tight text-text-secondary">
+    <div className={cn("flex w-full gap-compact", top || compact ? "items-start" : "items-center", compact && "[&>*:last-child]:min-w-0 [&>*:last-child]:flex-1")}>
+      <span className={cn("flex shrink-0 items-center gap-tight text-text-secondary", compact ? "w-[calc(var(--spacing-64)+var(--spacing-48))]" : "w-[calc(var(--spacing-64)*2+var(--spacing-24)-var(--spacing-2))]")}>
         <Icon name={icon} className="size-icon-sm" />
         <Txt className="text-caption">{label}</Txt>
       </span>
       {children}
     </div>
   );
+}
+
+/** Row value: a measured single-line Txt (desktop, Figma hug text) or a wrapping paragraph (mobile, narrow column). */
+function Val({ wrap, className, children }: { wrap: boolean; className?: string; children: ReactNode }) {
+  return wrap ? <p className={cn("min-w-0 flex-1 break-words", className)}>{children}</p> : <Txt className={className}>{children}</Txt>;
 }

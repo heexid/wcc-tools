@@ -23,7 +23,7 @@ export function PaymentInstructionCard({ value, onEdit, className }: { value: Pa
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         <Txt className="text-body-strong text-text-primary">{value.receiptName}</Txt>
-        <span className="truncate text-caption text-text-secondary">{paymentDetail(value)}</span>
+        <span className="text-caption text-text-secondary tablet:truncate">{paymentDetail(value)}</span>
       </span>
       {onEdit && (
         <Button variant="secondary" icon="pencil" onClick={onEdit} aria-label={`Edit payment instruction (${value.receiptName})`}>

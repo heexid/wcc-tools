@@ -34,8 +34,11 @@ const value = (t) => {
   const v = t.$value;
   if (typeof v === "string" && v.startsWith("{")) return `var(${byRef.get(v)})`;
   if (t.$type === "color") return hex(v);
+  if (unitless(t)) return `${v}`;
   return `${v}px`;
 };
+// Counts (Breakpoint › */columns) are plain numbers, not lengths.
+const unitless = (t) => /Column count/i.test(t.$description ?? "");
 const rgba = ({ r, g, b, a = 1 }) =>
   `rgb(${Math.round(r * 255)} ${Math.round(g * 255)} ${Math.round(b * 255)} / ${+a.toFixed(4)})`;
 
@@ -55,6 +58,12 @@ for (const section of ["primitives", "semantic", "component", "breakpoint"]) {
     out.push(`  ${cssName(l.path, l.token.$type)}: ${value(l.token)};${desc}`);
   }
 }
+// Breakpoints (Figma Breakpoint › */min-width). rem, like Tailwind's defaults, so variants sort correctly.
+// Desktop-first: write the 1440 class, then override with max-desktop: (< 1280) / max-tablet: (< 768).
+const bp = (device, key) => leaves.find((l) => l.path.join("/") === `breakpoint/${device}/${key}`)?.token.$value;
+const devices = ["tablet", "desktop"];
+out.push(``, `  /* Breakpoints → tablet: desktop: max-tablet: max-desktop: */`);
+for (const d of devices) out.push(`  --breakpoint-${d}: ${bp(d, "min-width") / 16}rem; /* ${bp(d, "min-width")}px */`);
 out.push(``, `  /* Text styles */`);
 for (const t of styles.text) {
   const n = textName(t.name);
@@ -78,8 +87,39 @@ for (const p of styles.paints) {
   if (p.base) layers.push(rgba(p.base));
   out.push(`  --gradient-${slug(p.name.split("/")[1])}: ${layers.join(", ")};`);
 }
+out.push(``, `  /* Per-breakpoint values (desktop defaults; re-pointed in the media queries below) */`);
+out.push(`  --input-font-size: var(--spacing-desktop-input-font-size);`);
+out.push(`  /* Sticky bottom bars / sheets: the device inset (needs viewport-fit=cover); on mobile at least Figma's 34. */`);
+out.push(`  --safe-area-bottom: max(var(--spacing-desktop-safe-area-bottom), env(safe-area-inset-bottom, 0px));`);
+out.push(`  --grid-columns: var(--spacing-desktop-columns);`);
+out.push(`  --grid-gutter: var(--spacing-desktop-gutter);`);
 out.push(`}`, ``);
 
+// Component sizes follow the breakpoint set: one class (h-control-height, px-layout-gutter…)
+// resolves to the desktop, tablet or mobile value. At ≥ 1280 every value equals the 1440 design.
+const responsive = [
+  ["--spacing-control-height", "control-height"],
+  ["--spacing-input-height", "input-height"],
+  ["--spacing-search-height", "input-height"],
+  ["--spacing-layout-header-height", "header-height"],
+  ["--spacing-layout-gutter", "margin"],
+  ["--spacing-layout-rail-width", "rail-width"],
+  ["--input-font-size", "input-font-size"],
+  ["--text-ui-input", "input-font-size"], // UI/Input (every field's value text): 13 → 14 → 16 (no iOS focus zoom)
+  ["--grid-columns", "columns"],
+  ["--grid-gutter", "gutter"],
+];
+for (const l of leaves.filter((l) => l.path[0] === "component")) {
+  const hit = responsive.find(([css]) => css === cssName(l.path, l.token.$type));
+  if (hit && value(l.token) !== `var(--spacing-desktop-${hit[1]})` && `${l.token.$value}` !== `${bp("desktop", hit[1])}`)
+    throw new Error(`${hit[0]} (${l.token.$value}) ≠ breakpoint desktop/${hit[1]} (${bp("desktop", hit[1])}) — fix Figma first`);
+}
+for (const [device, max] of [["tablet", bp("desktop", "min-width")], ["mobile", bp("tablet", "min-width")]]) {
+  out.push(`@media (width < ${max / 16}rem) {`, `  /* ${device} (< ${max}px) */`, `  :root {`);
+  for (const [css, key] of responsive) out.push(`    ${css}: var(--spacing-${device}-${key});`);
+  out.push(`    --safe-area-bottom: max(var(--spacing-${device}-safe-area-bottom), env(safe-area-inset-bottom, 0px));`);
+  out.push(`  }`, `}`, ``);
+}
 // Manifest: Figma name → CSS var → resolved value (used by /dev/tokens and the G2 token test)
 const resolveLeaf = (t) => {
   let cur = t;

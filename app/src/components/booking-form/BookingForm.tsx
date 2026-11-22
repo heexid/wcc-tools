@@ -17,6 +17,8 @@ import { cascade, cascadeChildren, useEntrance } from "@/components/ds/useEntran
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { InvoiceCard } from "@/components/ds/InvoiceCard";
+import { MobileChildBar } from "@/components/shell/MobileTopBar";
+import { ActionBar } from "@/components/ds/BottomSheet";
 import { EditorActions, HeaderDivider, useShellCrumb } from "@/components/shell/AppShell";
 import { useLeaveGuard } from "@/components/shell/LeaveGuard";
 import { LIMITS, type InvoiceError } from "@/lib/booking/calc";
@@ -93,7 +95,7 @@ function BookingSummary({ control, packages, priceOf }: { control: Control<Booki
   const extras = (items ?? []).reduce((s, it) => s + itemSubtotal(it), 0);
   const total = (pkg ? priceOf(pkg) : 0) + extras;
   return (
-    <section aria-label="Booking summary" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset">
+    <section aria-label="Booking summary" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset max-tablet:p-base">
       <div className="flex items-center">
         <h2 className="flex text-heading-section text-text-primary">
           <Txt>Booking summary</Txt>
@@ -123,7 +125,7 @@ const pkgLabel = (p?: Package) => (p ? `${p.name}${p.isActive ? "" : " (archived
  *  invoices) · accent block "Remaining after save" (Heading/Panel) + "Existing invoices keep their original figures…". */
 function UpdatedTotals({ l }: { l: Ledger }) {
   return (
-    <section aria-label="Updated totals" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset">
+    <section aria-label="Updated totals" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset max-tablet:p-base">
       <div className="flex items-center">
         <h2 className="flex text-heading-section text-text-primary">
           <Txt>Updated totals</Txt>
@@ -151,7 +153,7 @@ function UpdatedTotals({ l }: { l: Ledger }) {
  *  the inline error. Invoices and Save are unavailable until it's fixed. */
 function BelowPaidTotals({ l }: { l: Ledger }) {
   return (
-    <section aria-label="Booking total" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset">
+    <section aria-label="Booking total" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset max-tablet:p-base">
       <div className="flex items-center">
         <h2 className="flex text-heading-section text-text-primary">
           <Txt>Booking total</Txt>
@@ -198,7 +200,7 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf,
     </Button>
   );
   return (
-    <section aria-label="Invoices" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset">
+    <section aria-label="Invoices" className="flex flex-col gap-base rounded-card border border-border-default bg-surface-default p-inset max-tablet:p-base">
       <div className="flex items-center gap-compact">
         <h2 className="flex text-heading-section text-text-primary">
           <Txt>{`Invoices (${invoices.length})`}</Txt>
@@ -264,16 +266,27 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
   // Rows present on load (edit mode) don't animate; rows the admin adds slide in (.motion-notice).
   const [initial] = useState(() => new Set(fields.map((f) => f.id)));
   return (
-    <div role="table" aria-label="Additional items" className="flex flex-col overflow-hidden rounded-control border border-border-default">
-      <LineItemHeader />
+    // Mobile (Figma Mobile/Line item card): each row becomes a card — item + 44 remove / price · qty · subtotal.
+    <div role="table" aria-label="Additional items" className="flex flex-col overflow-hidden rounded-control border border-border-default max-tablet:gap-compact max-tablet:overflow-visible max-tablet:rounded-none max-tablet:border-0">
+      <div className="max-tablet:hidden">
+        <LineItemHeader />
+      </div>
       {fields.map((f, i) => {
         const e = errors.items?.[i];
         return (
-          <div key={f.id} role="row" className={cn(!initial.has(f.id) && "motion-notice", "flex w-full items-center gap-compact border-b border-border-default bg-surface-default px-control py-compact")}>
-            <span role="cell" className="flex min-w-0 flex-1">
+          <div
+            key={f.id}
+            role="row"
+            className={cn(
+              !initial.has(f.id) && "motion-notice",
+              "flex w-full items-center gap-compact border-b border-border-default bg-surface-default px-control py-compact",
+              "max-tablet:grid max-tablet:grid-cols-[1fr_calc(var(--spacing-64))_calc(var(--spacing-48)+var(--spacing-4))_var(--spacing-control-height)] max-tablet:rounded-card max-tablet:border max-tablet:p-control",
+            )}
+          >
+            <span role="cell" className="flex min-w-0 flex-1 max-tablet:col-span-3">
               <InlineInput className="w-full" aria-label={`Item ${i + 1} name`} placeholder="Item name" error={!!e?.name} {...register(`items.${i}.name`)} />
             </span>
-            <span role="cell" className={cn("flex shrink-0", LINE_COLS.price)}>
+            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.price)}>
               <Controller
                 control={control}
                 name={`items.${i}.price`}
@@ -282,7 +295,7 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
                 )}
               />
             </span>
-            <span role="cell" className={cn("flex shrink-0", LINE_COLS.qty)}>
+            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.qty)}>
               <Controller
                 control={control}
                 name={`items.${i}.qty`}
@@ -291,16 +304,16 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
                 )}
               />
             </span>
-            <span role="cell" className={cn("flex shrink-0 justify-end text-body-strong text-text-primary", LINE_COLS.subtotal)}>
+            <span role="cell" className={cn("flex shrink-0 justify-end text-body-strong text-text-primary max-tablet:col-span-2 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.subtotal)}>
               <Txt>{formatIDR(itemSubtotal(items?.[i] ?? {}))}</Txt>
             </span>
-            <span role="cell" className={cn("flex shrink-0", LINE_COLS.action)}>
-              <IconAction icon="trash" aria-label={`Remove item ${i + 1}`} onClick={() => onRemove(i)} />
+            <span role="cell" className={cn("flex shrink-0 max-tablet:col-start-4 max-tablet:row-start-1 max-tablet:w-auto max-tablet:justify-center", LINE_COLS.action)}>
+              <IconAction icon="trash" aria-label={`Remove item ${i + 1}`} onClick={() => onRemove(i)} className="max-tablet:size-control-height" />
             </span>
           </div>
         );
       })}
-      <div className="flex px-control py-[calc(var(--spacing-12)-var(--spacing-2))]">
+      <div className="flex px-control py-[calc(var(--spacing-12)-var(--spacing-2))] max-tablet:px-0">
         <Button variant="ghost" icon="plus" onClick={onAdd}>
           Add item
         </Button>
@@ -568,12 +581,15 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
   const liveCount = formState.submitCount || attention ? countErrors(errors) : 0;
   const showAlert = attention > 0 && liveCount > 0;
 
+  const saveState = !editing ? "Draft · not saved" : dirty ? "Unsaved changes" : justSaved ? "Saved just now" : saved.status === "draft" ? "Draft · saved" : "All changes saved";
   return (
     <>
+      {/* Below 768 (R05, Figma M05 / ME1): Mobile/Top bar Type=Child replaces the editor header + page header. */}
+      <MobileChildBar className="tablet:hidden" title={savedId ? saved.name : "New booking"} status={saved.status} onBack={() => navigate("/bookings")} backLabel="Back to bookings" saveState={saveState} />
       <EditorActions>
         <span className="flex items-center gap-compact text-text-secondary" role="status">
           <Icon name="history" className="size-icon-sm" />
-          <Txt className="text-micro">{!editing ? "Draft · not saved" : dirty ? "Unsaved changes" : justSaved ? "Saved just now" : saved.status === "draft" ? "Draft · saved" : "All changes saved"}</Txt>
+          <Txt className="text-micro">{saveState}</Txt>
         </span>
         <HeaderDivider />
         <span className="flex gap-tight">
@@ -586,13 +602,14 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
         </span>
       </EditorActions>
 
-      <EditorPageHeader className={entering ? cascade(0) : undefined} title={savedId ? saved.name : "New booking"} status={saved.status} onBack={() => navigate("/bookings")} backLabel="Back to bookings" />
-      <div data-cascade className="flex flex-1 gap-section pl-section">
-        <main className="flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))]">
+      <EditorPageHeader className={cn(entering && cascade(0), "max-tablet:hidden")} title={savedId ? saved.name : "New booking"} status={saved.status} onBack={() => navigate("/bookings")} backLabel="Back to bookings" />
+      {/* Mobile: one column — form, then Booking summary / Updated totals and Invoices (Figma M05 / ME1). */}
+      <div data-cascade className="flex flex-1 gap-section pl-section max-tablet:flex-col max-tablet:gap-0 max-tablet:pl-0">
+        <main className="flex w-[calc(var(--spacing-64)*9+var(--spacing-48))] shrink-0 flex-col gap-[calc(var(--spacing-24)+var(--spacing-4))] pt-group pb-[calc(var(--spacing-32)+var(--spacing-8))] max-tablet:w-full max-tablet:gap-group max-tablet:px-layout-gutter max-tablet:pt-20 max-tablet:pb-group">
           <form noValidate onSubmit={onSave} className={cn("contents", entering && cascadeChildren(1))}>
             <section aria-labelledby="sec-client" className="flex flex-col gap-base">
               <SectionHeader id="sec-client" title="Client & schedule" meta="Required fields" required />
-              <div className="flex gap-base">
+              <div className="flex gap-base max-tablet:flex-col">
                 <InputField label="Client name" required placeholder="Client name" error={errors.clientName?.message} {...register("clientName")} />
                 <InputField
                   label="Phone number"
@@ -609,10 +626,10 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
                 />
               </div>
               <InputField label="Booking name" placeholder={`${clientName.trim() || "Client"} · ${pkgName ?? "Package"}`} helper="Optional — defaults to “Client · Package”" {...register("bookingName")} />
-              <div className="flex items-start gap-base">
+              <div className="flex items-start gap-base max-tablet:grid max-tablet:grid-cols-2">
                 <Controller control={control} name="bookingDate" render={({ field, fieldState }) => <DateField value={field.value} onChange={field.onChange} today={today} error={fieldState.error?.message} helper={dateMoved} />} />
                 <Controller control={control} name="eventStart" render={({ field, fieldState }) => <TimeSelect value={field.value} onChange={field.onChange} error={fieldState.error?.message} />} />
-                <InputField label="Created" disabled value={created} readOnly helper="Set automatically" />
+                <InputField label="Created" disabled value={created} readOnly helper="Set automatically" className="max-tablet:col-span-2" />
               </div>
               <Controller
                 control={control}
@@ -687,7 +704,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             )}
           </form>
         </main>
-        <aside aria-label="Summary and invoices" className={cn("flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section", entering && cascade(1))}>
+        <aside aria-label="Summary and invoices" className={cn("flex min-w-0 flex-1 flex-col gap-inset border-l border-border-default bg-surface-header p-section max-tablet:gap-group max-tablet:border-l-0 max-tablet:bg-surface-default max-tablet:px-layout-gutter max-tablet:pt-0 max-tablet:pb-group", entering && cascade(1))}>
           {conflict && (
             // P7 (approved copy, 2026-11-16): someone else saved this booking after it was opened here.
             <Alert tone="warning" title="This booking was changed by someone else" className="motion-notice">
@@ -731,7 +748,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             invoices={saved.invoices}
             fresh={fresh}
             canInvoice={canInvoice}
-            onPdf={pdf.download}
+            onPdf={pdf.pick}
             pdfBusyId={pdf.busyId}
             onCreate={async () => {
               if (!(await trigger())) {
@@ -744,6 +761,14 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
           />}
         </aside>
       </div>
+      <ActionBar className="sticky bottom-0 z-30 tablet:hidden">
+        <Button variant="secondary" onClick={() => navigate("/bookings")}>
+          Cancel
+        </Button>
+        <Button icon="check" loading={saving} disabled={belowPaid} onClick={() => onSave()}>
+          {savedId ? "Save changes" : "Save booking"}
+        </Button>
+      </ActionBar>
 
       <NewInvoiceModal
         open={invoiceUi.open}
@@ -817,7 +842,7 @@ function PackageInfo({ pkg, price }: { pkg?: Package; price: number }) {
       </div>
     );
   return (
-    <div className="flex items-center gap-control rounded-control border border-border-default bg-surface-subtle px-base py-control">
+    <div className="flex items-center gap-control rounded-control border border-border-default bg-surface-subtle px-base py-control max-tablet:items-start">
       <span className="flex min-w-0 flex-1 flex-col gap-2">
         <span className="flex items-center gap-8">
           <Txt className="text-caption-strong text-text-primary">{pkg.name}</Txt>
@@ -829,7 +854,7 @@ function PackageInfo({ pkg, price }: { pkg?: Package; price: number }) {
             </span>
           )}
         </span>
-        <span className="truncate text-caption text-text-secondary">{pkg.summary}</span>
+        <span className="text-caption text-text-secondary tablet:truncate">{pkg.summary}</span>
       </span>
       <Txt className="text-body-strong text-text-primary">{formatIDR(price)}</Txt>
     </div>
