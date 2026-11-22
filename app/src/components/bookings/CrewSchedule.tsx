@@ -81,7 +81,7 @@ export function CrewSchedulePopover({
   if (mobile) {
     const s = a && data?.id === a.crewId ? data.s : null;
     return (
-      <BottomSheet open={open} onClose={onClose} title="Crew schedule" contentClassName="gap-micro">
+      <BottomSheet open={open} onClose={onClose} title="Crew schedule" contentClassName="gap-micro overflow-hidden">
         {s && <ScheduleBody s={s} today={today} month={month} currentBookingId={currentBookingId} onOpenBooking={onOpenBooking} onSeeInCalendar={onSeeInCalendar} sheet />}
       </BottomSheet>
     );
@@ -123,19 +123,22 @@ function ScheduleBody({
 }) {
   return (
     <>
-          <div className="flex items-center gap-[calc(var(--spacing-12)-var(--spacing-2))] border-b border-border-default px-compact pt-compact pb-[calc(var(--spacing-12)-var(--spacing-2))]">
+          <div className="flex shrink-0 items-center gap-[calc(var(--spacing-12)-var(--spacing-2))] border-b border-border-default px-compact pt-compact pb-[calc(var(--spacing-12)-var(--spacing-2))]">
             <Avatar size={38} initials={initials(s.crew.name)} />
             <span className="flex min-w-0 flex-1 flex-col">
-              <Txt className="text-body-strong text-text-primary">{s.crew.name}</Txt>
-              <Txt className="text-caption text-text-secondary">{`${s.crew.role} · ${s.monthCount} ${s.monthCount === 1 ? "booking" : "bookings"} in ${month}`}</Txt>
+              {/* Mobile: long names end in "…" and the role / count line wraps — nothing runs past the sheet edge. */}
+              <Txt className="text-body-strong text-text-primary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:truncate">{s.crew.name}</Txt>
+              <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:whitespace-normal">{`${s.crew.role} · ${s.monthCount} ${s.monthCount === 1 ? "booking" : "bookings"} in ${month}`}</Txt>
             </span>
           </div>
-          <div className="flex items-center px-compact pt-tight pb-2">
+          <div className="flex shrink-0 items-center px-compact pt-tight pb-2">
             <Txt className="text-caption-strong text-text-secondary">Upcoming schedule</Txt>
             <span className="flex-1" />
             <Txt className="text-timestamp text-text-tertiary">From today</Txt>
           </div>
-          <div className={cn("flex min-h-0 shrink flex-col gap-2", !sheet && "max-h-[calc(var(--spacing-64)*6+var(--spacing-16))] overflow-y-auto")} data-popover-scroll>
+          {/* Only the list scrolls — in the popover (max 400) and in the mobile sheet (whatever height is left), so the person
+              header and the See in calendar footer stay in view. */}
+          <div className={cn("flex min-h-0 shrink flex-col gap-2 overflow-y-auto", sheet ? "flex-1 overscroll-contain" : "max-h-[calc(var(--spacing-64)*6+var(--spacing-16))]")} data-popover-scroll>
             {s.upcoming.length === 0 && <p className="px-compact py-base text-caption text-text-secondary">Nothing scheduled from today.</p>}
             {s.upcoming.map((b) => {
               const d = parseISODate(b.bookingDate);
@@ -153,12 +156,13 @@ function ScheduleBody({
               );
             })}
           </div>
-          <div className="flex items-center border-t border-border-default px-micro pt-tight pb-2">
+          <div className="flex shrink-0 items-center border-t border-border-default px-micro pt-tight pb-2">
             <Button variant="ghost" icon="calendar" onClick={() => onSeeInCalendar(s.crew.id)}>
               See in calendar
             </Button>
-            <span className="flex-1" />
-            <Txt className="text-timestamp text-text-tertiary">{`Crew: ${s.crew.name}`}</Txt>
+            <span className="flex-1 max-tablet:min-w-compact" />
+            {/* Mobile: "Crew: …" gives way (ellipsis) so it never collides with See in calendar. */}
+            <Txt className="text-timestamp text-text-tertiary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:truncate">{`Crew: ${s.crew.name}`}</Txt>
           </div>
             </>
   );
