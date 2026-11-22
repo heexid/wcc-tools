@@ -19,16 +19,16 @@ A **Booking & Invoice Management** module for the WCC & ECC (Wedding Content Cre
 | `supabase/` | Migrations, seeds (`seed.sql`, `perf-seed.sql`, `seed.local-users.sql`), pgTAP tests, and `setup-production.sql` (one-shot setup). |
 | `production/docs/slices/Pxx.md` | Production slice logs (P00–P11 so far). |
 | `context/` | The source-of-truth docs. See [Documentation](#documentation). |
+| `agents/` | Working docs: `DEPLOY.md` (deploy guide), `FEATURES.md` (plain-language feature guide), `dummy.md` (SQL to insert sample bookings), `marketings/` (marketing and pricing), `promotions/` (promo video scenes). |
+| `agents/CREDENTIALS.md` | Local only and gitignored. Never commit it. |
 | `references/` | Reference images. |
-| `DEPLOY.md` | Step-by-step deploy to Supabase and Vercel (about 15 minutes). |
 | `.github/workflows/ci.yml` | CI: typecheck, lint, G1, unit tests, build, Supabase stack and pgTAP. |
-| `CREDENTIALS.md` | Local only and gitignored. Never commit it. |
 
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 (tokens generated from the CIR design system) · react-hook-form + zod · `@react-pdf/renderer` · Supabase (`@supabase/ssr`, Postgres, Auth, Storage) · Vitest · Playwright · Vercel.
 
-Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. The only layout is desktop at 1440 px.
+Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. On `main` the only layout is desktop at 1440 px; mobile (below 768 px) is in progress on a branch (see [Mobile layouts](#mobile-layouts-in-progress)).
 
 ## Run it locally
 
@@ -52,7 +52,7 @@ npm run dev            # http://localhost:3000
 - **Frozen clock:** test builds treat "today" as **Tue 10 Nov 2026** (`NEXT_PUBLIC_TODAY`).
 - **Testing rule (2026-11-14):** when asked to test, run unit, DB and e2e tests only. Don't re-export the Figma PNGs or re-run the visual tests unless explicitly asked.
 
-To deploy, follow [`DEPLOY.md`](DEPLOY.md).
+To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, copy `app/.env.example` to `app/.env.local`.
 
 ## Product at a glance
 
@@ -70,13 +70,13 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 | Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
 | Roles | `admin` can do everything. `viewer` (the Owner) is read-only, enforced in the UI and by RLS. | §4.3 |
 
-**Out of scope for v1:** tablet and mobile layouts, voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
+**Out of scope for v1:** tablet layouts (mobile is in progress, see below), voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
 
 ---
 
 ## Progress tracker
 
-*Last updated from `context/` on 2026-11-21.*
+*Last updated on 2026-11-22 from `context/`, the slice logs and git (`main` at `e8c58b7`).*
 
 ### Overall
 
@@ -84,6 +84,7 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 |---|---|
 | Design (Figma `bs internal tools`) | ✅ All screens, interaction states and hi-fi flows done. 96 of 96 interactions defined. |
 | Prototype F0–F19 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
+| Mobile layouts R01–R07 | 🟡 Designed in Figma and built on branch `feat/mobile-responsive`. Not merged into `main` yet. |
 | Production P0–P11 | ✅ Built and tested on **local** Supabase. CI on GitHub (branch `production/p0-p10`). |
 | Production P12–P14 | ☐ Not started: full regression on staging, operations, UAT and launch. |
 | Release gates PG1–PG7 | ☐ Not yet signed off. They need a staging environment. |
@@ -114,6 +115,22 @@ To deploy, follow [`DEPLOY.md`](DEPLOY.md).
 | F17 | Viewer role, loading states, full regression | 🟡 2026-11-14: 53 inherited visual failures waiting on a PNG re-export; a11y open |
 | F18 | Business information → PDF brand row | ⚠ 2026-11-14: PNG re-export pending |
 | F19 | Booking event details (event start, location, notes): form, detail sheet, invoice PDF, plus Supabase migration 013 | ⚠ 2026-11-21: PNG re-export pending ([log](app/docs/slices/F19.md)) |
+
+### Mobile layouts (in progress)
+
+Started 2026-11-22 (it was deferred to v1.1). The admin often books from a phone while talking to a client on WhatsApp. All of this is on the branch **`feat/mobile-responsive`** (commit `ef70449`) and **not yet merged into `main`**. Desktop (768 px and up) doesn't change: every mobile change sits behind `max-tablet:` / `tablet:` classes or `useIsMobile()`.
+
+| Slice | Scope | Status |
+|---|---|---|
+| R01 | Breakpoint tokens (tablet 768, desktop 1280), larger 44 px controls and 16 px input text on mobile | ✅ on branch |
+| R02 | Figma mobile frames at 390 px: Bookings M01–M07 and ME1–ME4, Login ML1–ML3, shell MS1–MS3, Account MA1–MA5, Package Lib MP1–MP8 | ✅ in Figma |
+| R03 | Mobile shell: top bar, launcher / account / log-out bottom sheets, login | ✅ on branch |
+| R04 | Bookings: list with search, filters and infinite scroll; agenda calendar that shows every day | ✅ on branch |
+| R05 | Booking form: one column, item cards, sticky Cancel / Save, invoice modal as a bottom sheet | ✅ on branch |
+| R06 | Booking detail full screen, invoice PDF via the phone's share sheet | ✅ on branch |
+| R07 | Account settings and Package Library | ✅ on branch |
+
+Logs: `app/docs/slices/R01.md`, `R02.md`, `R03-R07.md` (on the branch). Tests: `tests/e2e/R0*.spec.ts` at 390 × 844. **Still open:** review and merge, tablet layouts, a mobile pass on the read-only booking view, and updating PRD §4.5 / §5.1 (they still say mobile is deferred).
 
 ### Production slices (P0–P14)
 
@@ -147,6 +164,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
 | Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
+| Review and merge `feat/mobile-responsive` (R01–R07) | Mobile | Your review |
 | Apply migration 013 (event details) to any database deployed before 2026-11-21 | Deploy | Run `supabase/migrations/20261121000013_booking_event_details.sql` (see `agents/DEPLOY.md`) |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
 | P2 and P11 code review | P2, P11 | Running `code-review` |
@@ -172,6 +190,8 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (96 rows, 1.1–6.12) with its Figma frame |
 | [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F19, pixel gates G1–G4, motion rules, the prototype tracker |
 | [`context/PRODUCTION-PLAN.md`](context/PRODUCTION-PLAN.md) | Production slices P0–P14, gates PG1–PG7, the RLS matrix, the production tracker, a paste-ready prompt for each slice |
-| [`DEPLOY.md`](DEPLOY.md) | Going live on Supabase and Vercel |
+| [`agents/DEPLOY.md`](agents/DEPLOY.md) | Going live on Supabase and Vercel |
+| [`agents/FEATURES.md`](agents/FEATURES.md) | Plain-language guide to every feature |
+| `app/docs/slices/`, `production/docs/slices/` | Per-slice logs: what changed, decisions, test results |
 
 **Keeping it current:** the trackers in `PROTOTYPE-PLAN.md` §4 and `PRODUCTION-PLAN.md` §4 are the source of truth. Update this README's tracker when either of them changes.
