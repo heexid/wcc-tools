@@ -109,7 +109,7 @@ function BookingSummary({ control, packages, priceOf }: { control: Control<Booki
       <SummaryRow type="emphasis" label="Subtotal" value={formatIDR(total)} />
       <div className="flex flex-col gap-micro rounded-control bg-surface-accent p-base">
         <SummaryRow type="total" label="Total booking" value={formatIDR(total)} />
-        <Txt className="text-caption text-text-secondary">
+        <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">
           {bookingDate ? `Booking date ${formatDate(bookingDate)} · shows on calendar after save` : "Pick a booking date to place it on the calendar"}
         </Txt>
       </div>
@@ -140,7 +140,7 @@ function UpdatedTotals({ l }: { l: Ledger }) {
       <SummaryRow label={`Paid (${invoicesLabel(l.invoiceCount)})`} value={formatIDR(l.paid)} />
       <div className="flex flex-col gap-micro rounded-control bg-surface-accent p-base">
         <SummaryRow type="accent" label="Remaining after save" value={formatIDR(l.total - l.paid)} />
-        <Txt className="text-caption text-text-secondary">
+        <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">
           {l.total - l.paid > 0 ? "Existing invoices keep their original figures. Create the next invoice below." : "Paid in full. Existing invoices keep their original figures."}
         </Txt>
       </div>
@@ -280,13 +280,13 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
             className={cn(
               !initial.has(f.id) && "motion-notice",
               "flex w-full items-center gap-compact border-b border-border-default bg-surface-default px-control py-compact",
-              "max-tablet:grid max-tablet:grid-cols-[1fr_calc(var(--spacing-64))_calc(var(--spacing-48)+var(--spacing-4))_var(--spacing-control-height)] max-tablet:rounded-card max-tablet:border max-tablet:p-control",
+              "max-tablet:grid max-tablet:grid-cols-[minmax(0,1fr)_calc(var(--spacing-64))_calc(var(--spacing-48)+var(--spacing-4))_var(--spacing-control-height)] max-tablet:rounded-card max-tablet:border max-tablet:p-control",
             )}
           >
             <span role="cell" className="flex min-w-0 flex-1 max-tablet:col-span-3">
               <InlineInput className="w-full" aria-label={`Item ${i + 1} name`} placeholder="Item name" error={!!e?.name} {...register(`items.${i}.name`)} />
             </span>
-            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.price)}>
+            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto max-tablet:min-w-0", LINE_COLS.price)}>
               <Controller
                 control={control}
                 name={`items.${i}.price`}
@@ -295,7 +295,7 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
                 )}
               />
             </span>
-            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.qty)}>
+            <span role="cell" className={cn("flex shrink-0 max-tablet:row-start-2 max-tablet:w-auto max-tablet:min-w-0", LINE_COLS.qty)}>
               <Controller
                 control={control}
                 name={`items.${i}.qty`}
@@ -304,7 +304,7 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
                 )}
               />
             </span>
-            <span role="cell" className={cn("flex shrink-0 justify-end text-body-strong text-text-primary max-tablet:col-span-2 max-tablet:row-start-2 max-tablet:w-auto", LINE_COLS.subtotal)}>
+            <span role="cell" className={cn("flex shrink-0 justify-end text-body-strong text-text-primary max-tablet:col-span-2 max-tablet:row-start-2 max-tablet:w-auto max-tablet:min-w-0", LINE_COLS.subtotal)}>
               <Txt>{formatIDR(itemSubtotal(items?.[i] ?? {}))}</Txt>
             </span>
             <span role="cell" className={cn("flex shrink-0 max-tablet:col-start-4 max-tablet:row-start-1 max-tablet:w-auto max-tablet:justify-center", LINE_COLS.action)}>

@@ -173,7 +173,7 @@ export function MobileChildBar({
         <Icon name="chevron-left" className="size-icon-md" />
       </button>
       <h1 tabIndex={-1} className="flex min-w-0 flex-1 text-heading-module text-text-primary outline-none">
-        <Txt className="truncate">{title}</Txt>
+        <span className="min-w-0 truncate">{title}</span>
       </h1>
       {status && <PaymentStatusBadge status={status} info={false} />}
       {saveState && (

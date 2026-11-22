@@ -66,7 +66,7 @@ export function AccountSettings() {
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
             <Txt>Account settings</Txt>
           </h1>
-          <Txt className="text-body text-text-secondary">Your profile and sign-in details for bs internal tools.</Txt>
+          <Txt className="text-body text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">Your profile and sign-in details for bs internal tools.</Txt>
         </div>
 
         <Card title="Profile" caption="How you appear to your team.">

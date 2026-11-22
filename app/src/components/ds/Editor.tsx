@@ -100,12 +100,15 @@ export function LineItemHeader() {
 export function SummaryRow({ label, value, type = "default" }: { label: ReactNode; value: string; type?: "default" | "emphasis" | "total" | "accent" | "negative" }) {
   const accent = type === "accent";
   return (
-    <div className="flex w-full items-center justify-between">
+    // Mobile: on very narrow screens (320) a long label and a large amount don't fit one line — the amount wraps to
+    // the next line, still right-aligned.
+    <div className="flex w-full items-center justify-between max-tablet:flex-wrap max-tablet:gap-x-compact">
       <Txt className={type === "default" || type === "negative" ? "text-caption text-text-secondary" : cn("text-body-strong", accent ? "text-text-accent" : "text-text-primary")}>{label}</Txt>
       <Txt
         className={cn(
           type === "total" || accent ? "text-heading-panel" : type === "emphasis" ? "text-body-strong" : "text-body",
           type === "negative" ? "text-text-danger" : accent ? "text-text-accent" : "text-text-primary",
+          "max-tablet:ml-auto",
         )}
       >
         {value}
