@@ -96,7 +96,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 
 ## 9. QA & launch (Day 11–12)
 - Unit: calc (≥ 30 cases). Integration: RPC concurrency (2 parallel `create_invoice` calls → one fails). E2E (Playwright): every hi-fi flow lane (Bookings A–H, Package Lib A–D, Launchpad A–B, Profile A–E).
-- Visual QA against the Figma frames at 1440 (gates G1–G4 in `PROTOTYPE-PLAN.md` §0.3). 768 / 390 come with the deferred tablet/mobile layouts.
+- Visual QA against the Figma frames at 1440 (gates G1–G4 in `PROTOTYPE-PLAN.md` §0.3). Mobile (390) shipped 2026-11-22 with its own e2e + Figma gates (`tests/e2e/R0*`); 768 comes with the tablet layouts.
 - Reconciliation SQL check (success criterion #3) runs as a nightly cron.
 
 ## Figma deliverables (`bs internal tools`, updated 2026-11-14)
@@ -148,4 +148,4 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
   - E: business information — E1 Account settings (card) → Clicks "Edit" → E2 Edit business information (prefilled) → Clicks "Save changes" → *Valid?* → Yes → E3 Updated (toast) → Downloads an invoice PDF → E4 Invoice PDF brand row (logo, name, address, phone · email) → End. No → E2b errors → Fixes the fields → back to E2.
 - **Bookings · Invoice PDF frames** (11, 11b, 11c, A5, A5b): Brand row is now three text lines — name · address · "phone · email" — and the header grows by 20 px.
 - **Booking components** gained `Business information card` and `Logo upload field` (2026-11-14); the Account-settings frames AC1–AC7 / flow copies are now 1440 × 864 viewports with clipped content (the page is taller than the viewport).
-- **Deferred (noted 2026-11-10, design later):** tablet/mobile layouts, void-invoice dialog (v1.1).
+- **Deferred (noted 2026-11-10, design later):** tablet layouts, void-invoice dialog (v1.1). Mobile layouts were designed and built 2026-11-22 (R01–R09, see `app/docs/slices/R0*`).

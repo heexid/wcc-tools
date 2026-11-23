@@ -16,7 +16,7 @@ The IDs here are the same ones the other docs use: **US-n** (PRD stories), **scr
 ### 0.1 Scope of the prototype
 - **Front end only, real behaviour.** All screens, states and flows from the three docs work in the browser. Data comes from a **mock data layer** (`lib/data/*`), not Supabase. It has the same function signatures as the RPCs in PLAN §2 (`save_booking`, `create_invoice`, `cancel_booking`) and enforces the PRD §2.4 business rules, so Supabase can replace it later without touching the UI.
 - Persistence: in memory + `localStorage`, reset via `/dev/reset`. Seed per PLAN §2.7 (built from Figma in F2): 8 packages (6 active + 2 archived), 6 crew and 40 bookings Oct–Dec 2026, covering every status including Canceled. Each Figma screen also gets a **named fixture** (`?fixture=screen-06`, 58 in total) so the page renders exactly the data shown in that frame. Figma's data inconsistencies and who decides them: `app/docs/slices/F02.md`.
-- **Desktop 1440 only.** Tablet/mobile and the void-invoice dialog are deferred (PRD §5.1 v1.1, PLAN "Deferred").
+- **Desktop 1440 only** for F0–F19. Mobile followed as R01–R09 (2026-11-22, `app/docs/slices/R0*`); tablet and the void-invoice dialog stay deferred (PRD §5.1 v1.1).
 - **Frozen clock.** "Today" is **Tue 10 Nov 2026** (the Today cell in Figma screen 01). `lib/clock.ts` `now()` reads `NEXT_PUBLIC_TODAY`; visual tests always run on that date.
 
 ### 0.2 Stack

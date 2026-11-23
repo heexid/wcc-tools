@@ -234,7 +234,7 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf,
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/empty-invoice.png" srcSet="/assets/empty-invoice.png 1x, /assets/empty-invoice@2x.png 2x" alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
           <p className="flex text-body-strong text-text-primary">
-            <Txt>No invoice yet — booking will be saved as Draft</Txt>
+            <Txt className="max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal max-tablet:text-center">No invoice yet — booking will be saved as Draft</Txt>
           </p>
           <p className="w-full text-caption text-text-secondary">Create the first invoice (DP or full price) here when the client pays. Each invoice is linked to this booking.</p>
           {canInvoice ? (
@@ -280,7 +280,7 @@ function LineItems({ control, register, errors, onAdd, onRemove, fields }: {
             className={cn(
               !initial.has(f.id) && "motion-notice",
               "flex w-full items-center gap-compact border-b border-border-default bg-surface-default px-control py-compact",
-              "max-tablet:grid max-tablet:grid-cols-[minmax(0,1fr)_calc(var(--spacing-64))_calc(var(--spacing-48)+var(--spacing-4))_var(--spacing-control-height)] max-tablet:rounded-card max-tablet:border max-tablet:p-control",
+              "max-tablet:grid max-tablet:grid-cols-[minmax(0,1fr)_calc(var(--spacing-64))_calc(var(--spacing-48)+var(--spacing-4))_var(--spacing-control-height)] max-tablet:rounded-card max-tablet:border max-tablet:p-base",
             )}
           >
             <span role="cell" className="flex min-w-0 flex-1 max-tablet:col-span-3">
@@ -697,10 +697,12 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
               />
             </section>
             {canCancel && (
-              <>
+              // Desktop: last in the form column. Mobile renders it after Updated totals / Invoices instead (below), so
+              // the destructive action stays last on the page in DOM order too (Figma ME1).
+              <div className="contents max-tablet:hidden">
                 <Divider />
                 <CancelBookingSection onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
-              </>
+              </div>
             )}
           </form>
         </main>
@@ -760,6 +762,12 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             }}
           />}
         </aside>
+        {canCancel && (
+          <div className="flex flex-col gap-group px-layout-gutter pb-group tablet:hidden">
+            <Divider />
+            <CancelBookingSection onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
+          </div>
+        )}
       </div>
       <ActionBar className="sticky bottom-0 z-30 tablet:hidden">
         <Button variant="secondary" onClick={() => navigate("/bookings")}>

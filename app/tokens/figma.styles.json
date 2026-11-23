@@ -1,5 +1,5 @@
 {
-  "$source": "Figma 'bs internal tools' (TFiwbjBZC0sfpLRknSkKqV) — local text, effect and paint styles, copied from figma_get_text_styles / getLocalEffectStylesAsync / getLocalPaintStylesAsync on 2026-11-11. Do not edit by hand; re-pull from Figma.",
+  "$source": "Figma 'bs internal tools' (TFiwbjBZC0sfpLRknSkKqV) — local text, effect and paint styles, copied from figma_get_text_styles / getLocalEffectStylesAsync / getLocalPaintStylesAsync on 2026-11-11. Do not edit by hand; re-pull from Figma. Mobile/* text styles (2026-11-23): the phone sizes of the desktop styles, applied below 768.",
   "text": [
     { "name": "Display/Metric", "fontSize": 28, "fontStyle": "Medium", "lineHeight": 36, "letterSpacing": -0.6000000238418579 },
     { "name": "Heading/Page", "fontSize": 24, "fontStyle": "Semi Bold", "lineHeight": 32, "letterSpacing": 0 },
@@ -39,5 +39,21 @@
     { "name": "Gradient/Login Glow", "angle": 180, "layers": [
       { "opacity": 1, "stops": [ { "position": 0, "color": { "r": 0.9921568632125854, "g": 0.7098039388656616, "b": 0.8745098114013672, "a": 0.25 } }, { "position": 1, "color": { "r": 1, "g": 1, "b": 1, "a": 0 } } ] }
     ] }
+  ],
+  "mobileText": [
+    {"name": "Mobile/Heading · Module", "fontSize": 17, "fontStyle": "Semi Bold", "lineHeight": 24, "letterSpacing": 0},
+    {"name": "Mobile/Heading · Section", "fontSize": 17, "fontStyle": "Semi Bold", "lineHeight": 24, "letterSpacing": 0},
+    {"name": "Mobile/Heading · Subsection", "fontSize": 15, "fontStyle": "Semi Bold", "lineHeight": 22, "letterSpacing": 0},
+    {"name": "Mobile/Text · Body", "fontSize": 16, "fontStyle": "Regular", "lineHeight": 24, "letterSpacing": 0},
+    {"name": "Mobile/Text · Body Strong", "fontSize": 16, "fontStyle": "Semi Bold", "lineHeight": 24, "letterSpacing": 0},
+    {"name": "Mobile/Text · Caption", "fontSize": 14, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0},
+    {"name": "Mobile/Text · Caption Strong", "fontSize": 14, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0},
+    {"name": "Mobile/Text · Micro", "fontSize": 13, "fontStyle": "Regular", "lineHeight": 18, "letterSpacing": 0},
+    {"name": "Mobile/Text · Timestamp", "fontSize": 12, "fontStyle": "Regular", "lineHeight": 16, "letterSpacing": 0},
+    {"name": "Mobile/UI · Button", "fontSize": 15, "fontStyle": "Medium", "lineHeight": 20, "letterSpacing": 0},
+    {"name": "Mobile/UI · Input", "fontSize": 16, "fontStyle": "Regular", "lineHeight": 24, "letterSpacing": 0},
+    {"name": "Mobile/UI · Field Label", "fontSize": 14, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0},
+    {"name": "Mobile/UI · Tab Active", "fontSize": 15, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0},
+    {"name": "Mobile/UI · Tab", "fontSize": 15, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0}
   ]
 }

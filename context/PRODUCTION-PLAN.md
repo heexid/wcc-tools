@@ -15,7 +15,7 @@ IDs are the same ones the other docs use: **US-n**, **#x.y** (INTERACTIONS rows)
 
 ### 0.1 Scope of production v1
 - **Same product as the prototype MVP** (PRD §5.1 *MVP* row): Login, App launcher, Account, Package Library, Booking create / edit / cancel, DP / Full / Partial / Paid invoices, Calendar (month / week / day), Table + search + filters, Detail + Crew schedule, PDF, viewer role.
-- **Out of scope** (unchanged, PRD §5.1 v1.1+): tablet & mobile layouts, void invoice, refunds, VAT / discounts, WhatsApp / email sending, payment gateway, client portal.
+- **Out of scope** (PRD §5.1 v1.1+): tablet layouts (mobile shipped 2026-11-22, R01–R09), void invoice, refunds, VAT / discounts, WhatsApp / email sending, payment gateway, client portal.
 - **The UI does not get redesigned.** Every Figma-matching component, route, URL contract (`view`, `date`, `tab`, `?booking=`, `crew=`…) and motion rule from the prototype stays. Production work happens **below** the components: data, auth, storage, security, ops.
 - **Single swap point.** The prototype was built so that Supabase can replace `lib/data/*` without touching the UI (PROTOTYPE-PLAN §0.1). Production keeps that contract: the Supabase-backed repo implements the **same function names and result shapes** as `repo.ts`. Where the prototype cheats (below), P3 fixes the contract first.
 

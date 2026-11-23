@@ -19,9 +19,9 @@ test.describe("M01 · list", () => {
     await expect(cards(page).first()).toBeVisible();
   });
 
-  test("cards: 358 × 104 at the 16 margin, ref + status / name + remaining / date · client", async ({ page }) => {
+  test("cards: 358 × 114 at the 16 margin (mobile type scale + 16 padding), ref + status / name + remaining / date · client", async ({ page }) => {
     const first = cards(page).first().getByRole("button");
-    expect(await first.boundingBox()).toMatchObject({ x: 16, width: 358, height: 104 });
+    expect(await first.boundingBox()).toMatchObject({ x: 16, width: 358, height: 114 });
     await expect(first).toContainText("BK-2026-0139");
     await expect(first).toContainText("Graduation · Aulia");
     await expect(first).toContainText("Rp 1.750.000");

@@ -46,9 +46,10 @@ export function InvoiceCard({
         <span className="flex size-[calc(var(--spacing-32)+var(--spacing-4))] shrink-0 items-center justify-center rounded-control bg-surface-accent text-text-accent">
           <Icon name="receipt" className="size-[calc(var(--spacing-16)+var(--spacing-2))]" />
         </span>
+        {/* Mobile: the issue date wraps under the number instead of running into the amount. */}
         <div className="flex min-w-0 flex-1 flex-col">
           <Txt className="text-body-strong text-text-primary">{number}</Txt>
-          <Txt className="text-caption text-text-secondary">{`Issued ${issued}`}</Txt>
+          <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{`Issued ${issued}`}</Txt>
         </div>
         <Txt className="text-heading-section text-text-primary">{amount}</Txt>
       </div>

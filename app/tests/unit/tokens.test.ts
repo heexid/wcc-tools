@@ -52,4 +52,15 @@ describe("F0 · token generation", () => {
     expect(block("48rem")).toContain("--spacing-layout-header-height: var(--spacing-mobile-header-height);");
     expect(block("48rem")).toContain("--input-font-size: var(--spacing-mobile-input-font-size);");
   });
+
+  it("swaps the text styles for the mobile type scale below 768 (Figma Mobile/… styles)", () => {
+    const mobile = css.slice(css.indexOf("@media (width < 48rem)")).split("\n}\n")[0];
+    expect(mobile).toContain("--text-body: 16px;");
+    expect(mobile).toContain("--text-body--line-height: 24px;");
+    expect(mobile).toContain("--text-caption: 14px;");
+    expect(mobile).toContain("--text-micro: 13px;");
+    expect(mobile).toContain("--text-timestamp: 12px;");
+    expect(manifest.mobileText).toHaveLength(14);
+    for (const m of manifest.mobileText) expect(m.fontSize).toBeGreaterThanOrEqual(12);
+  });
 });

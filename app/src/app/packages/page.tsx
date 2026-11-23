@@ -418,24 +418,24 @@ function PackageLibrary() {
   );
 }
 
-/** Figma Booking components › Mobile/Package list item (MP1 / MP2): card (radius card, border, pad control, gap tight):
- *  name Body Strong + Active / Archived pill · description Caption secondary (2 lines) · usage · updated Caption
- *  secondary + price Body Strong. Active: the card opens Edit package. Archived: Restore (44, full width). */
+/** Figma Booking components › Mobile/Package list item (MP1 / MP2): card (radius card, border, pad base, gap tight):
+ *  name Body Strong + price Body Strong · description Caption secondary (2 lines) · usage · updated Caption secondary +
+ *  Active / Archived pill. Active: the card opens Edit package. Archived: Restore (44, full width). */
 function PackageCard({ p, viewer, onEdit, onRestore }: { p: PackageRow; viewer: boolean; onEdit: () => void; onRestore: () => void }) {
   const body = (
     <>
       <span className="flex items-center gap-compact">
-        <Txt className="min-w-0 flex-1 truncate text-body-strong text-text-primary">{p.name}</Txt>
-        <StatusPill tone={p.isActive ? "positive" : "neutral"}>{p.isActive ? "Active" : "Archived"}</StatusPill>
+        <span className="min-w-0 flex-1 truncate text-body-strong text-text-primary">{p.name}</span>
+        <Txt className="shrink-0 text-body-strong text-text-primary">{formatIDR(p.price)}</Txt>
       </span>
       <span className="line-clamp-2 text-caption text-text-secondary">{p.summary}</span>
       <span className="flex items-center gap-compact">
         <span className="min-w-0 flex-1 truncate text-caption text-text-secondary">{`${p.bookings} bookings · ${p.isActive ? `Updated ${formatDate(p.updatedAt)}` : `Archived ${formatDate(p.archivedAt!)}`}`}</span>
-        <Txt className="shrink-0 text-body-strong text-text-primary">{formatIDR(p.price)}</Txt>
+        <StatusPill tone={p.isActive ? "positive" : "neutral"}>{p.isActive ? "Active" : "Archived"}</StatusPill>
       </span>
     </>
   );
-  const card = "flex w-full flex-col gap-tight rounded-card border border-border-default bg-surface-default p-control text-left";
+  const card = "flex w-full flex-col gap-tight rounded-card border border-border-default bg-surface-default p-base text-left";
   if (p.isActive && !viewer)
     return (
       <button type="button" onClick={onEdit} aria-label={`Edit ${p.name}`} className={cn(card, "cursor-pointer outline-none transition-[transform] focus-visible:shadow-focus-ring active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out)")}>

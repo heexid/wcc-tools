@@ -391,7 +391,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 - Live calculation < 50 ms per keystroke (pure functions, no network).
 - Calendar month query < 200 ms at 10k bookings, and table page < 300 ms.
 - Accessibility: WCAG 2.2 AA, keyboard-operable calendar grid (arrow keys) and status not conveyed by colour alone (badge text plus icon).
-- Responsive: desktop-first at 1440 (the only MVP layout; tablet & mobile deferred to v1.1). When built, tablet and mobile use the DS *Pattern · Responsive* layouts, where Table becomes the *Mobile/Invoice list item* pattern and the Calendar becomes an agenda list.
+- Responsive: desktop-first at 1440. Mobile (below 768) was brought forward from v1.1 on 2026-11-22 and is live: it uses the DS *Pattern · Responsive* layouts (Mobile/Top bar, bottom sheets, sticky action bar), the Table becomes booking cards, the Calendar becomes a day-by-day agenda, and text uses the mobile type scale (`Mobile/…` text styles: body 16, caption 14, smallest 12) with 44 px controls and 16 px field text. Tablet (768–1279) keeps the desktop layouts with tablet-sized controls.
 
 ---
 
@@ -402,7 +402,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 | Phase | Scope |
 |---|---|
 | **MVP** | Login, App launcher, Account settings (+ Business information) + Log out, Package Library, Create booking (crew, T&C, leave guard), Cancel booking (manual, with optional reason), DP/Full invoice, Edit booking, Partial/Paid, total-below-paid guard, Calendar (month/week/day), Table, search + filters, Detail panel + Crew schedule, PDF. Built first as a front-end prototype (`context/PROTOTYPE-PLAN.md`). |
-| **v1.1** | Refund records, discounts/VAT lines, send via WhatsApp/email, CSV export, **void invoice dialog**, **tablet & mobile layouts** (deferred 2026-11-10, not yet designed) |
+| **v1.1** | Refund records, discounts/VAT lines, send via WhatsApp/email, CSV export, **void invoice dialog**, **tablet layouts** (mobile shipped 2026-11-22) |
 | **v2.0** | Payment gateway and auto-reconciliation, client portal, resource/conflict scheduling, reminders for unpaid balances before the booking date |
 
 ### 5.2 Risks

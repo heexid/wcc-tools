@@ -285,7 +285,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
         <ActionBar className="shrink-0">
           {b.invoices.length > 0 && (
             <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
-              {canceled || viewer ? "Download latest PDF" : "Latest PDF"}
+              Download PDF
             </Button>
           )}
           {!canceled && !viewer && (

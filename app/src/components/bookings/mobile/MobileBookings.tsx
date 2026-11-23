@@ -290,7 +290,8 @@ function MobileAgenda({
   const thisMonth = today >= from && today <= to;
   return (
     <>
-      <div className="flex items-center gap-micro">
+      {/* Wraps on the narrowest phones (320): Today moves under the month instead of off-screen. */}
+      <div className="flex flex-wrap items-center gap-x-micro gap-y-compact">
         <Button variant="ghost" iconOnly icon="chevron-left" aria-label="Previous month" onClick={() => onMonth(prev)}/>
         <h2 aria-live="polite" className="text-heading-section text-text-primary">
           <Txt>{formatMonthYear(y, m)}</Txt>

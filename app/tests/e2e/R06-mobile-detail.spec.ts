@@ -30,7 +30,7 @@ test("M04 · full screen: Child bar (ref · status), title, summary 2 + 1, 112 k
   const box = (await edit.boundingBox())!;
   expect(box.height).toBe(44);
   expect(Math.round(box.y + box.height)).toBe(844 - 34);
-  await expect(d.getByRole("button", { name: "Latest PDF" })).toBeVisible();
+  await expect(d.getByRole("button", { name: "Download PDF", exact: true })).toBeVisible();
   await edit.click();
   await expect(page).toHaveURL(/\/edit$/);
 });
@@ -67,12 +67,12 @@ test("ME4 · crew chip → Crew schedule sheet, this booking highlighted, See in
   await expect(page).toHaveURL(/crew=/);
 });
 
-test("ME3 · canceled: red notice, Not collected, only Download latest PDF", async ({ page }) => {
+test("ME3 · canceled: red notice, Not collected, only Download PDF", async ({ page }) => {
   await page.goto("/bookings?fixture=screen-35&tab=table&booking=BK-2026-0142");
   const d = detail(page);
   await expect(d.getByText(/^Canceled on .* by Admin$/)).toBeVisible();
   await expect(d.getByText("Not collected", { exact: true })).toBeVisible();
-  await expect(d.getByRole("button", { name: "Download latest PDF" })).toBeVisible();
+  await expect(d.getByRole("button", { name: "Download PDF", exact: true })).toBeVisible();
   await expect(d.getByRole("button", { name: "Edit booking" })).toHaveCount(0);
 });
 

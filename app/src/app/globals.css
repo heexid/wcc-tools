@@ -13,6 +13,8 @@
     font-feature-settings: normal;
     /* The global header is sticky: focus / scrollIntoView land below it, not underneath. */
     scroll-padding-top: calc(var(--spacing-layout-header-height) + var(--spacing-base));
+    /* Touch: every control draws its own pressed state, so iOS's grey tap flash would double it. */
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Scrollbars: transparent track, light see-through thumb (not the browser's default black) — every scroller. */

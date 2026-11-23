@@ -237,7 +237,7 @@ Permissions are enforced in two places: the screens hide the controls, and the d
 
 ## Not in this version
 
-Tablet and mobile layouts; voiding an invoice; refunds; VAT and discounts; sending invoices by WhatsApp or email; payment gateway; a client portal; due dates for remaining balances. The Bookmark module is a placeholder.
+Tablet-specific layouts (phones are supported; tablets use the desktop layout); voiding an invoice; refunds; VAT and discounts; sending invoices by WhatsApp or email; payment gateway; a client portal; due dates for remaining balances. The Bookmark module is a placeholder.
 
 ---
 

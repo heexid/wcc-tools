@@ -39,7 +39,7 @@ export function BusinessRows({ business }: { business: Business }) {
       <Row label="Logo">
         <span className="flex items-center gap-control">
           <BusinessLogo business={business} />
-          <Txt className="text-caption text-text-tertiary">{business.logo ? "Shown in the invoice PDF header." : "No logo — the PDF shows your initials."}</Txt>
+          <Txt className="text-caption text-text-tertiary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{business.logo ? "Shown in the invoice PDF header." : "No logo — the PDF shows your initials."}</Txt>
         </span>
       </Row>
       <Row label="Business name">

@@ -316,5 +316,33 @@
     --grid-columns: var(--spacing-mobile-columns);
     --grid-gutter: var(--spacing-mobile-gutter);
     --safe-area-bottom: max(var(--spacing-mobile-safe-area-bottom), env(safe-area-inset-bottom, 0px));
+    --text-heading-module: 17px;
+    --text-heading-module--line-height: 24px;
+    --text-heading-section: 17px;
+    --text-heading-section--line-height: 24px;
+    --text-heading-subsection: 15px;
+    --text-heading-subsection--line-height: 22px;
+    --text-body: 16px;
+    --text-body--line-height: 24px;
+    --text-body-strong: 16px;
+    --text-body-strong--line-height: 24px;
+    --text-caption: 14px;
+    --text-caption--line-height: 20px;
+    --text-caption-strong: 14px;
+    --text-caption-strong--line-height: 20px;
+    --text-micro: 13px;
+    --text-micro--line-height: 18px;
+    --text-timestamp: 12px;
+    --text-timestamp--line-height: 16px;
+    --text-ui-button: 15px;
+    --text-ui-button--line-height: 20px;
+    --text-ui-input: 16px;
+    --text-ui-input--line-height: 24px;
+    --text-ui-field-label: 14px;
+    --text-ui-field-label--line-height: 20px;
+    --text-ui-tab-active: 15px;
+    --text-ui-tab-active--line-height: 20px;
+    --text-ui-tab: 15px;
+    --text-ui-tab--line-height: 20px;
   }
 }

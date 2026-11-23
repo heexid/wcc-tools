@@ -78,15 +78,15 @@ test.describe("390 · signed in", () => {
   // G3 on the shell regions only: the list behind the sheets is R04. The sheet is measured from the bottom of
   // the 844 frame (its height comes from Figma).
   for (const [frame, open, sheetH] of [
-    ["mobile-ms1", (p: Page) => menu(p).click(), 286],
-    ["mobile-ms2", (p: Page) => avatar(p).click(), 292],
+    ["mobile-ms1", (p: Page) => menu(p).click(), 290],
+    ["mobile-ms2", (p: Page) => avatar(p).click(), 294],
     [
       "mobile-ms3",
       async (p: Page) => {
         await avatar(p).click();
         await p.getByRole("menuitem", { name: "Log out" }).click();
       },
-      238,
+      242,
     ],
   ] as const) {
     test(`${frame} · top bar (under the scrim) + sheet match Figma`, async ({ page }) => {

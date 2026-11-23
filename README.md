@@ -28,7 +28,7 @@ A **Booking & Invoice Management** module for the WCC & ECC (Wedding Content Cre
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 (tokens generated from the CIR design system) · react-hook-form + zod · `@react-pdf/renderer` · Supabase (`@supabase/ssr`, Postgres, Auth, Storage) · Vitest · Playwright · Vercel.
 
-Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. On `main` the only layout is desktop at 1440 px; mobile (below 768 px) is in progress on a branch (see [Mobile layouts](#mobile-layouts-in-progress)).
+Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. Layouts: desktop at 1440 px, and mobile below 768 px with its own type scale (see [Mobile layouts](#mobile-layouts)). Tablet (768–1279 px) uses the desktop layouts with tablet-sized controls.
 
 ## Run it locally
 
@@ -70,13 +70,13 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
 | Roles | `admin` can do everything. `viewer` (the Owner) is read-only, enforced in the UI and by RLS. | §4.3 |
 
-**Out of scope for v1:** tablet layouts (mobile is in progress, see below), voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
+**Out of scope for v1:** tablet-specific layouts, voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
 
 ---
 
 ## Progress tracker
 
-*Last updated on 2026-11-22 from `context/`, the slice logs and git (`main` at `e8c58b7`).*
+*Last updated on 2026-11-23 from `context/`, the slice logs and git (`main` at `9a0214c`).*
 
 ### Overall
 
@@ -84,7 +84,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 |---|---|
 | Design (Figma `bs internal tools`) | ✅ All screens, interaction states and hi-fi flows done. 96 of 96 interactions defined. |
 | Prototype F0–F19 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
-| Mobile layouts R01–R07 | 🟡 Designed in Figma and built on branch `feat/mobile-responsive`. Not merged into `main` yet. |
+| Mobile layouts R01–R09 | ✅ Designed in Figma, built and live on `main` (PR #6, then fixes and the mobile type scale). |
 | Production P0–P11 | ✅ Built and tested on **local** Supabase. CI on GitHub (branch `production/p0-p10`). |
 | Production P12–P14 | ☐ Not started: full regression on staging, operations, UAT and launch. |
 | Release gates PG1–PG7 | ☐ Not yet signed off. They need a staging environment. |
@@ -116,21 +116,23 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | F18 | Business information → PDF brand row | ⚠ 2026-11-14: PNG re-export pending |
 | F19 | Booking event details (event start, location, notes): form, detail sheet, invoice PDF, plus Supabase migration 013 | ⚠ 2026-11-21: PNG re-export pending ([log](app/docs/slices/F19.md)) |
 
-### Mobile layouts (in progress)
+### Mobile layouts
 
-Started 2026-11-22 (it was deferred to v1.1). The admin often books from a phone while talking to a client on WhatsApp. All of this is on the branch **`feat/mobile-responsive`** (commit `ef70449`) and **not yet merged into `main`**. Desktop (768 px and up) doesn't change: every mobile change sits behind `max-tablet:` / `tablet:` classes or `useIsMobile()`.
+Started 2026-11-22 (it was deferred to v1.1). The admin often books from a phone while talking to a client on WhatsApp. Merged into `main` (PR #6) and deployed. Desktop (768 px and up) doesn't change: every mobile change sits behind `max-tablet:` / `tablet:` classes or `useIsMobile()`.
 
 | Slice | Scope | Status |
 |---|---|---|
-| R01 | Breakpoint tokens (tablet 768, desktop 1280), larger 44 px controls and 16 px input text on mobile | ✅ on branch |
+| R01 | Breakpoint tokens (tablet 768, desktop 1280), larger 44 px controls and 16 px input text on mobile | ✅ on main |
 | R02 | Figma mobile frames at 390 px: Bookings M01–M07 and ME1–ME4, Login ML1–ML3, shell MS1–MS3, Account MA1–MA5, Package Lib MP1–MP8 | ✅ in Figma |
-| R03 | Mobile shell: top bar, launcher / account / log-out bottom sheets, login | ✅ on branch |
-| R04 | Bookings: list with search, filters and infinite scroll; agenda calendar that shows every day | ✅ on branch |
-| R05 | Booking form: one column, item cards, sticky Cancel / Save, invoice modal as a bottom sheet | ✅ on branch |
-| R06 | Booking detail full screen, invoice PDF via the phone's share sheet | ✅ on branch |
-| R07 | Account settings and Package Library | ✅ on branch |
+| R03 | Mobile shell: top bar, launcher / account / log-out bottom sheets, login | ✅ on main |
+| R04 | Bookings: list with search, filters and infinite scroll; agenda calendar that shows every day | ✅ on main |
+| R05 | Booking form: one column, item cards, sticky Cancel / Save, invoice modal as a bottom sheet | ✅ on main |
+| R06 | Booking detail full screen, invoice PDF via the phone's share sheet | ✅ on main |
+| R07 | Account settings and Package Library | ✅ on main |
+| R08 | No sideways overflow at 320–390 px: item cards, summary captions, crew schedule sheet (pinned header and footer), account sheet update | ✅ on main |
+| R09 | Mobile type scale (`Mobile/…` text styles: body 16, caption 14, badges 13, smallest 12), 16 px card padding, layouts re-checked at 320 | ✅ on main |
 
-Logs: `app/docs/slices/R01.md`, `R02.md`, `R03-R07.md` (on the branch). Tests: `tests/e2e/R0*.spec.ts` at 390 × 844. **Still open:** review and merge, tablet layouts, a mobile pass on the read-only booking view, and updating PRD §4.5 / §5.1 (they still say mobile is deferred).
+Logs: `app/docs/slices/R01.md`, `R02.md`, `R03-R07.md`, `R08-R09.md`. Tests: `tests/e2e/R0*.spec.ts` (390 × 844, plus overflow checks at 320 / 360 / 375 / 390). **Still open:** tablet layouts and a mobile pass on the read-only booking page (`/bookings/[id]`).
 
 ### Production slices (P0–P14)
 
@@ -164,7 +166,6 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
 | Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
-| Review and merge `feat/mobile-responsive` (R01–R07) | Mobile | Your review |
 | Apply migration 013 (event details) to any database deployed before 2026-11-21 | Deploy | Run `supabase/migrations/20261121000013_booking_event_details.sql` (see `agents/DEPLOY.md`) |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
 | P2 and P11 code review | P2, P11 | Running `code-review` |

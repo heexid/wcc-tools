@@ -118,6 +118,12 @@ for (const [device, max] of [["tablet", bp("desktop", "min-width")], ["mobile", 
   out.push(`@media (width < ${max / 16}rem) {`, `  /* ${device} (< ${max}px) */`, `  :root {`);
   for (const [css, key] of responsive) out.push(`    ${css}: var(--spacing-${device}-${key});`);
   out.push(`    --safe-area-bottom: max(var(--spacing-${device}-safe-area-bottom), env(safe-area-inset-bottom, 0px));`);
+  // Mobile type scale (Figma text styles "Mobile/…", 2026-11-23): the phone size + line height of each desktop style.
+  if (device === "mobile")
+    for (const m of styles.mobileText ?? []) {
+      const n = textName(m.name.slice("Mobile/".length).replace(" · ", "/"));
+      out.push(`    --text-${n}: ${m.fontSize}px;`, `    --text-${n}--line-height: ${m.lineHeight}px;`);
+    }
   out.push(`  }`, `}`, ``);
 }
 // Manifest: Figma name → CSS var → resolved value (used by /dev/tokens and the G2 token test)
@@ -137,6 +143,7 @@ const manifest = {
     alias: typeof l.token.$value === "string" && l.token.$value.startsWith("{") ? byRef.get(l.token.$value) : null,
     value: resolveLeaf(l.token),
   })),
+  mobileText: (styles.mobileText ?? []).map((m) => ({ figma: m.name, css: `--text-${textName(m.name.slice(7).replace(" · ", "/"))}`, fontSize: m.fontSize, lineHeight: m.lineHeight })),
   text: styles.text.map((t) => ({ figma: t.name, css: `--text-${textName(t.name)}`, fontSize: t.fontSize, lineHeight: t.lineHeight, fontWeight: weight[t.fontStyle], letterSpacing: +t.letterSpacing.toFixed(2) })),
   effects: styles.effects.map((e) => ({ figma: e.name, css: `--${e.type === "INNER_SHADOW" ? "inset-shadow" : "shadow"}-${slug(e.name.split("/")[1])}` })),
   paints: styles.paints.map((p) => ({ figma: p.name, css: `--gradient-${slug(p.name.split("/")[1])}` })),

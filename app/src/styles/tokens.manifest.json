@@ -1121,6 +1121,92 @@
       "value": "#a4abb6"
     }
   ],
+  "mobileText": [
+    {
+      "figma": "Mobile/Heading · Module",
+      "css": "--text-heading-module",
+      "fontSize": 17,
+      "lineHeight": 24
+    },
+    {
+      "figma": "Mobile/Heading · Section",
+      "css": "--text-heading-section",
+      "fontSize": 17,
+      "lineHeight": 24
+    },
+    {
+      "figma": "Mobile/Heading · Subsection",
+      "css": "--text-heading-subsection",
+      "fontSize": 15,
+      "lineHeight": 22
+    },
+    {
+      "figma": "Mobile/Text · Body",
+      "css": "--text-body",
+      "fontSize": 16,
+      "lineHeight": 24
+    },
+    {
+      "figma": "Mobile/Text · Body Strong",
+      "css": "--text-body-strong",
+      "fontSize": 16,
+      "lineHeight": 24
+    },
+    {
+      "figma": "Mobile/Text · Caption",
+      "css": "--text-caption",
+      "fontSize": 14,
+      "lineHeight": 20
+    },
+    {
+      "figma": "Mobile/Text · Caption Strong",
+      "css": "--text-caption-strong",
+      "fontSize": 14,
+      "lineHeight": 20
+    },
+    {
+      "figma": "Mobile/Text · Micro",
+      "css": "--text-micro",
+      "fontSize": 13,
+      "lineHeight": 18
+    },
+    {
+      "figma": "Mobile/Text · Timestamp",
+      "css": "--text-timestamp",
+      "fontSize": 12,
+      "lineHeight": 16
+    },
+    {
+      "figma": "Mobile/UI · Button",
+      "css": "--text-ui-button",
+      "fontSize": 15,
+      "lineHeight": 20
+    },
+    {
+      "figma": "Mobile/UI · Input",
+      "css": "--text-ui-input",
+      "fontSize": 16,
+      "lineHeight": 24
+    },
+    {
+      "figma": "Mobile/UI · Field Label",
+      "css": "--text-ui-field-label",
+      "fontSize": 14,
+      "lineHeight": 20
+    },
+    {
+      "figma": "Mobile/UI · Tab Active",
+      "css": "--text-ui-tab-active",
+      "fontSize": 15,
+      "lineHeight": 20
+    },
+    {
+      "figma": "Mobile/UI · Tab",
+      "css": "--text-ui-tab",
+      "fontSize": 15,
+      "lineHeight": 20
+    }
+  ],
   "text": [
     {
       "figma": "Display/Metric",

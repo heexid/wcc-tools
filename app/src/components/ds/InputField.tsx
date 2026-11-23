@@ -16,7 +16,7 @@ export type FieldState = "default" | "focus" | "error" | "disabled";
 export function FieldLabel({ children, required, htmlFor }: { children: ReactNode; required?: boolean; htmlFor?: string }) {
   return (
     <div className="flex items-start gap-micro overflow-hidden">
-      <label htmlFor={htmlFor} className="text-ui-field-label text-text-secondary whitespace-nowrap">
+      <label htmlFor={htmlFor} className="text-ui-field-label text-text-secondary whitespace-nowrap max-tablet:whitespace-normal">
         {children}
       </label>
       {required && (
@@ -31,7 +31,7 @@ export function FieldLabel({ children, required, htmlFor }: { children: ReactNod
 export function FieldHelper({ children, error, warning, id }: { children: ReactNode; error?: boolean; warning?: boolean; id?: string }) {
   return (
     // Figma helpers are auto-width text: one line that may run past the field (Bookings 15 phone error).
-    <p id={id} aria-live={warning ? "polite" : undefined} className={cn("text-caption whitespace-nowrap", error ? "text-text-danger" : warning ? "text-status-warning" : "text-text-secondary")}>
+    <p id={id} aria-live={warning ? "polite" : undefined} className={cn("text-caption whitespace-nowrap max-tablet:whitespace-normal", error ? "text-text-danger" : warning ? "text-status-warning" : "text-text-secondary")}>
       {children}
     </p>
   );
