@@ -63,7 +63,7 @@ function Hero() {
             <p className="text-[length:calc(var(--spacing-16)+var(--spacing-2))] leading-[calc(var(--spacing-24)+var(--spacing-4))] text-text-primary">
               Bookings, packages, payments and invoices in one place, with totals that add up themselves
             </p>
-            <ButtonLink href={GET_STARTED_HREF} variant="secondary" size="lg" className="max-tablet:w-full">
+            <ButtonLink href={GET_STARTED_HREF} size="lg" className="max-tablet:w-full">
               Start your first booking
             </ButtonLink>
             <p className="text-caption text-text-primary">Free setup by our team</p>
