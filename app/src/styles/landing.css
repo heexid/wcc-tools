@@ -144,3 +144,39 @@ html:has(.lp) {
 [data-lp-nav][data-scrolled]::after {
   opacity: 1;
 }
+
+/* Full-screen mobile / tablet menu (Figma LP-M · Navigation menu, fullscreen) — slides down from the top edge and
+   goes back up through it: drawer curve in, the shorter modal duration out. Transform only (composite). Reduced
+   motion: no travel, a fade. data-state comes from usePresence. */
+.lp-menu {
+  --lp-menu-from-y: -100%;
+  transition-property: opacity, transform;
+  transition-duration: var(--dur-sheet);
+  transition-timing-function: var(--ease-drawer);
+}
+.lp-menu[data-state="open"] {
+  opacity: 1;
+  transform: none;
+}
+.lp-menu[data-state="closed"] {
+  transform: translateY(var(--lp-menu-from-y));
+  transition-duration: var(--dur-modal);
+}
+@starting-style {
+  .lp-menu[data-state="open"] {
+    transform: translateY(var(--lp-menu-from-y));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-menu {
+    --lp-menu-from-y: 0;
+  }
+  .lp-menu[data-state="closed"] {
+    opacity: 0;
+  }
+  @starting-style {
+    .lp-menu[data-state="open"] {
+      opacity: 0;
+    }
+  }
+}
