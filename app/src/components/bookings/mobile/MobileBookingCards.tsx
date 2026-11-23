@@ -7,6 +7,7 @@ import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDate, formatIDR } from "@/lib/format";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma: Booking components › Mobile/Booking list item (206:55829) — replaces Booking table/Row below 768 (M01).
 // Card: surface/default, 1px border/default, radius card, pad base (16, mobile cards 2026-11-23), gap tight (6).
@@ -18,6 +19,7 @@ export function MobileBookingCard({ row, onOpen }: { row: BookingRow; onOpen: (i
     <button
       type="button"
       onClick={() => onOpen(row.id)}
+      onPointerDown={() => prefetchBooking(row.id)}
       aria-label={`${row.bookingName}, ${row.ref}`}
       className="flex w-full cursor-pointer flex-col gap-tight rounded-card border border-border-default bg-surface-default p-base text-left outline-none transition-[background-color,transform] duration-(--dur-hover) ease-(--ease-hover) focus-visible:shadow-focus-ring active:scale-(--press-scale) active:bg-surface-subtle active:duration-(--dur-press) active:ease-(--ease-out)"
     >
@@ -48,6 +50,7 @@ export function MobileAgendaItem({ row, onOpen }: { row: BookingRow; onOpen: (id
     <button
       type="button"
       onClick={() => onOpen(row.id)}
+      onPointerDown={() => prefetchBooking(row.id)}
       aria-label={`${row.bookingName}, ${row.ref}`}
       className="flex w-full cursor-pointer items-center gap-control border-b border-border-default p-base text-left outline-none transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) last:border-b-0 focus-visible:bg-surface-subtle active:bg-surface-subtle"
     >

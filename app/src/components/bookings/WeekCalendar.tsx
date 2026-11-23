@@ -16,6 +16,7 @@ import type { Crew } from "@/lib/data/types";
 import { addDays, formatDayMonth, formatDateLongDay, initials, parseISODate, type ISODate } from "@/lib/format";
 import { DayPopover, DAY_POPOVER_WIDTH } from "./DayPopover";
 import { useIsViewer } from "@/lib/role";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 19 (week), 28 (hover · drill-in · quick add), 31 (busy day "+N more") — PRD US-6 week,
 // INTERACTIONS 1.24–1.27. Mon–Sun, 7 columns (pad compact/tight, gap tight, right border; today's column
@@ -27,8 +28,8 @@ import { useIsViewer } from "@/lib/role";
 export const WEEK_CARD_LIMIT = 5;
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-/** Monday of the anchor's week. */
-export const weekStartOf = (d: string): ISODate => addDays(d, -((parseISODate(d).dow + 6) % 7));
+import { weekStartOf } from "@/lib/booking/calendar-window";
+export { weekStartOf };
 
 type Pop = { date: ISODate; left: number; top: number; origin: string };
 
@@ -136,6 +137,7 @@ export function WeekCalendar({
                     pkg={b.packageNameSnapshot}
                     crew={<CrewAvatars ids={b.crewIds} crew={crew} bookingId={b.id} />}
                     onOpen={() => onOpenBooking(b.id)}
+                    onPreview={() => prefetchBooking(b.id)}
                   />
                 ))}
                 {extra > 0 && (

@@ -14,6 +14,7 @@ import { formatDate, formatIDR, formatPhone } from "@/lib/format";
 import { BOOKING_COLS, BookingTableHeader } from "./BookingTableHeader";
 import { useIsViewer } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 02 / 18 / 25 / 26 — Booking table (998, 1px border, radius card, clips): header, Booking
 // table/Row (h 62, pad 0/control, bottom border; Hover surface/subtle), Table/Footer ("Showing 1–4 of 4
@@ -43,6 +44,8 @@ function Row({ b, onOpen }: { b: BookingRow; onOpen: (id: string) => void }) {
     <div
       role="row"
       onClick={openUnlessControl(() => onOpen(b.id))}
+      onPointerEnter={() => prefetchBooking(b.id)}
+      onFocus={() => prefetchBooking(b.id)}
       className={cn(
         "relative flex h-table-row-height w-full items-center border-b border-border-default bg-surface-default px-control text-caption text-text-primary",
         "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-subtle has-focus-visible:bg-surface-subtle",

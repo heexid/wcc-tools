@@ -243,6 +243,7 @@ export function CalendarWeekCard({
   pkg,
   crew,
   onOpen,
+  onPreview,
   forceState,
   className,
 }: {
@@ -251,6 +252,8 @@ export function CalendarWeekCard({
   pkg: string;
   crew?: ReactNode;
   onOpen: () => void;
+  /** Pointer reached the card or focus entered it — e.g. start loading what onOpen shows. */
+  onPreview?: () => void;
   forceState?: "hover";
   className?: string;
 }) {
@@ -258,6 +261,8 @@ export function CalendarWeekCard({
     <div
       data-force={forceState}
       onClick={openUnlessControl(onOpen)}
+      onPointerEnter={onPreview}
+      onFocus={onPreview}
       className={cn(
         "group/card relative flex w-full shrink-0 flex-col gap-tight rounded-control border-l-3 bg-surface-default p-compact",
         "transition-[background-color,box-shadow] duration-(--dur-hover) ease-(--ease-hover)",
@@ -297,6 +302,7 @@ export function CalendarDayRow({
   total,
   remaining,
   onOpen,
+  onPreview,
   forceState,
 }: {
   status: BookingStatus;
@@ -306,12 +312,16 @@ export function CalendarDayRow({
   total: string;
   remaining: string;
   onOpen: () => void;
+  /** Pointer reached the card or focus entered it — e.g. start loading what onOpen shows. */
+  onPreview?: () => void;
   forceState?: "hover";
 }) {
   return (
     <div
       data-force={forceState}
       onClick={openUnlessControl(onOpen)}
+      onPointerEnter={onPreview}
+      onFocus={onPreview}
       className={cn(
         "group/row relative flex w-full items-center gap-base border-b border-border-default px-base py-[calc(var(--spacing-12)+var(--spacing-2))]",
         "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-subtle data-[force=hover]:bg-surface-subtle has-focus-visible:bg-surface-subtle",

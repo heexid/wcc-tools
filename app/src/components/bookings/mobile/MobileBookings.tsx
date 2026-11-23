@@ -12,6 +12,8 @@ import { cn } from "@/components/ds/cn";
 import { useBookingFilters } from "@/components/bookings/useBookingFilters";
 import { STATUS_OPTIONS, rangeChip, toQuery, type BookingFilters } from "@/lib/booking/filters";
 import { listAllBookings, listBookings, type BookingRow } from "@/lib/data/repo";
+import { fetchCached, peek } from "@/lib/data/cache";
+import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import type { Crew, Package } from "@/lib/data/types";
 import { addDays, formatMonthYear, parseISODate, toISODate, type ISODate } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
@@ -179,19 +181,24 @@ function MobileList({
     setWantKey(key);
     setWant(1);
   }
+  // Page 1 is cached (lib/data/cache.ts): coming back, or back to filters seen before, shows it at once while it
+  // refreshes; later pages always load fresh.
+  const firstKey = `bookings:mobile-list:${key}`;
   useEffect(() => {
     const have = state?.key === key ? state.page : 0;
     if (have >= want) return;
     let live = true;
-    void listBookings({ ...query, page: have + 1 }).then(
+    const run = () => listBookings({ ...query, page: have + 1 });
+    void (have === 0 ? fetchCached(firstKey, run) : run()).then(
       (r) => live && setState((s) => ({ key, rows: s?.key === key ? [...s.rows, ...r.rows] : r.rows, page: r.page, pages: r.pages, total: r.total })),
       () => {},
     );
     return () => {
       live = false;
     };
-  }, [key, query, want, state]);
-  const current = state?.key === key ? state : null;
+  }, [key, firstKey, query, want, state]);
+  const cachedFirst = state?.key === key ? undefined : peek<{ rows: BookingRow[]; page: number; pages: number; total: number }>(firstKey)?.value;
+  const current = useMemo(() => (state?.key === key ? state : cachedFirst ? { key, ...cachedFirst } : null), [state, key, cachedFirst]);
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = sentinel.current;
@@ -260,15 +267,10 @@ function MobileAgenda({
   const { y, m } = parseISODate(anchor);
   const from = toISODate(y, m, 1), to = toISODate(y, m + 1, 0);
   const key = JSON.stringify({ ...toQuery(filters, today, "calendar"), from, to });
-  const [state, setState] = useState<{ key: string; rows: BookingRow[] } | null>(null);
-  useEffect(() => {
-    let live = true;
-    void listAllBookings(JSON.parse(key)).then((rows) => live && setState({ key, rows }), () => {});
-    return () => {
-      live = false;
-    };
-  }, [key]);
-  const rows = state?.key === key ? state.rows : null;
+  // Cached per month + filters: a month seen before shows at once and refreshes. Tagged with its key so another
+  // month's rows never show under this month's days.
+  const result = useCachedQuery(() => listAllBookings(JSON.parse(key)).then((rows) => ({ key, rows })), `bookings:agenda:${key}`);
+  const rows = result?.key === key ? result.rows : null;
   const byDay = useMemo(() => {
     const map = new Map<string, BookingRow[]>();
     for (const r of rows ?? []) map.set(r.bookingDate, [...(map.get(r.bookingDate) ?? []), r]);

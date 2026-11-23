@@ -10,7 +10,7 @@ import { cascade, useEntrance } from "@/components/ds/useEntrance";
 import { AppShell } from "@/components/shell/AppShell";
 import { useLeaveGuard } from "@/components/shell/LeaveGuard";
 import { BookingTableHeader } from "@/components/bookings/BookingTableHeader";
-import { BookingCalendar } from "@/components/bookings/BookingCalendar";
+import { BookingCalendar, initialCalendarWindow } from "@/components/bookings/BookingCalendar";
 import { ActiveFilters, BookingToolbar, type View } from "@/components/bookings/BookingFilters";
 import { BookingTable } from "@/components/bookings/BookingTable";
 import { BookingDetail } from "@/components/bookings/BookingDetail";
@@ -22,12 +22,13 @@ import { takeFlash } from "@/lib/flash";
 import { useBookingFilters } from "@/components/bookings/useBookingFilters";
 import { hasFilters, toQuery } from "@/lib/booking/filters";
 import { UpcomingRail } from "@/components/bookings/UpcomingRail";
-import { buildInsights, countTrend, percentTrend, weekStart } from "@/lib/booking/insights";
+import { buildInsights, countTrend, percentTrend } from "@/lib/booking/insights";
 import { now } from "@/lib/clock";
-import { countBookings, getKpis, getUpcoming, listAllBookings, listBookings, loadCatalog, type BookingQuery, type BookingRow } from "@/lib/data/repo";
-import { withRetry } from "@/lib/data/retry";
-import type { Crew, Package } from "@/lib/data/types";
-import { addDays, formatIDR, isoToLocalDate, type ISODate } from "@/lib/format";
+import { countBookings, getKpis, getUpcoming, listAllBookings, listBookings, loadFilterCatalog, type BookingQuery } from "@/lib/data/repo";
+import { useCachedQuery } from "@/lib/data/useCachedQuery";
+import { calendarQuery, dashboardKeys, kpiMonth, weekQuery } from "@/lib/data/dashboard-reads";
+import type { Crew } from "@/lib/data/types";
+import { formatIDR, isoToLocalDate, type ISODate } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
 import { useIsMobile } from "@/components/ds/useBreakpoint";
@@ -46,68 +47,21 @@ const KPI_INFO = {
   collected: "Sum of invoices created this month",
 };
 
-type Kpis = Awaited<ReturnType<typeof getKpis>>;
-
-/** Everything the dashboard shows regardless of filters — one round of parallel, query-shaped reads (P3).
- *  Goes through the data layer's latency (?latency=…) so the loading state (6.3) can be held on screen. */
-function useDashboardData() {
-  const [data, setData] = useState<null | { count: number; week: BookingRow[]; upcoming: BookingRow[]; crew: Map<string, Crew>; packages: Package[]; kpis: Kpis; today: ISODate }>(null);
-  // One effect owns the load and its retries: a failed round tries again 10 s later (review P8 #3); leaving the
-  // page stops it, including an attempt still in flight (P9 review #6).
-  useEffect(() => {
-    let live = true;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const load = () => {
-      const today = isoToLocalDate(now().toISOString());
-      const from = weekStart(today);
-      // Every crew member (incl. inactive — a past booking keeps their avatar) and every package, as before.
-      void withRetry(() => Promise.all([loadCatalog(), getKpis(today.slice(0, 7)), countBookings(), listAllBookings({ from, to: addDays(from, 6) }), getUpcoming(7)])).then(
-        ([catalog, kpis, count, week, upcoming]) => {
-          if (live) setData({ count, week, upcoming, crew: new Map(catalog.crew.map((c) => [c.id, c])), packages: catalog.packages, kpis, today });
-        },
-        (e) => {
-          console.error("Bookings dashboard: data source unavailable", e);
-          if (live) timer = setTimeout(load, 10_000);
-        },
-      );
-    };
-    load();
-    return () => {
-      live = false;
-      if (timer) clearTimeout(timer);
-    };
-  }, []);
-  return data;
-}
-
-/** One query-shaped read that re-runs when its query changes; the last result stays on screen meanwhile. */
-function useQuery<T>(run: (() => Promise<T>) | null, key: string): T | null {
-  const [state, setState] = useState<{ key: string; value: T | null; failed?: boolean } | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    if (!run) return;
-    let live = true;
-    void withRetry(run).then(
-      (value) => live && setState({ key, value }),
-      (e) => {
-        // Never show the previous query's rows as this one's result (review P6 #6): back to the skeleton.
-        if (live) setState({ key, value: null, failed: true });
-        console.error("Bookings list: data source unavailable", e);
-      },
-    );
-    return () => {
-      live = false;
-    };
-  }, [key, attempt]); // eslint-disable-line react-hooks/exhaustive-deps -- `key` is the serialised query `run` closes over
-  // A failed query tries again 10 s after it FAILED (review P7 #2, P8 #7): the timer starts from the failure, so a
-  // slow attempt is never cut short. No read-error design exists, so the skeleton stays until the source answers.
-  const failedAt = state?.failed && state.key === key ? state : null;
-  useEffect(() => {
-    if (!failedAt) return;
-    const t = setTimeout(() => setAttempt((n) => n + 1), 10_000);
-    return () => clearTimeout(t);
-  }, [failedAt]);
-  return state?.value ?? null;
+/** Everything the dashboard shows regardless of filters. Each read lands on its own, so a section fills in as soon
+ *  as its data is in instead of waiting for the slowest read; a failed read retries by itself (useCachedQuery); a return visit opens on the cached results. KPIs and
+ *  the rail are desktop-only, so the mobile view skips those reads. Goes through the data layer's latency
+ *  (?latency=…) so the loading state (6.3) can be held on screen. */
+function useDashboardData(today: ISODate, mobile: boolean) {
+  // Keys + queries shared with the server's streamed first reads (lib/data/dashboard-reads.ts).
+  // Every crew member (incl. inactive — a past booking keeps their avatar) and every package.
+  const catalog = useCachedQuery(() => loadFilterCatalog(), dashboardKeys.catalog);
+  const count = useCachedQuery(() => countBookings(), dashboardKeys.count);
+  const kpis = useCachedQuery(mobile ? null : () => getKpis(kpiMonth(today)), mobile ? "" : dashboardKeys.kpis(today));
+  const week = useCachedQuery(mobile ? null : () => listAllBookings(weekQuery(today)), mobile ? "" : dashboardKeys.week(today));
+  const upcoming = useCachedQuery(mobile ? null : () => getUpcoming(7), mobile ? "" : dashboardKeys.upcoming(today));
+  const crew = useMemo(() => new Map<string, Crew>(catalog?.crew.map((c) => [c.id, c])), [catalog]);
+  const ready = !!catalog && count !== null && (mobile || (!!kpis && !!week && !!upcoming));
+  return { catalog, crew, count, kpis, week, upcoming, ready };
 }
 
 function FirstUse({ onNew, className }: { onNew: () => void; className?: string }) {
@@ -140,9 +94,14 @@ function Dashboard() {
   const path = usePathname();
   const { navigate } = useLeaveGuard();
   const viewer = useIsViewer();
-  const data = useDashboardData();
+  // Below 768 the page is the mobile view (R04, Figma M01–M03); it runs its own list / agenda queries.
+  const mobile = useIsMobile();
+  // Fixed for the visit, so every read (and the calendar's first window) agrees on the day.
+  const [today] = useState(() => isoToLocalDate(now().toISOString()));
+  const data = useDashboardData(today, mobile);
   // The arrival cascade plays once per visit, then its classes go, so view swaps and re-renders never replay it.
-  const entering = useEntrance(!!data);
+  // Its timer starts once every dashboard read is in, as before.
+  const entering = useEntrance(data.ready);
   // One-shot toast carried from another screen ("Booking canceled · BK-…" after canceling in Edit booking, US-12).
   const [flash, setFlashState] = useState<{ text: string; open: boolean } | null>(null);
   const flashPresence = usePresence(!!flash?.open);
@@ -157,8 +116,6 @@ function Dashboard() {
     return () => clearTimeout(t);
   }, [flash]);
   const view: View = params.get("tab") === "table" ? "table" : "calendar";
-  // Below 768 the page is the mobile view (R04, Figma M01–M03); it runs its own list / agenda queries.
-  const mobile = useIsMobile();
   const setView = (v: View) => {
     const p = new URLSearchParams(params);
     if (v === "calendar") p.delete("tab");
@@ -182,37 +139,39 @@ function Dashboard() {
   const [avatarPop, setAvatarPop] = useState<(CrewPopoverAnchor & { bookingId: string }) | null>(null);
   const crewCtx = useMemo(() => ({ open: setAvatarPop, active: avatarPop }), [avatarPop]);
 
-  const upcoming = data?.upcoming ?? [];
+  const upcoming = data.upcoming ?? [];
   const { filters, update, reset } = useBookingFilters();
   // Calendar: search + status / crew / package / invoice filters; Canceled hidden unless the Status filter
   // includes it (PRD US-12, INTERACTIONS 1.33). Table: the same plus the date range, sort and paging — one page
   // from the data source (server-side sort + pagination).
-  // Calendar: only the visible days (BookingCalendar reports its window; P6 range-bounded load). Each list query
-  // runs only for the view on screen, and starts in parallel with the dashboard reads (review P6 #3, #4).
-  const [visibleRange, setVisibleRange] = useState<{ from: ISODate; to: ISODate } | null>(null);
-  const queryToday = data?.today ?? isoToLocalDate(now().toISOString());
-  const calendarQuery: BookingQuery | null = !mobile && view === "calendar" && visibleRange ? { ...toQuery(filters, queryToday, "calendar"), ...visibleRange } : null;
-  const tableQuery: BookingQuery | null = !mobile && view === "table" ? { ...toQuery(filters, queryToday, "table"), page: filters.page, pageSize: filters.size } : null;
-  const calendarResult = useQuery(calendarQuery && (() => listAllBookings(calendarQuery)), JSON.stringify(calendarQuery));
+  // Calendar: only the visible days (P6 range-bounded load). The first window is read from the URL the same way the
+  // calendar reads it, so this query starts on the first render, in parallel with the dashboard reads, rather than
+  // after the calendar mounts and reports its window. Each list query runs only for the view on screen (review P6 #3, #4).
+  const [visibleRange, setVisibleRange] = useState(() => initialCalendarWindow(params, today));
+  const onVisibleRange = useCallback((r: { from: ISODate; to: ISODate }) => setVisibleRange((p) => (p.from === r.from && p.to === r.to ? p : r)), []);
+  const calQuery: BookingQuery | null = !mobile && view === "calendar" ? calendarQuery(filters, today, visibleRange) : null;
+  const tableQuery: BookingQuery | null = !mobile && view === "table" ? { ...toQuery(filters, today, "table"), page: filters.page, pageSize: filters.size } : null;
+  const calendarResult = useCachedQuery(calQuery && (() => listAllBookings(calQuery)), calQuery ? dashboardKeys.calendar(calQuery) : "");
   const calendarRows = calendarResult ?? [];
-  const table = useQuery(tableQuery && (() => listBookings(tableQuery)), JSON.stringify(tableQuery));
+  const table = useCachedQuery(tableQuery && (() => listBookings(tableQuery)), tableQuery ? dashboardKeys.table(tableQuery) : "");
   const tableRows = table?.rows ?? [];
   const page = table?.page ?? 1;
   const pages = table?.pages ?? 1;
   // Insights only look at this week (due today, still on DP this week), so the week's rows are enough.
-  const insights = useMemo(() => (data ? buildInsights(data.week, data.today, now()) : []), [data]);
+  const insights = useMemo(() => (data.week ? buildInsights(data.week, today, now()) : []), [data.week, today]);
   // 6.3: while the data loads the frame stays — title, filters and view switch are live; KPIs, rail, table rows and
-  // calendar cells show skeletons.
-  const loading = !data;
-  // The list keeps its skeleton until its own first result is in (no empty frame between data and rows).
-  const listLoading = loading || (view === "calendar" ? !calendarResult : !table);
-  const today = data?.today ?? isoToLocalDate(now().toISOString());
-  const crewList = data ? [...data.crew.values()] : [];
-  const packageList = data?.packages ?? [];
+  // calendar cells show skeletons. Each section leaves its skeleton when its own reads are in.
+  const railLoading = !data.week || !data.upcoming;
+  // The list needs the count (first use replaces it) and the crew (avatars) as well as its own first result, so it
+  // never shows rows that first use then swaps out (no empty frame between data and rows).
+  const listLoading = data.count === null || !data.catalog || (view === "calendar" ? !calendarResult : !table);
+  const crewList = data.catalog?.crew ?? [];
+  const packageList = data.catalog?.packages ?? [];
   const rise = (i: number) => (entering ? cascade(i) : undefined);
 
-  const kpis = data?.kpis;
-  const firstUse = !!data && data.count === 0;
+  // KPI cards wait for the count too: on first use their captions read "No data yet".
+  const kpis = data.count !== null ? data.kpis : null;
+  const firstUse = data.count === 0;
   const count = kpis ? countTrend(kpis.bookingsThisMonth, kpis.bookingsPrevMonth) : null;
   const collected = kpis ? percentTrend(kpis.collectedThisMonth, kpis.collectedPrevMonth) : null;
   const noData = firstUse ? "No data yet" : undefined;
@@ -225,8 +184,8 @@ function Dashboard() {
         today={today}
         crew={crewList}
         packages={packageList}
-        total={data ? data.count : null}
-        loading={loading}
+        total={data.count}
+        loading={data.count === null || !data.catalog}
         onOpen={openBooking}
         onNew={() => navigate("/bookings/new")}
       />
@@ -254,7 +213,7 @@ function Dashboard() {
             icon="calendar"
             value={kpis ? String(kpis.bookingsThisMonth) : kpiSkeleton}
             trend={!firstUse && count?.changed ? { value: count.value, direction: count.direction, tone: count.tone } : undefined}
-            period={loading ? undefined : (noData ?? "vs last month")}
+            period={kpis ? (noData ?? "vs last month") : undefined}
           />
           <MetricCard
             className={cn("min-w-0 flex-1", rise(2))}
@@ -285,14 +244,14 @@ function Dashboard() {
             today={today}
             crew={crewList}
             packages={packageList}
-            summary={view === "table" && hasFilters(filters) && data && table ? `Showing ${table.total} of ${data.count} bookings` : undefined}
+            summary={view === "table" && hasFilters(filters) && data.count !== null && table ? `Showing ${table.total} of ${data.count} bookings` : undefined}
           />
         )}
 
         {firstUse ? (
           <FirstUse className={rise(6)} onNew={() => navigate("/bookings/new")} />
         ) : view === "calendar" ? (
-          <BookingCalendar onVisibleRange={setVisibleRange} loading={listLoading} className={rise(6)} rows={calendarRows} crew={data?.crew ?? new Map()} today={today} onOpenBooking={openBooking} onNewBooking={(d) => navigate(`/bookings/new?date=${d}`)} />
+          <BookingCalendar onVisibleRange={onVisibleRange} loading={listLoading} className={rise(6)} rows={calendarRows} crew={data.crew} today={today} onOpenBooking={openBooking} onNewBooking={(d) => navigate(`/bookings/new?date=${d}`)} />
         ) : (
           <BookingTable
             loading={listLoading}
@@ -311,7 +270,7 @@ function Dashboard() {
           />
         )}
       </main>
-      <UpcomingRail loading={loading} className={rise(1)} upcoming={upcoming} insights={insights} today={today} onOpenBooking={openBooking} onNavigate={(href) => navigate(href)} />
+      <UpcomingRail loading={railLoading} className={rise(1)} upcoming={upcoming} insights={insights} today={today} onOpenBooking={openBooking} onNavigate={(href) => navigate(href)} />
     </div>
     )}
     <SideSheet open={!!bookingId} onClose={closeBooking} label="Booking detail">

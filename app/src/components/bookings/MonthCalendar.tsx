@@ -12,6 +12,7 @@ import { addDays, formatDateLongDay, parseISODate, toISODate, type ISODate } fro
 import { DayPopover, DAY_POPOVER_WIDTH } from "./DayPopover";
 import { useIsViewer } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 01 (month) + 17 ("+N more" popover, empty-date hover) — PRD US-6, §4.5 (keyboard grid),
 // INTERACTIONS 1.11–1.15. Weekdays row (h 36, surface/header, Caption text/secondary, pad compact) + 6 week
@@ -23,13 +24,8 @@ export const CHIP_LIMIT = 3;
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const STATUS_TEXT = { draft: "Draft", partially_paid: "Partially paid", paid: "Paid", canceled: "Canceled" } as const;
 
-/** The 42 dates (6 Mon-first weeks) shown for the anchor's month. */
-export function monthGrid(anchor: string): ISODate[] {
-  const { y, m } = parseISODate(anchor);
-  const first = toISODate(y, m, 1);
-  const lead = (parseISODate(first).dow + 6) % 7; // Mon = 0
-  return Array.from({ length: 42 }, (_, i) => addDays(first, i - lead));
-}
+import { monthGrid } from "@/lib/booking/calendar-window";
+export { monthGrid };
 
 /** Same day-of-month in the month `delta` away, clamped to that month's length. */
 export function shiftMonth(d: string, delta: number): ISODate {
@@ -185,7 +181,7 @@ export function MonthCalendar({
                   ) : (
                     <>
                       {chips.map((b) => (
-                        <CalendarBookingChip key={b.id} status={b.status} label={b.bookingName} aria-label={`${b.bookingName}, ${STATUS_TEXT[b.status]}`} onClick={() => onOpenBooking(b.id)} />
+                        <CalendarBookingChip key={b.id} status={b.status} label={b.bookingName} aria-label={`${b.bookingName}, ${STATUS_TEXT[b.status]}`} onClick={() => onOpenBooking(b.id)} onPointerEnter={() => prefetchBooking(b.id)} onFocus={() => prefetchBooking(b.id)} />
                       ))}
                       {n === 0 && <EmptyDateTarget date={date} onNew={onNewBooking} />}
                     </>

@@ -16,7 +16,8 @@ import { usePresence } from "@/components/ds/usePresence";
 import { paidPercent } from "@/lib/booking/calc";
 import { paymentDetail } from "@/lib/booking/payment";
 import { now } from "@/lib/clock";
-import { getBooking, type BookingDetail as Detail } from "@/lib/data/repo";
+import { bookingDetailKey, loadBookingDetail } from "@/lib/data/prefetch";
+import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, initials, isoToLocalDate, waLink } from "@/lib/format";
 import { useShellCrumb } from "@/components/shell/AppShell";
 import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
@@ -46,7 +47,6 @@ type Props = {
 };
 
 export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBooking, onSeeInCalendar }: Props) {
-  const [state, setState] = useState<{ id: string; b: Detail | null } | null>(null);
   const viewer = useIsViewer();
   const [crewAnchor, setCrewAnchor] = useState<CrewPopoverAnchor | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -59,20 +59,16 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
   // Content eases in after the Loader (first open) and when switching to another booking inside the open sheet (4.9).
   const swap = "motion-notice";
 
-  useEffect(() => {
-    let live = true;
-    getBooking(id).then((b) => live && setState({ id, b }));
-    return () => {
-      live = false;
-    };
-  }, [id]);
+  // Cached (opens at once when it was prefetched on hover or seen before) and refreshed in the background.
+  const loaded = useCachedQuery(() => loadBookingDetail(id), bookingDetailKey(id));
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
   }, [toast]);
 
-  const b = state?.id === id ? state.b : undefined;
+  // Switching to another booking shows the Loader, never the previous booking (the hook keeps the last result).
+  const b = loaded?.id === id ? loaded.b : undefined;
   useShellCrumb(mode === "page" ? (b?.ref ?? null) : null); // full page: breadcrumb shows the ref
   if (b === undefined)
     return (

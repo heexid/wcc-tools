@@ -8,26 +8,19 @@ import { now } from "@/lib/clock";
 import { isAuthCookie, supabaseBrowser } from "@/lib/supabase/browser";
 import type { BookingErrors, BookingInput, BookingQuery, BookingRow, BookingDetail, InvoiceInput, PackageErrors, PackageInput, PackageRow } from "../repo";
 import type * as Mock from "../repo";
+import { invalidateAll } from "../cache";
 import { NetworkError, PROFILE_CHANGED, type Catalog } from "../shared";
 import type { Business, Crew, Invoice, InvoiceSnapshot, PaymentInstruction, Profile } from "../types";
 import * as act from "./actions";
+import { countBookingsWith, filterCatalogWith, getKpisWith, listAllBookingsWith, listPackagesWith, rpc } from "./reads";
 
 export { NetworkError, nextInvoiceTypes, passwordRules } from "../shared";
 export type * from "../repo";
 
 const today = (): ISODate => isoToLocalDate(now().toISOString());
 
-/** A read failure that isn't a rule (offline, 5xx, RLS denial) → NetworkError, like the mock's failNext(). */
-async function read<T>(op: string, fn: string, args: Record<string, unknown> = {}): Promise<T> {
-  let res;
-  try {
-    res = await supabaseBrowser().rpc(fn as never, args as never);
-  } catch {
-    throw new NetworkError(op);
-  }
-  if (res.error) throw new NetworkError(op);
-  return res.data as T;
-}
+/** A read under RLS with this tab's client (./reads.ts maps failures to NetworkError). */
+const read = <T>(op: string, fn: string, args: Record<string, unknown> = {}): Promise<T> => rpc<T>(supabaseBrowser(), op, fn, args);
 
 /** Await a Server Action: a request that never completes (offline, dropped connection — the action call itself
  *  throws) or a `{network:true}` result → NetworkError, like the mock's failNext(); anything else returns. */
@@ -37,6 +30,8 @@ async function settled<T extends { ok: boolean }>(op: string, call: Promise<T>):
     r = await call;
   } catch {
     throw new NetworkError(op);
+  } finally {
+    invalidateAll(); // every write (and sign-in) goes through here: cached reads (../cache.ts) never outlive it
   }
   if ("network" in r && r.network) throw new NetworkError(op);
   return r as Exclude<T, { network: true }>;
@@ -73,6 +68,7 @@ export const login: typeof Mock.login = async (email, password) => {
 };
 
 export const logout: typeof Mock.logout = async () => {
+  invalidateAll();
   await act.logoutAction().catch(() => {});
   // Always clear this browser's session too: if the action didn't get through (offline), this still removes the
   // auth cookies, so the user is really signed out here (review P4 #4).
@@ -113,6 +109,9 @@ export const loadCatalog: typeof Mock.loadCatalog = async () => {
   } satisfies Catalog;
 };
 
+/** Bookings dashboard: packages + crew only — skips get_settings and the logo's Storage signing (loadCatalog). */
+export const loadFilterCatalog: typeof Mock.loadFilterCatalog = () => filterCatalogWith(supabaseBrowser());
+
 export const updateDisplayName: typeof Mock.updateDisplayName = async (name) => {
   const r = await settled("updateProfile", act.updateDisplayNameAction(name));
   if (!r.ok) return { ok: false as const, error: "length" as const };
@@ -131,7 +130,7 @@ export const changePassword: typeof Mock.changePassword = async (a) => {
 };
 
 // ── Packages ────────────────────────────────────────────────────────────────────────────────────
-export const listPackages: typeof Mock.listPackages = (q = {}) => read<PackageRow[]>("listPackages", "list_packages", { p_tab: q.tab ?? null, p_search: q.search ?? null });
+export const listPackages: typeof Mock.listPackages = (q = {}) => listPackagesWith(supabaseBrowser(), q);
 
 export const savePackage: typeof Mock.savePackage = async (a: PackageInput) => {
   const r = await settled("savePackage", act.savePackageAction(a));
@@ -168,11 +167,11 @@ export const listCrew: typeof Mock.listCrew = async () => {
 // ── Bookings: read ──────────────────────────────────────────────────────────────────────────────
 export const listBookings: typeof Mock.listBookings = (q: BookingQuery = {}) =>
   read<Awaited<ReturnType<typeof Mock.listBookings>>>("listBookings", "list_bookings", { q });
-export const listAllBookings: typeof Mock.listAllBookings = (q: BookingQuery = {}) => read<BookingRow[]>("listBookings", "list_all_bookings", { q });
-export const countBookings: typeof Mock.countBookings = () => read<number>("listBookings", "count_bookings");
+export const listAllBookings: typeof Mock.listAllBookings = (q: BookingQuery = {}) => listAllBookingsWith(supabaseBrowser(), q);
+export const countBookings: typeof Mock.countBookings = () => countBookingsWith(supabaseBrowser());
 export const getBooking: typeof Mock.getBooking = (id) => read<BookingDetail | null>("getBooking", "get_booking", { p_id: id });
 
-export const getKpis: typeof Mock.getKpis = (ym) => read("getKpis", "get_kpis", { p_ym: ym ?? today().slice(0, 7) });
+export const getKpis: typeof Mock.getKpis = (ym) => getKpisWith(supabaseBrowser(), ym ?? today().slice(0, 7));
 export const getUpcoming: typeof Mock.getUpcoming = (days = 7) => listAllBookings({ view: "calendar", from: today(), to: addDays(today(), days - 1) });
 export const getCrewSchedule: typeof Mock.getCrewSchedule = (crewId) =>
   read<{ crew: Crew; monthCount: number; upcoming: BookingRow[] } | null>("getCrewSchedule", "get_crew_schedule", { p_crew_id: crewId, p_today: today() });

@@ -10,6 +10,7 @@ import type { Crew } from "@/lib/data/types";
 import { formatDayMonth, formatIDR, parseISODate, type ISODate } from "@/lib/format";
 import { CrewAvatars } from "./WeekCalendar";
 import { useIsViewer } from "@/lib/role";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 20 (day), 29 (row hover · crew schedule → F12), 30 (no bookings) — PRD US-6 day,
 // INTERACTIONS 1.28–1.31. Summary bar (h 45, pad control/base, gap base, surface/subtle, bottom border):
@@ -74,6 +75,7 @@ export function DayCalendar({
               total={formatIDR(b.total)}
               remaining={formatIDR(b.remaining)}
               onOpen={() => onOpenBooking(b.id)}
+              onPreview={() => prefetchBooking(b.id)}
             />
           </li>
         ))}

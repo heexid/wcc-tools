@@ -4,6 +4,7 @@ import { DB_VERSION, seedDb } from "./seed";
 // Aliased to fixtures.stub.ts in staging / production builds (next.config.ts).
 import { applyFixture } from "@/lib/data/fixtures";
 import type { Db } from "./types";
+import { invalidateAll } from "./cache";
 
 // Compile-time flag (next.config.ts sets it). Kept as a per-module const on purpose: Next inlines the
 // literal and the bundler drops the guarded branch; an imported flag is not folded across modules.
@@ -65,6 +66,8 @@ export function transaction<T>(fn: (d: Db) => T): T {
   } catch (e) {
     db = JSON.parse(before) as Db;
     throw e;
+  } finally {
+    invalidateAll(); // cached reads (./cache.ts) never outlive a write
   }
 }
 

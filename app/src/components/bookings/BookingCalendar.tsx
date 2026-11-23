@@ -8,16 +8,18 @@ import type { BookingRow } from "@/lib/data/repo";
 import { addDays, formatDateLongDay, formatMonthYear, formatWeekRange, parseISODate, type ISODate } from "@/lib/format";
 import type { Crew } from "@/lib/data/types";
 import { DayCalendar } from "./DayCalendar";
-import { MonthCalendar, monthGrid, shiftMonth } from "./MonthCalendar";
+import { MonthCalendar, shiftMonth } from "./MonthCalendar";
 import { WeekCalendar, weekStartOf } from "./WeekCalendar";
 import { Skeleton } from "@/components/ds/Loading";
+import { initialCalendarWindow, isISO, rangeOf, windowOf } from "@/lib/booking/calendar-window";
 
 // Calendar card (Figma 01: 998 wide, 1px border, radius card, surface/default): Calendar/Header + the
 // range body (Month F7 · Week / Day F8). URL: `view=day|week` (Month is the default, no param) and
 // `date=YYYY-MM-DD` (the anchor — Selected cell / keyboard tab stop; defaults to today). Switching the
 // range keeps the anchor and every other param (filters).
 
-const isISO = (v: string | null): v is ISODate => !!v && /^\d{4}-\d{2}-\d{2}$/.test(v);
+// The window logic is shared with the page and the server (lib/booking/calendar-window.ts).
+export { initialCalendarWindow };
 
 export function BookingCalendar({
   className,
@@ -43,7 +45,7 @@ export function BookingCalendar({
   const router = useRouter();
   const path = usePathname();
   const urlDate = params.get("date");
-  const range: CalendarRange = params.get("view") === "week" ? "week" : params.get("view") === "day" ? "day" : "month";
+  const range = rangeOf(params);
 
   // The anchor lives in state (arrow keys move it every keypress) and is written to the URL. The URL is
   // only read back on load and on back / forward — reading it on every change would race fast ‹ › clicks
@@ -78,8 +80,7 @@ export function BookingCalendar({
 
   const { y, m } = parseISODate(anchor);
   const weekStart = weekStartOf(anchor);
-  const grid = range === "month" ? monthGrid(anchor) : null;
-  const visible = range === "month" ? { from: grid![0], to: grid![41] } : range === "week" ? { from: weekStart, to: addDays(weekStart, 6) } : { from: anchor, to: anchor };
+  const visible = windowOf(range, anchor);
   useEffect(() => {
     onVisibleRange?.(visible);
   }, [visible.from, visible.to]); // eslint-disable-line react-hooks/exhaustive-deps -- report on window change only

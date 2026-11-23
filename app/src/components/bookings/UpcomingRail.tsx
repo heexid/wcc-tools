@@ -10,6 +10,7 @@ import type { BookingRow } from "@/lib/data/repo";
 import type { Insight } from "@/lib/booking/insights";
 import { formatDowUpper, formatIDR, parseISODate } from "@/lib/format";
 import { Skeleton } from "@/components/ds/Loading";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 01 → Rail (352, pad section/group, gap inset, left border): Upcoming heading (calendar 20
 // text/accent · Heading/Section · "Next 7 days" Caption), up to 4 Upcoming items, "See all in table",
@@ -27,6 +28,8 @@ function UpcomingItem({ b, today, onOpen }: { b: BookingRow; today: string; onOp
       <button
         type="button"
         onClick={() => onOpen(b.id)}
+        onPointerEnter={() => prefetchBooking(b.id)}
+        onFocus={() => prefetchBooking(b.id)}
         className="flex w-full cursor-pointer items-start gap-control rounded-control border border-border-default bg-surface-subtle p-control text-left outline-none transition-[background-color,border-color] duration-(--dur-hover) ease-(--ease-hover) hover:border-border-strong hover:bg-surface-default focus-visible:shadow-focus-ring"
       >
         <span className="flex w-[calc(var(--spacing-32)+var(--spacing-12))] shrink-0 flex-col items-center rounded-control border border-border-default bg-surface-default py-tight">

@@ -10,6 +10,7 @@ import type { Presence } from "@/components/ds/usePresence";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDateWithDay, formatDayMonth, type ISODate } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
+import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 17 · "Day popover" (also Week overflow 31 → F8): 360 wide, pad popover/inset (6) inside a
 // 1px border, gap tight, surface/default, radius card, Shadow/Floating.
@@ -75,6 +76,8 @@ export function DayPopover({
             <button
               type="button"
               onClick={() => onOpenBooking(b.id)}
+              onPointerEnter={() => prefetchBooking(b.id)}
+              onFocus={() => prefetchBooking(b.id)}
               className={cn(
                 "flex w-full cursor-pointer items-center gap-compact rounded-control bg-surface-subtle p-compact text-left outline-none",
                 "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-header focus-visible:shadow-focus-ring",

@@ -19,6 +19,7 @@ import { Txt } from "@/components/ds/Txt";
 import { usePresence } from "@/components/ds/usePresence";
 import { AppShell } from "@/components/shell/AppShell";
 import { archivePackage, listPackages, NetworkError, restorePackage, savePackage, type PackageErrors, type PackageRow } from "@/lib/data/repo";
+import { fetchCached, peek } from "@/lib/data/cache";
 import { formatDate, formatIDR } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
 
@@ -190,12 +191,17 @@ function ArchiveDialog({ pkg, onCancel, onConfirm }: { pkg: Draft | null; onCanc
   );
 }
 
+type PackageLists = [PackageRow[], PackageRow[], PackageRow[]];
+const packagesKey = (tab: string, search: string) => `packages:${tab}:${search}`;
+
 function PackageLibrary() {
   const [tab, setTab] = useState<"active" | "archived">("active");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState<PackageRow[] | null>(null);
-  const [counts, setCounts] = useState({ active: 0, archived: 0 });
+  // Opens on the cached lists when coming back (lib/data/cache.ts), then refreshes them; a write clears the cache.
+  const [initial] = useState(() => peek<PackageLists>(packagesKey("active", ""))?.value);
+  const [rows, setRows] = useState<PackageRow[] | null>(initial?.[0] ?? null);
+  const [counts, setCounts] = useState({ active: initial?.[1].length ?? 0, archived: initial?.[2].length ?? 0 });
   const viewer = useIsViewer();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [archiving, setArchiving] = useState<Draft | null>(null);
@@ -207,7 +213,7 @@ function PackageLibrary() {
   const mobile = useIsMobile();
 
   const load = useCallback(async () => {
-    const [all, a, b] = await Promise.all([listPackages({ tab, search }), listPackages({ tab: "active" }), listPackages({ tab: "archived" })]);
+    const [all, a, b] = await fetchCached(packagesKey(tab, search), () => Promise.all([listPackages({ tab, search }), listPackages({ tab: "active" }), listPackages({ tab: "archived" })]));
     setRows(all);
     setCounts({ active: a.length, archived: b.length });
   }, [tab, search]);

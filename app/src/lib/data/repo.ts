@@ -10,6 +10,7 @@ import { addDays, isoToLocalDate, normalizePhone, parseISODate, type ISODate } f
 import { buildInvoice, invoicesOf, nextNumber, recompute } from "./ledger";
 import { NetworkError, passwordRules, type Catalog } from "./shared";
 import { getDb, transaction } from "./store";
+import { invalidateAll } from "./cache";
 import type { Booking, BookingStatus, Business, Crew, Db, Invoice, Package, PaymentInstruction, Profile } from "./types";
 
 // ── Dev controls ───────────────────────────────────────────────────────────────────
@@ -57,6 +58,7 @@ export function lastEmail(): string {
   }
 }
 export async function login(email: string, password: string) {
+  invalidateAll(); // another account's cached reads must not show
   return call("login", () => {
     if (!email.trim() || !password) return { ok: false as const, error: "required" as const };
     const d = getDb();
@@ -69,6 +71,7 @@ export async function login(email: string, password: string) {
   });
 }
 export async function logout() {
+  invalidateAll();
   try {
     localStorage.removeItem(SESSION);
   } catch {}
@@ -90,6 +93,13 @@ export function peekCatalog(): Catalog | null {
 }
 export async function loadCatalog(): Promise<Catalog> {
   return call(null, () => peekCatalog()!);
+}
+/** The Bookings dashboard's filters and avatars: packages + crew only (no workspace defaults, no logo signing). */
+export async function loadFilterCatalog(): Promise<Pick<Catalog, "packages" | "crew">> {
+  return call(null, () => {
+    const d = getDb();
+    return { packages: d.packages, crew: d.crew };
+  });
 }
 /** Sync read of the signed-in profile for the header and role checks (null = not loaded / signed out). */
 export function peekProfile(): Profile | null {
