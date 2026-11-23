@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CIR Mascot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js" } }
+    </script>
+    <style>
+      :root {
+        --bg: #fbf2fe;
+        --bg-2: #fdb5df;
+        --surface: #ffffff;
+        --surface-header: #f7f5f8;
+        --border: #ebe6ee;
+        --text: #18151b;
+        --text-2: #6b6470;
+        --accent: #c2338a;
+        --primary: #18151b;
+        --on-primary: #ffffff;
+        --focus: rgba(194, 51, 138, 0.28);
+        --danger: #c0352b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font: 14px/20px Inter, system-ui, sans-serif;
+        color: var(--text);
+        background: radial-gradient(120% 90% at 15% 0%, var(--bg) 30%, var(--bg-2) 140%) fixed;
+      }
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 40px 16px 64px;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        align-items: start;
+      }
+      @media (max-width: 860px) { main { grid-template-columns: minmax(0, 1fr); } }
+      h1 { grid-column: 1 / -1; margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+      h1 span { color: var(--text-2); font-weight: 400; }
+      .card {
+        background: var(--surface-header);
+        border-radius: 12px;
+        padding: 6px;
+        box-shadow: 0 1px 2px rgba(24, 21, 27, 0.06), 0 12px 32px -8px rgba(120, 40, 100, 0.18);
+      }
+      .card > header { padding: 10px 14px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+      .card > header small { font-weight: 400; color: var(--text-2); }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px 20px;
+      }
+      .stage { height: 300px; display: grid; place-items: center; }
+      .stage > div { width: 260px; height: 260px; }
+      .label { font-size: 12px; font-weight: 500; color: var(--text-2); margin: 20px 0 8px; }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .chip {
+        font: inherit; font-size: 13px; font-weight: 500;
+        padding: 6px 12px; border-radius: 999px; cursor: pointer;
+        background: var(--surface-header); color: var(--text); border: 1px solid var(--border);
+        transition: background-color 150ms ease-out, transform 150ms ease-out;
+      }
+      .chip:active { transform: scale(0.96); }
+      .chip[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+      @media (hover: hover) { .chip:hover:not([aria-pressed="true"]) { background: #efeaf1; } }
+      .chip:focus-visible, input:focus-visible, button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus); }
+      .sizes { display: flex; gap: 6px; }
+      .note { color: var(--text-2); font-size: 12px; margin: 12px 0 0; }
+
+      /* mock login, mirrors app/src/app/login/page.tsx */
+      form { display: flex; flex-direction: column; align-items: center; gap: 16px; background: var(--surface) linear-gradient(180deg, #fde9f5 0%, rgba(255,255,255,0) 45%); }
+      .login-mascot { width: 88px; height: 88px; margin-bottom: -4px; }
+      .greet { text-align: center; }
+      .greet h2 { margin: 0 0 4px; font-size: 20px; line-height: 28px; font-weight: 600; }
+      .greet p { margin: 0; color: var(--text-2); max-width: 300px; }
+      .field { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+      .field label { font-size: 13px; font-weight: 500; }
+      .control { position: relative; }
+      .control input {
+        width: 100%; font: inherit; height: 40px; padding: 0 12px; border-radius: 8px;
+        border: 1px solid var(--border); background: #fff; color: var(--text);
+        transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+      }
+      .control input:focus { border-color: var(--accent); }
+      .control input[aria-invalid="true"] { border-color: var(--danger); }
+      .control input[type="password"], .control .pw { padding-right: 44px; }
+      .toggle {
+        position: absolute; right: 4px; top: 4px; width: 32px; height: 32px; border: 0; border-radius: 6px;
+        background: transparent; cursor: pointer; color: var(--text-2); display: grid; place-items: center;
+      }
+      .err { color: var(--danger); font-size: 12px; min-height: 0; }
+      .err:empty { display: none; }
+      .submit {
+        width: 100%; height: 40px; font: inherit; font-weight: 600; border: 0; border-radius: 8px; cursor: pointer;
+        background: var(--primary); color: var(--on-primary); transition: transform 150ms ease-out, opacity 150ms ease-out;
+      }
+      .submit:active { transform: scale(0.96); }
+      .submit:disabled { opacity: 0.6; cursor: progress; }
+      .hint { font-size: 12px; color: var(--text-2); text-align: center; margin: 0; }
+      code { font-size: 12px; background: var(--surface-header); padding: 1px 5px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>CIR mascot <span>· three.js preview</span></h1>
+
+      <section class="card" aria-labelledby="pg-title">
+        <header><span id="pg-title">Playground</span><small id="pg-state">idle</small></header>
+        <div class="panel">
+          <div class="stage"><div id="playground"></div></div>
+
+          <div class="label">States</div>
+          <div class="chips" id="states"></div>
+
+          <div class="label">One-shot reactions</div>
+          <div class="chips">
+            <button class="chip" data-react="blink">Blink</button>
+            <button class="chip" data-react="bounce">Bounce</button>
+            <button class="chip" data-react="shake">Shake</button>
+            <button class="chip" data-react="giggle">Giggle</button>
+            <button class="chip" data-react="keystroke">Keystroke</button>
+          </div>
+
+          <div class="label">Size</div>
+          <div class="sizes chips" id="sizes">
+            <button class="chip" data-size="64">64</button>
+            <button class="chip" data-size="88">88</button>
+            <button class="chip" data-size="160">160</button>
+            <button class="chip" aria-pressed="true" data-size="260">260</button>
+          </div>
+          <p class="note">Idle follows your cursor and falls asleep after 20s without input. Click the mascot to make it giggle.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="login-title">
+        <header><span id="login-title">Login</span><small id="login-state">idle</small></header>
+        <form class="panel" id="login" novalidate>
+          <div class="login-mascot" id="login-mascot"></div>
+          <div class="greet">
+            <h2>Hello, welcome 👋</h2>
+            <p>Glad to see you again, use your credential to access your account</p>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <div class="control"><input id="email" name="email" type="email" placeholder="Enter email" autocomplete="off" /></div>
+            <div class="err" id="email-err"></div>
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="control">
+              <input id="password" name="password" type="password" placeholder="Enter password" autocomplete="off" />
+              <button type="button" class="toggle" id="toggle" aria-label="Show password" aria-pressed="false">
+                <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="err" id="pw-err"></div>
+          </div>
+          <button class="submit" id="submit" type="submit">Login</button>
+          <p class="hint">Try password <code>wrong</code> for the error state, anything else succeeds.</p>
+        </form>
+      </section>
+    </main>
+
+    <script type="module">
+      import { createMascot, STATES } from "../app/src/components/login/mascotScene.js";
+
+      // ── Playground ──
+      const pgEl = document.getElementById("playground");
+      const pg = createMascot(pgEl);
+      const pgState = document.getElementById("pg-state");
+      const statesEl = document.getElementById("states");
+      for (const s of STATES) {
+        const b = document.createElement("button");
+        b.className = "chip";
+        b.textContent = s;
+        b.setAttribute("aria-pressed", String(s === "idle"));
+        b.addEventListener("click", () => {
+          pg.setState(s);
+          pgState.textContent = s;
+          statesEl.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        });
+        statesEl.appendChild(b);
+      }
+      document.querySelectorAll("[data-react]").forEach((b) =>
+        b.addEventListener("click", () => (b.dataset.react === "keystroke" ? pg.keystroke() : pg.react(b.dataset.react))),
+      );
+      document.querySelectorAll("[data-size]").forEach((b) =>
+        b.addEventListener("click", () => {
+          pgEl.style.width = pgEl.style.height = b.dataset.size + "px";
+          document.querySelectorAll("[data-size]").forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        }),
+      );
+
+      // ── Login mock: the real interaction wiring, ready to port to the Next.js page ──
+      const m = createMascot(document.getElementById("login-mascot"));
+      const label = document.getElementById("login-state");
+      const set = (s) => { m.setState(s); label.textContent = s; };
+      const email = document.getElementById("email");
+      const pw = document.getElementById("password");
+      const toggle = document.getElementById("toggle");
+      const submit = document.getElementById("submit");
+      const form = document.getElementById("login");
+
+      // Caret position → page point, so the eyes follow the text as it is typed.
+      const measure = document.createElement("canvas").getContext("2d");
+      function lookAtCaret(input) {
+        const cs = getComputedStyle(input);
+        measure.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const text = input.type === "password" ? "•".repeat(input.value.length) : input.value;
+        const upto = text.slice(0, input.selectionStart ?? text.length);
+        const r = input.getBoundingClientRect();
+        const x = Math.min(r.right - 12, r.left + parseFloat(cs.paddingLeft) + measure.measureText(upto).width - input.scrollLeft);
+        m.lookAtClient(x, r.top + r.height / 2);
+      }
+
+      const pwVisible = () => pw.type === "text";
+      function fromFocus() {
+        const a = document.activeElement;
+        if (a === email) { set("typing"); lookAtCaret(email); }
+        else if (a === pw || a === toggle) set(pwVisible() ? "peek" : "password");
+        else set("idle");
+      }
+
+      email.addEventListener("focus", fromFocus);
+      email.addEventListener("input", () => { m.keystroke(); lookAtCaret(email); clearErr(email); });
+      email.addEventListener("keyup", () => lookAtCaret(email));
+      email.addEventListener("click", () => lookAtCaret(email));
+      pw.addEventListener("focus", fromFocus);
+      pw.addEventListener("input", () => { m.keystroke(); clearErr(pw); });
+      toggle.addEventListener("click", () => {
+        const show = !pwVisible();
+        pw.type = show ? "text" : "password";
+        toggle.setAttribute("aria-pressed", String(show));
+        toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+        set(show ? "peek" : "password");
+        pw.focus();
+      });
+      // Blur settles on the next frame so moving between the fields doesn't flash idle.
+      form.addEventListener("focusout", () => requestAnimationFrame(() => { if (!submit.disabled) fromFocus(); }));
+
+      function setErr(input, msg) {
+        input.setAttribute("aria-invalid", "true");
+        document.getElementById(input === email ? "email-err" : "pw-err").textContent = msg;
+      }
+      function clearErr(input) {
+        input.removeAttribute("aria-invalid");
+        document.getElementById(input === email ? "email-err" : "pw-err").textContent = "";
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearErr(email); clearErr(pw);
+        let bad = false;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { setErr(email, email.value ? "Enter an email like name@company.com" : "Enter your email"); bad = true; }
+        if (!pw.value) { setErr(pw, "Enter your password"); bad = true; }
+        if (bad) { set("error"); return; }
+
+        submit.disabled = true;
+        submit.textContent = "Logging in…";
+        document.activeElement.blur();
+        set("loading");
+        await new Promise((r) => setTimeout(r, 1400));
+        submit.disabled = false;
+        submit.textContent = "Login";
+        if (pw.value === "wrong") {
+          set("error");
+          setErr(pw, "Email or password is incorrect");
+          pw.value = "";
+        } else {
+          set("success");
+          setTimeout(() => set("idle"), 2600);
+        }
+      });
+    </script>
+  </body>
+</html>

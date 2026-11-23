@@ -102,8 +102,15 @@ export function InputField({
   type = "text",
   disabled,
   defaultRevealed = false,
+  onRevealChange,
   ...input
-}: Common & InputHTMLAttributes<HTMLInputElement> & { defaultRevealed?: boolean; ref?: Ref<HTMLInputElement> }) {
+}: Common &
+  InputHTMLAttributes<HTMLInputElement> & {
+    defaultRevealed?: boolean;
+    /** Password: called when Show / Hide password toggles (the login mascot peeks). */
+    onRevealChange?: (revealed: boolean) => void;
+    ref?: Ref<HTMLInputElement>;
+  }) {
   const id = useId();
   const [reveal, setReveal] = useState(defaultRevealed);
   const isPassword = type === "password";
@@ -126,7 +133,12 @@ export function InputField({
         {isPassword && (
           <button
             type="button"
-            onClick={() => setReveal((r) => !r)}
+            // mousedown keeps focus (and the caret) in the input, so toggling doesn't blur the field
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setReveal(!reveal);
+              onRevealChange?.(!reveal);
+            }}
             disabled={disabled}
             aria-label={reveal ? "Hide password" : "Show password"}
             className="text-text-secondary outline-none focus-visible:text-text-accent cursor-pointer disabled:cursor-not-allowed"

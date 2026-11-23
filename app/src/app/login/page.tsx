@@ -9,6 +9,7 @@ import { usePresence } from "@/components/ds/usePresence";
 import { InputField } from "@/components/ds/InputField";
 import { Txt } from "@/components/ds/Txt";
 import { LiquidBackground } from "@/components/login/LiquidBackground";
+import { caretPoint, Mascot, type MascotApi, type MascotState } from "@/components/login/Mascot";
 import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 
 // Figma: Login page — P1 empty · P2 filled · P3 logging in · E1 required · E2 email format ·
@@ -20,6 +21,9 @@ import { lastEmail, login, NetworkError } from "@/lib/data/repo";
 // radius control, pad section/group, gap base, items centred.
 // Motion: the card rises in on load and the panel content follows in a 50ms stagger (rare surface, CSS only —
 // typing works at once); a notice opens its own row so the fields slide down instead of jumping.
+// Mascot (components/login/Mascot): eyes follow the cursor · email focused → watches the caret as you type ·
+// password → eyes closed (sneaks a peek now and then) · Show password → peeks · Logging in… → loading ·
+// any error → worried shake for a moment · success → happy bounce while the next page loads.
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,6 +46,32 @@ function LoginForm() {
   const [pending, setPending] = useState(false);
   const [caps, setCaps] = useState(false);
   const form = useRef<HTMLFormElement>(null);
+  const mascot = useRef<MascotApi | null>(null);
+  const [focused, setFocused] = useState<"email" | "password" | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [mood, setMood] = useState<"error" | "success" | null>(null);
+  useEffect(() => {
+    if (mood !== "error") return;
+    const t = setTimeout(() => setMood(null), 1600);
+    return () => clearTimeout(t);
+  }, [mood]);
+  const flashError = () => {
+    if (mood === "error") mascot.current?.react("shake");
+    setMood("error");
+  };
+  const mascotState: MascotState = pending
+    ? "loading"
+    : mood ?? (focused === "email" ? "typing" : focused === "password" ? (revealed ? "peek" : "password") : "idle");
+  // The focused field (the Show password button counts as the password field).
+  const fieldOf = (el: EventTarget | null) => {
+    if (!(el instanceof HTMLElement)) return null;
+    const input = el instanceof HTMLInputElement ? el : el.parentElement?.querySelector("input");
+    return input?.name === "email" || input?.name === "password" ? input.name : null;
+  };
+  const watchCaret = (input: HTMLInputElement) => {
+    const p = caretPoint(input);
+    mascot.current?.lookAtClient(p.x, p.y);
+  };
   // After Log out (Figma LO2, INTERACTIONS 6.10): "You’ve logged out", top-centre, 32 from the top.
   const [loggedOut, setLoggedOut] = useState(params.get("loggedOut") === "1");
   const toast = usePresence(loggedOut);
@@ -60,6 +90,7 @@ function LoginForm() {
     if (!password) next.password = "Enter your password";
     setErrors(next);
     if (next.email || next.password) {
+      flashError();
       field(next.email ? "email" : "password")?.focus();
       return;
     }
@@ -67,16 +98,19 @@ function LoginForm() {
     try {
       const r = await login(email, password);
       if (r.ok) {
+        setMood("success");
         router.replace(safeNext(params.get("next"))); // same-site paths only (no open redirect)
         return; // stay in "Logging in…" until the next page takes over
       }
       setNotice("wrong");
+      flashError();
       setPassword("");
       setPending(false);
       requestAnimationFrame(() => field("password")?.focus());
     } catch (err) {
       if (!(err instanceof NetworkError)) throw err;
       setNotice("network");
+      flashError();
       setPending(false);
     }
   }
@@ -101,10 +135,11 @@ function LoginForm() {
           ref={form}
           noValidate
           onSubmit={submit}
+          onFocus={(e) => setFocused(fieldOf(e.target))}
+          onBlur={(e) => setFocused(fieldOf(e.relatedTarget))}
           className="flex flex-col items-center gap-base overflow-hidden rounded-control border border-border-default bg-surface-default bg-(image:--gradient-login-glow) px-group py-section motion-stagger"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/mascot-64.png" srcSet="/assets/mascot-64.png 1x, /assets/mascot-64@2x.png 2x" alt="" className="block size-64" />
+          <Mascot state={mascotState} apiRef={mascot} />
           <div className="flex w-[calc(var(--spacing-64)*4+var(--spacing-32)+var(--spacing-12))] flex-col items-center gap-micro">
             <h2 className="text-heading-panel text-text-primary">
               <Txt>Hello, welcome 👋</Txt>
@@ -135,7 +170,10 @@ function LoginForm() {
             value={email}
             disabled={pending}
             error={errors.email}
+            onFocus={(e) => watchCaret(e.currentTarget)}
+            onSelect={(e) => watchCaret(e.currentTarget)}
             onChange={(e) => {
+              mascot.current?.keystroke();
               setEmail(e.target.value);
               if (errors.email) setErrors((x) => ({ ...x, email: undefined }));
             }}
@@ -154,7 +192,9 @@ function LoginForm() {
             onKeyDown={onCaps}
             onKeyUp={onCaps}
             onBlur={() => setCaps(false)}
+            onRevealChange={setRevealed}
             onChange={(e) => {
+              mascot.current?.keystroke();
               setPassword(e.target.value);
               if (errors.password) setErrors((x) => ({ ...x, password: undefined }));
             }}

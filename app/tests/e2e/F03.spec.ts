@@ -97,3 +97,27 @@ test("show / hide password", async ({ page }) => {
   await page.getByRole("button", { name: "Show password" }).click();
   await expect(password(page)).toHaveAttribute("type", "text");
 });
+
+// Login mascot (components/login/Mascot): the state follows focus, reveal, pending and errors.
+test("mascot reacts to the form", async ({ page }) => {
+  const mascot = page.locator("[data-mascot-state]");
+  await expect(mascot).toHaveAttribute("data-mascot-ready", "true");
+  await expect(mascot.locator("canvas")).toBeVisible();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "idle");
+  await email(page).click();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "typing");
+  await email(page).fill("bs-moment@email.com");
+  await password(page).click();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "password");
+  await page.getByRole("button", { name: "Show password" }).click();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "peek");
+  await expect(password(page)).toBeFocused(); // the toggle keeps focus in the field
+  await page.getByRole("button", { name: "Hide password" }).click();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "password");
+  await password(page).fill("nope12345");
+  await page.getByRole("button", { name: "Login" }).click();
+  await expect(mascot).toHaveAttribute("data-mascot-state", "error");
+  await expect(mascot).toHaveAttribute("data-mascot-state", "password"); // error passes, password is focused again
+  await page.locator("body").click({ position: { x: 5, y: 5 } });
+  await expect(mascot).toHaveAttribute("data-mascot-state", "idle");
+});

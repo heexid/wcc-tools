@@ -21,12 +21,13 @@ A **Booking & Invoice Management** module for the WCC & ECC (Wedding Content Cre
 | `context/` | The source-of-truth docs. See [Documentation](#documentation). |
 | `agents/` | Working docs: `DEPLOY.md` (deploy guide), `FEATURES.md` (plain-language feature guide), `dummy.md` (SQL to insert sample bookings), `marketings/` (marketing and pricing), `promotions/` (promo video scenes). |
 | `agents/CREDENTIALS.md` | Local only and gitignored. Never commit it. |
+| `mascot/` | Standalone preview of the CIR login mascot (three.js): every state, reactions, sizes and a mock login. It loads the app's own `app/src/components/login/mascotScene.js`. See [`mascot/README.md`](mascot/README.md). |
 | `references/` | Reference images. |
 | `.github/workflows/ci.yml` | CI: typecheck, lint, G1, unit tests, build, Supabase stack and pgTAP. |
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 (tokens generated from the CIR design system) · react-hook-form + zod · `@react-pdf/renderer` · Supabase (`@supabase/ssr`, Postgres, Auth, Storage) · Vitest · Playwright · Vercel.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 (tokens generated from the CIR design system) · react-hook-form + zod · `@react-pdf/renderer` · three.js (login mascot) · Supabase (`@supabase/ssr`, Postgres, Auth, Storage) · Vitest · Playwright · Vercel.
 
 Money is always IDR, stored as whole Rupiah (`bigint`) and shown as `Rp 1.250.000`. The UI is in English with `id-ID` number and date formats. Layouts: desktop at 1440 px, and mobile below 768 px with its own type scale (see [Mobile layouts](#mobile-layouts)). Tablet (768–1279 px) uses the desktop layouts with tablet-sized controls.
 
@@ -58,7 +59,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 
 | Area | What it does | PRD |
 |---|---|---|
-| Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. | §4.3 |
+| Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. A live mascot reacts to the form: its eyes follow the cursor, it watches the caret while you type the email, closes its eyes for the password (peeks when you show it), and looks worried on errors. | §4.3 |
 | App launcher | ⋮⋮ popover to switch between Booking and Package Lib (Bookmark is "Coming soon"). | US-11 |
 | Package Library | Create, edit, archive and restore packages. Duplicate active names are blocked. Description up to 1000 characters. | US-0 |
 | New / Edit booking | One form. **Client & schedule** first: client, phone (`+62…`), booking name, booking date, optional **event start** (30-minute time select), **location** and **notes** (up to 255 characters each). Then package, items, crew, and **Others**: payment instruction and T&C (up to 255 characters). Live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
@@ -133,6 +134,12 @@ Started 2026-11-22 (it was deferred to v1.1). The admin often books from a phone
 | R09 | Mobile type scale (`Mobile/…` text styles: body 16, caption 14, badges 13, smallest 12), 16 px card padding, layouts re-checked at 320 | ✅ on main |
 
 Logs: `app/docs/slices/R01.md`, `R02.md`, `R03-R07.md`, `R08-R09.md`. Tests: `tests/e2e/R0*.spec.ts` (390 × 844, plus overflow checks at 320 / 360 / 375 / 390). **Still open:** tablet layouts and a mobile pass on the read-only booking page (`/bookings/[id]`).
+
+### Login mascot
+
+Added 2026-11-23. The CIR mascot (Figma `Asset/mascot-large`) is now a live three.js bubble on the login page: glowing, with colour that flows and glossy light that moves around its edge, and pill eyes with no mouth. States: idle (follows the cursor, falls asleep after 20 s), typing (watches the caret), password (eyes closed, sneaks a peek), peek (password shown), loading, error, success, plus happy and sleepy. It loads after first paint, shows the PNG until it's ready or if WebGL is missing, and holds still under reduced motion.
+
+Code: `app/src/components/login/mascotScene.js` (the scene), `Mascot.tsx` (React wrapper), `app/src/app/login/page.tsx` (state wiring), `InputField` `onRevealChange`. Test: `tests/e2e/F03.spec.ts` "mascot reacts to the form". Preview: `python3 -m http.server 8765` from the repo root, then open `/mascot/`. **Still open:** re-check the login visual gate (F03, G3) against Figma, which still shows the static PNG.
 
 ### Production slices (P0–P14)
 
