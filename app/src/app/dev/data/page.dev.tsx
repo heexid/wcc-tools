@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { computeKpis, saveBooking } from "@/lib/data/repo";
+// The mock repo itself, not "@/lib/data/repo": with DATA_SOURCE=supabase that specifier resolves to the Supabase
+// repo (next.config.ts aliases), which has no computeKpis and doesn't write to the mock store this page reads.
+import { computeKpis, saveBooking } from "../../../lib/data/repo";
 import { getDb } from "@/lib/data/store";
 import { FIXTURES } from "@/lib/data/fixtures";
 import { formatIDR } from "@/lib/format";
 
-// Dev inspector for the mock data layer: active fixture, counts, KPIs. ?fixture=screen-31 switches.
+// Dev inspector for the mock data layer (always the browser mock store, whatever DATA_SOURCE is): active fixture,
+// counts, KPIs. ?fixture=screen-31 switches.
 export default function DataPage() {
   const [snap, setSnap] = useState<null | { fixture: string; bookings: number; invoices: number; packages: number; kpis: ReturnType<typeof computeKpis>; sari: string }>(null);
   const read = () => {
