@@ -62,9 +62,11 @@
    Shared tokens only (motion.css). Reduced motion: --list-from-y / --stagger-step are 0 there, so every entrance
    below becomes a plain fade; the FAQ rows snap. */
 
-/* 6 · Anchor jumps scroll instead of teleporting (motion.css turns smooth scrolling off for reduced motion). */
-html:has(.lp) {
-  scroll-behavior: smooth;
+/* 6 · Anchor jumps scroll instead of teleporting — only without reduced motion (they jump straight there). */
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.lp) {
+    scroll-behavior: smooth;
+  }
 }
 
 /* 1 · Hero entrance — once per visit: headline → copy → product window, 50 ms apart, blur → sharp with the fade.
@@ -85,6 +87,16 @@ html:has(.lp) {
     opacity: 0;
     transform: translateY(var(--list-from-y));
     filter: blur(var(--cascade-from-blur));
+  }
+}
+/* The product window is a large image surface: blurring it is expensive (Safari) and reads as a load glitch, so it
+   only fades and rises. */
+[data-hero][data-hero-window] {
+  transition-property: opacity, transform;
+}
+@starting-style {
+  [data-hero][data-hero-window] {
+    filter: none;
   }
 }
 

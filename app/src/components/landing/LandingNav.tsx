@@ -30,7 +30,8 @@ export function LandingNav() {
   // Menu rows: close first, then jump — the menu's scroll lock would otherwise swallow the scroll.
   const go = (hash: string) => {
     setOpen(false);
-    requestAnimationFrame(() => document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" }));
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    requestAnimationFrame(() => document.querySelector(hash)?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" }));
     history.replaceState(null, "", hash);
   };
 
@@ -84,7 +85,9 @@ export function LandingNav() {
 }
 
 function FullscreenMenu({ open, onClose, onGo }: { open: boolean; onClose: () => void; onGo: (hash: string) => void }) {
-  const { mounted, presence } = usePresence(open);
+  // The exit only moves (no fade), so there's no opacity transitionend to unmount on: unmount once the exit
+  // (--dur-modal, 250ms) has run, instead of usePresence's 600ms default holding the scroll lock and focus trap.
+  const { mounted, presence } = usePresence(open, 300);
   const panel = useRef<HTMLDivElement>(null);
   useFocusTrap(open, panel, onClose, "[data-menu-close]");
   useScrollLock(mounted);
@@ -126,7 +129,7 @@ function FullscreenMenu({ open, onClose, onGo }: { open: boolean; onClose: () =>
                 e.preventDefault();
                 onGo(l.href);
               }}
-              className="flex min-h-[calc(var(--spacing-48)+var(--spacing-4))] items-center justify-between text-heading-section text-text-primary outline-none focus-visible:bg-surface-subtle"
+              className="-mx-8 flex min-h-[calc(var(--spacing-48)+var(--spacing-4))] items-center justify-between rounded-control px-8 text-heading-section text-text-primary outline-none [-webkit-tap-highlight-color:transparent] focus-visible:bg-surface-subtle active:bg-surface-subtle"
             >
               {l.label}
               <Icon name="chevron-right" className="size-icon-md" />
