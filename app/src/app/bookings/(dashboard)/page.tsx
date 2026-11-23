@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ds/Button";
-import { MetricCard } from "@/components/ds/Surfaces";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { cascade, useEntrance } from "@/components/ds/useEntrance";
@@ -21,16 +20,16 @@ import { usePresence } from "@/components/ds/usePresence";
 import { takeFlash } from "@/lib/flash";
 import { useBookingFilters } from "@/components/bookings/useBookingFilters";
 import { hasFilters, toQuery } from "@/lib/booking/filters";
+import { KpiCards } from "@/components/bookings/KpiCards";
 import { UpcomingRail } from "@/components/bookings/UpcomingRail";
-import { buildInsights, countTrend, percentTrend } from "@/lib/booking/insights";
+import { buildInsights } from "@/lib/booking/insights";
 import { now } from "@/lib/clock";
 import { countBookings, getKpis, getUpcoming, listAllBookings, listBookings, loadFilterCatalog, type BookingQuery } from "@/lib/data/repo";
 import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import { calendarQuery, dashboardKeys, kpiMonth, weekQuery } from "@/lib/data/dashboard-reads";
 import type { Crew } from "@/lib/data/types";
-import { formatIDR, isoToLocalDate, type ISODate } from "@/lib/format";
+import { isoToLocalDate, type ISODate } from "@/lib/format";
 import { useIsViewer } from "@/lib/role";
-import { Skeleton } from "@/components/ds/Loading";
 import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { MobileBookings } from "@/components/bookings/mobile/MobileBookings";
 
@@ -41,26 +40,20 @@ import { MobileBookings } from "@/components/bookings/mobile/MobileBookings";
 // Table view and first use (Figma 02–36).
 
 
-const KPI_INFO = {
-  bookings: "Bookings with a booking date this month",
-  outstanding: "Remaining across Partially paid bookings",
-  collected: "Sum of invoices created this month",
-};
-
 /** Everything the dashboard shows regardless of filters. Each read lands on its own, so a section fills in as soon
- *  as its data is in instead of waiting for the slowest read; a failed read retries by itself (useCachedQuery); a return visit opens on the cached results. KPIs and
- *  the rail are desktop-only, so the mobile view skips those reads. Goes through the data layer's latency
+ *  as its data is in instead of waiting for the slowest read; a failed read retries by itself (useCachedQuery); a return visit opens on the cached results. The
+ *  rail is desktop-only, so the mobile view skips its reads. Goes through the data layer's latency
  *  (?latency=…) so the loading state (6.3) can be held on screen. */
 function useDashboardData(today: ISODate, mobile: boolean) {
   // Keys + queries shared with the server's streamed first reads (lib/data/dashboard-reads.ts).
   // Every crew member (incl. inactive — a past booking keeps their avatar) and every package.
   const catalog = useCachedQuery(() => loadFilterCatalog(), dashboardKeys.catalog);
   const count = useCachedQuery(() => countBookings(), dashboardKeys.count);
-  const kpis = useCachedQuery(mobile ? null : () => getKpis(kpiMonth(today)), mobile ? "" : dashboardKeys.kpis(today));
+  const kpis = useCachedQuery(() => getKpis(kpiMonth(today)), dashboardKeys.kpis(today));
   const week = useCachedQuery(mobile ? null : () => listAllBookings(weekQuery(today)), mobile ? "" : dashboardKeys.week(today));
   const upcoming = useCachedQuery(mobile ? null : () => getUpcoming(7), mobile ? "" : dashboardKeys.upcoming(today));
   const crew = useMemo(() => new Map<string, Crew>(catalog?.crew.map((c) => [c.id, c])), [catalog]);
-  const ready = !!catalog && count !== null && (mobile || (!!kpis && !!week && !!upcoming));
+  const ready = !!catalog && count !== null && !!kpis && (mobile || (!!week && !!upcoming));
   return { catalog, crew, count, kpis, week, upcoming, ready };
 }
 
@@ -172,10 +165,6 @@ function Dashboard() {
   // KPI cards wait for the count too: on first use their captions read "No data yet".
   const kpis = data.count !== null ? data.kpis : null;
   const firstUse = data.count === 0;
-  const count = kpis ? countTrend(kpis.bookingsThisMonth, kpis.bookingsPrevMonth) : null;
-  const collected = kpis ? percentTrend(kpis.collectedThisMonth, kpis.collectedPrevMonth) : null;
-  const noData = firstUse ? "No data yet" : undefined;
-  const kpiSkeleton = <Skeleton className="h-[calc(var(--spacing-24)+var(--spacing-4))] w-[calc(var(--spacing-64)+var(--spacing-24))]" />;
 
   return (
     <CrewScheduleContext.Provider value={crewCtx}>
@@ -185,6 +174,7 @@ function Dashboard() {
         crew={crewList}
         packages={packageList}
         total={data.count}
+        kpis={kpis}
         loading={data.count === null || !data.catalog}
         onOpen={openBooking}
         onNew={() => navigate("/bookings/new")}
@@ -205,34 +195,7 @@ function Dashboard() {
           )}
         </div>
 
-        <div className="flex items-stretch gap-base">
-          <MetricCard
-            className={cn("min-w-0 flex-1", rise(1))}
-            label="Bookings this month"
-            info={KPI_INFO.bookings}
-            icon="calendar"
-            value={kpis ? String(kpis.bookingsThisMonth) : kpiSkeleton}
-            trend={!firstUse && count?.changed ? { value: count.value, direction: count.direction, tone: count.tone } : undefined}
-            period={kpis ? (noData ?? "vs last month") : undefined}
-          />
-          <MetricCard
-            className={cn("min-w-0 flex-1", rise(2))}
-            label="Outstanding balance"
-            info={KPI_INFO.outstanding}
-            icon="wallet"
-            value={kpis ? formatIDR(kpis.outstanding) : kpiSkeleton}
-            period={kpis ? (noData ?? `${kpis.outstandingCount} ${kpis.outstandingCount === 1 ? "booking" : "bookings"}`) : undefined}
-          />
-          <MetricCard
-            className={cn("min-w-0 flex-1", rise(3))}
-            label="Collected this month"
-            info={KPI_INFO.collected}
-            icon="chart-analytics"
-            value={kpis ? formatIDR(kpis.collectedThisMonth) : kpiSkeleton}
-            trend={!firstUse && collected ? collected : undefined}
-            period={noData ?? (collected ? "vs last month" : undefined)}
-          />
-        </div>
+        <KpiCards kpis={kpis} firstUse={firstUse} rise={rise} />
 
         <BookingToolbar className={rise(4)} view={view} onView={setView} filters={filters} update={update} today={today} crew={crewList} packages={packageList} />
         {!firstUse && (
