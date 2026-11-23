@@ -1065,11 +1065,18 @@
       "value": "#fffbee"
     },
     {
+      "figma": "semantic/surface/inverse",
+      "css": "--color-surface-inverse",
+      "type": "color",
+      "alias": "--color-neutral-900",
+      "value": "#202938"
+    },
+    {
       "figma": "semantic/text/accent",
       "css": "--color-text-accent",
       "type": "color",
-      "alias": "--color-orchid-500",
-      "value": "#b23ad4"
+      "alias": "--color-orchid-600",
+      "value": "#8c03b3"
     },
     {
       "figma": "semantic/text/danger",
@@ -1110,8 +1117,8 @@
       "figma": "semantic/text/secondary",
       "css": "--color-text-secondary",
       "type": "color",
-      "alias": "--color-neutral-500",
-      "value": "#7c8492"
+      "alias": "--color-neutral-600",
+      "value": "#606266"
     },
     {
       "figma": "semantic/text/tertiary",
@@ -1124,85 +1131,85 @@
   "mobileText": [
     {
       "figma": "Mobile/Heading · Module",
-      "css": "--text-heading-module",
+      "css": "--text-mobile-heading-module",
       "fontSize": 17,
       "lineHeight": 24
     },
     {
       "figma": "Mobile/Heading · Section",
-      "css": "--text-heading-section",
+      "css": "--text-mobile-heading-section",
       "fontSize": 17,
       "lineHeight": 24
     },
     {
       "figma": "Mobile/Heading · Subsection",
-      "css": "--text-heading-subsection",
+      "css": "--text-mobile-heading-subsection",
       "fontSize": 15,
       "lineHeight": 22
     },
     {
       "figma": "Mobile/Text · Body",
-      "css": "--text-body",
+      "css": "--text-mobile-body",
       "fontSize": 16,
       "lineHeight": 24
     },
     {
       "figma": "Mobile/Text · Body Strong",
-      "css": "--text-body-strong",
+      "css": "--text-mobile-body-strong",
       "fontSize": 16,
       "lineHeight": 24
     },
     {
       "figma": "Mobile/Text · Caption",
-      "css": "--text-caption",
+      "css": "--text-mobile-caption",
       "fontSize": 14,
       "lineHeight": 20
     },
     {
       "figma": "Mobile/Text · Caption Strong",
-      "css": "--text-caption-strong",
+      "css": "--text-mobile-caption-strong",
       "fontSize": 14,
       "lineHeight": 20
     },
     {
       "figma": "Mobile/Text · Micro",
-      "css": "--text-micro",
+      "css": "--text-mobile-micro",
       "fontSize": 13,
       "lineHeight": 18
     },
     {
       "figma": "Mobile/Text · Timestamp",
-      "css": "--text-timestamp",
+      "css": "--text-mobile-timestamp",
       "fontSize": 12,
       "lineHeight": 16
     },
     {
       "figma": "Mobile/UI · Button",
-      "css": "--text-ui-button",
+      "css": "--text-mobile-ui-button",
       "fontSize": 15,
       "lineHeight": 20
     },
     {
       "figma": "Mobile/UI · Input",
-      "css": "--text-ui-input",
+      "css": "--text-mobile-ui-input",
       "fontSize": 16,
       "lineHeight": 24
     },
     {
       "figma": "Mobile/UI · Field Label",
-      "css": "--text-ui-field-label",
+      "css": "--text-mobile-ui-field-label",
       "fontSize": 14,
       "lineHeight": 20
     },
     {
       "figma": "Mobile/UI · Tab Active",
-      "css": "--text-ui-tab-active",
+      "css": "--text-mobile-ui-tab-active",
       "fontSize": 15,
       "lineHeight": 20
     },
     {
       "figma": "Mobile/UI · Tab",
-      "css": "--text-ui-tab",
+      "css": "--text-mobile-ui-tab",
       "fontSize": 15,
       "lineHeight": 20
     }
@@ -1367,6 +1374,22 @@
       "lineHeight": 16,
       "fontWeight": 700,
       "letterSpacing": 0
+    },
+    {
+      "figma": "Marketing/Display",
+      "css": "--text-marketing-display",
+      "fontSize": 68,
+      "lineHeight": 72,
+      "fontWeight": 500,
+      "letterSpacing": -0.02
+    },
+    {
+      "figma": "Marketing/Heading",
+      "css": "--text-marketing-heading",
+      "fontSize": 36,
+      "lineHeight": 44,
+      "fontWeight": 500,
+      "letterSpacing": -0.02
     }
   ],
   "effects": [

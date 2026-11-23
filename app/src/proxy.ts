@@ -11,7 +11,8 @@ import { safeNext } from "@/lib/safe-next";
 import { authenticatedAtFromToken, sessionEndedAtMidnight } from "@/lib/session-day";
 import { authCookieOptions, isAuthCookie } from "@/lib/supabase/cookie";
 
-const PUBLIC = new Set(["/login"]);
+// "/" = marketing landing, "/get-started" = its CTA target (placeholder) — public like the login page.
+const PUBLIC = new Set(["/", "/login", "/get-started"]);
 
 export async function proxy(request: NextRequest) {
   if (process.env.NEXT_PUBLIC_DATA_SOURCE !== "supabase") return NextResponse.next();

@@ -1,5 +1,5 @@
 {
-  "$source": "Figma 'bs internal tools' (TFiwbjBZC0sfpLRknSkKqV) — local text, effect and paint styles, copied from figma_get_text_styles / getLocalEffectStylesAsync / getLocalPaintStylesAsync on 2026-11-11. Do not edit by hand; re-pull from Figma. Mobile/* text styles (2026-11-23): the phone sizes of the desktop styles, applied below 768.",
+  "$source": "Figma 'bs internal tools' (TFiwbjBZC0sfpLRknSkKqV) — local text, effect and paint styles, copied from figma_get_text_styles / getLocalEffectStylesAsync / getLocalPaintStylesAsync on 2026-11-11. Do not edit by hand; re-pull from Figma. Mobile/* text styles (2026-11-23): the phone sizes of the desktop styles, applied below 768. Marketing/* (2026-11-23): landing-page display + heading, letter-spacing -2% (em); Marketing/Display Tablet → tabletText (768–1279), Marketing/* Mobile → mobileText.",
   "text": [
     { "name": "Display/Metric", "fontSize": 28, "fontStyle": "Medium", "lineHeight": 36, "letterSpacing": -0.6000000238418579 },
     { "name": "Heading/Page", "fontSize": 24, "fontStyle": "Semi Bold", "lineHeight": 32, "letterSpacing": 0 },
@@ -20,7 +20,9 @@
     { "name": "UI/Field Label", "fontSize": 12, "fontStyle": "Regular", "lineHeight": 22, "letterSpacing": 0 },
     { "name": "UI/Tab Active", "fontSize": 13, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0 },
     { "name": "UI/Tab", "fontSize": 13, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0 },
-    { "name": "UI/Avatar", "fontSize": 12, "fontStyle": "Bold", "lineHeight": 16, "letterSpacing": 0 }
+    { "name": "UI/Avatar", "fontSize": 12, "fontStyle": "Bold", "lineHeight": 16, "letterSpacing": 0 },
+    { "name": "Marketing/Display", "fontSize": 68, "fontStyle": "Medium", "lineHeight": 72, "letterSpacing": -0.02, "letterSpacingUnit": "em" },
+    { "name": "Marketing/Heading", "fontSize": 36, "fontStyle": "Medium", "lineHeight": 44, "letterSpacing": -0.02, "letterSpacingUnit": "em" }
   ],
   "effects": [
     { "name": "Shadow/Card", "type": "DROP_SHADOW", "x": 0, "y": 2, "blur": 8, "spread": 0, "color": { "r": 0.125490203499794, "g": 0.16078431904315948, "b": 0.21960784494876862, "a": 0.019999999552965164 } },
@@ -54,6 +56,11 @@
     {"name": "Mobile/UI · Input", "fontSize": 16, "fontStyle": "Regular", "lineHeight": 24, "letterSpacing": 0},
     {"name": "Mobile/UI · Field Label", "fontSize": 14, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0},
     {"name": "Mobile/UI · Tab Active", "fontSize": 15, "fontStyle": "Semi Bold", "lineHeight": 20, "letterSpacing": 0},
-    {"name": "Mobile/UI · Tab", "fontSize": 15, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0}
+    {"name": "Mobile/UI · Tab", "fontSize": 15, "fontStyle": "Regular", "lineHeight": 20, "letterSpacing": 0},
+    { "name": "Mobile/Marketing · Display", "fontSize": 40, "fontStyle": "Medium", "lineHeight": 44, "letterSpacing": 0 },
+    { "name": "Mobile/Marketing · Heading", "fontSize": 28, "fontStyle": "Medium", "lineHeight": 34, "letterSpacing": 0 }
+  ],
+  "tabletText": [
+    { "name": "Tablet/Marketing · Display", "fontSize": 56, "fontStyle": "Medium", "lineHeight": 60, "letterSpacing": 0 }
   ]
 }

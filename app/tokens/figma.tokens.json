@@ -3211,6 +3211,29 @@
         },
         "$type": "color",
         "$value": "{primitives.color.amber.50}"
+      },
+      "inverse": {
+        "$description": "Dark surface for inverse sections (footer, end cards). Pair with text/inverse.",
+        "$extensions": {
+          "figma-console-mcp": {
+            "collectionId": "VariableCollectionId:20:758",
+            "figmaResolvedType": "COLOR",
+            "lastSyncedAt": "2026-11-23T12:00:00.000Z",
+            "lastSyncedValue": {
+              "Light": {
+                "reference": "{primitives.color.neutral.900}"
+              }
+            },
+            "primaryMode": "Light",
+            "scopes": [
+              "FRAME_FILL",
+              "SHAPE_FILL"
+            ],
+            "variableId": "VariableID:231:80995"
+          }
+        },
+        "$type": "color",
+        "$value": "{primitives.color.neutral.900}"
       }
     },
     "text": {
@@ -3220,10 +3243,10 @@
           "figma-console-mcp": {
             "collectionId": "VariableCollectionId:20:758",
             "figmaResolvedType": "COLOR",
-            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedAt": "2026-11-23T12:00:00.000Z",
             "lastSyncedValue": {
               "Light": {
-                "reference": "{primitives.color.orchid.500}"
+                "reference": "{primitives.color.orchid.600}"
               }
             },
             "primaryMode": "Light",
@@ -3234,7 +3257,7 @@
           }
         },
         "$type": "color",
-        "$value": "{primitives.color.orchid.500}"
+        "$value": "{primitives.color.orchid.600}"
       },
       "danger": {
         "$description": "Field error message, required mark",
@@ -3353,10 +3376,10 @@
           "figma-console-mcp": {
             "collectionId": "VariableCollectionId:20:758",
             "figmaResolvedType": "COLOR",
-            "lastSyncedAt": "2026-11-11T01:28:10.387Z",
+            "lastSyncedAt": "2026-11-23T12:00:00.000Z",
             "lastSyncedValue": {
               "Light": {
-                "reference": "{primitives.color.neutral.500}"
+                "reference": "{primitives.color.neutral.600}"
               }
             },
             "primaryMode": "Light",
@@ -3367,7 +3390,7 @@
           }
         },
         "$type": "color",
-        "$value": "{primitives.color.neutral.500}"
+        "$value": "{primitives.color.neutral.600}"
       },
       "tertiary": {
         "$description": "Timestamps, disabled labels",

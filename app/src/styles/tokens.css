@@ -108,13 +108,14 @@
   --color-surface-scrim: var(--color-scrim-90); /* Full-screen overlay backdrop (template picker) */
   --color-surface-subtle: var(--color-neutral-50); /* Quiet grouping and table rows */
   --color-surface-warning: var(--color-amber-50); /* Review insight cards */
-  --color-text-accent: var(--color-orchid-500); /* Ghost actions, links */
+  --color-surface-inverse: var(--color-neutral-900); /* Dark surface for inverse sections (footer, end cards). Pair with text/inverse. */
+  --color-text-accent: var(--color-orchid-600); /* Ghost actions, links */
   --color-text-danger: var(--color-red-400); /* Field error message, required mark */
   --color-text-inverse: var(--color-neutral-0); /* Text on scrim */
   --color-text-on-accent: var(--color-neutral-0); /* Text on primary button */
   --color-text-placeholder: var(--color-neutral-450); /* Input placeholder */
   --color-text-primary: var(--color-neutral-900); /* Titles and financial values */
-  --color-text-secondary: var(--color-neutral-500); /* Metadata and chart axes */
+  --color-text-secondary: var(--color-neutral-600); /* Metadata and chart axes */
   --color-text-tertiary: var(--color-neutral-400); /* Timestamps, disabled labels */
 
   /* component (Figma variables) */
@@ -262,6 +263,58 @@
   --text-ui-avatar--line-height: 16px;
   --text-ui-avatar--font-weight: 700;
   --text-ui-avatar--letter-spacing: 0px;
+  --text-marketing-display: 68px;
+  --text-marketing-display--line-height: 72px;
+  --text-marketing-display--font-weight: 500;
+  --text-marketing-display--letter-spacing: -0.02em;
+  --text-marketing-heading: 36px;
+  --text-marketing-heading--line-height: 44px;
+  --text-marketing-heading--font-weight: 500;
+  --text-marketing-heading--letter-spacing: -0.02em;
+
+  /* Mobile/… text styles at every width (marketing pages) */
+  --text-mobile-heading-module: 17px;
+  --text-mobile-heading-module--line-height: 24px;
+  --text-mobile-heading-module--font-weight: 600;
+  --text-mobile-heading-section: 17px;
+  --text-mobile-heading-section--line-height: 24px;
+  --text-mobile-heading-section--font-weight: 600;
+  --text-mobile-heading-subsection: 15px;
+  --text-mobile-heading-subsection--line-height: 22px;
+  --text-mobile-heading-subsection--font-weight: 600;
+  --text-mobile-body: 16px;
+  --text-mobile-body--line-height: 24px;
+  --text-mobile-body--font-weight: 400;
+  --text-mobile-body-strong: 16px;
+  --text-mobile-body-strong--line-height: 24px;
+  --text-mobile-body-strong--font-weight: 600;
+  --text-mobile-caption: 14px;
+  --text-mobile-caption--line-height: 20px;
+  --text-mobile-caption--font-weight: 400;
+  --text-mobile-caption-strong: 14px;
+  --text-mobile-caption-strong--line-height: 20px;
+  --text-mobile-caption-strong--font-weight: 600;
+  --text-mobile-micro: 13px;
+  --text-mobile-micro--line-height: 18px;
+  --text-mobile-micro--font-weight: 400;
+  --text-mobile-timestamp: 12px;
+  --text-mobile-timestamp--line-height: 16px;
+  --text-mobile-timestamp--font-weight: 400;
+  --text-mobile-ui-button: 15px;
+  --text-mobile-ui-button--line-height: 20px;
+  --text-mobile-ui-button--font-weight: 500;
+  --text-mobile-ui-input: 16px;
+  --text-mobile-ui-input--line-height: 24px;
+  --text-mobile-ui-input--font-weight: 400;
+  --text-mobile-ui-field-label: 14px;
+  --text-mobile-ui-field-label--line-height: 20px;
+  --text-mobile-ui-field-label--font-weight: 400;
+  --text-mobile-ui-tab-active: 15px;
+  --text-mobile-ui-tab-active--line-height: 20px;
+  --text-mobile-ui-tab-active--font-weight: 600;
+  --text-mobile-ui-tab: 15px;
+  --text-mobile-ui-tab--line-height: 20px;
+  --text-mobile-ui-tab--font-weight: 400;
 
   /* Effect styles */
   --shadow-card: 0px 2px 8px 0px rgb(32 41 56 / 0.02);
@@ -299,6 +352,8 @@
     --grid-columns: var(--spacing-tablet-columns);
     --grid-gutter: var(--spacing-tablet-gutter);
     --safe-area-bottom: max(var(--spacing-tablet-safe-area-bottom), env(safe-area-inset-bottom, 0px));
+    --text-marketing-display: 56px;
+    --text-marketing-display--line-height: 60px;
   }
 }
 
@@ -344,5 +399,9 @@
     --text-ui-tab-active--line-height: 20px;
     --text-ui-tab: 15px;
     --text-ui-tab--line-height: 20px;
+    --text-marketing-display: 40px;
+    --text-marketing-display--line-height: 44px;
+    --text-marketing-heading: 28px;
+    --text-marketing-heading--line-height: 34px;
   }
 }

@@ -12,7 +12,7 @@ const twMerge = extendTailwindMerge({
       color: names("color"),
       spacing: names("spacing"),
       radius: names("radius"),
-      text: manifest.text.map((t) => strip(t.css, "text")),
+      text: [...manifest.text, ...manifest.mobileText].map((t) => strip(t.css, "text")),
       shadow: manifest.effects.filter((e) => e.css.startsWith("--shadow-")).map((e) => strip(e.css, "shadow")),
       "inset-shadow": manifest.effects.filter((e) => e.css.startsWith("--inset-shadow-")).map((e) => strip(e.css, "inset-shadow")),
     },

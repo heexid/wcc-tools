@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { LIQUID_FRAGMENT, LIQUID_VERTEX } from "./liquidShader";
 import { GRAIN_BACKGROUND_SIZE, GRAIN_OPACITY, LIQUID_COLORS } from "./liquidParams";
 
-// WebGL liquid gradient behind the login card (exported from the pipeline shader tool, flow type 10) plus a fine
+// WebGL liquid gradient behind the login card and the landing hero (exported from the pipeline shader tool, flow type 10) plus a fine
 // overlay-blended grain tile. Decorative only — hidden from assistive tech, never takes pointer events.
 // Reduced motion → draws one still frame. If WebGL is unavailable the pale base colour stays.
 
@@ -112,14 +112,23 @@ export function LiquidBackground() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0;
     const draw = (ms: number) => {
+      raf = 0;
       gl.uniform1f(loc("u_time"), ms * 0.001);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      if (!reduced.matches) raf = requestAnimationFrame(draw);
+      if (!reduced.matches && visible) raf = requestAnimationFrame(draw);
     };
+    // Off-screen (the landing hero once scrolled past) → stop drawing; resume where time left off when it returns.
+    let visible = true;
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible && !raf) raf = requestAnimationFrame(draw);
+    });
+    io.observe(canvas);
     raf = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       window.removeEventListener("resize", resize);
     };
   }, []);

@@ -1,0 +1,146 @@
+/* Landing page layout (Figma "Landing Page": LP-D 1440 · LP-T 768 · LP-M 390).
+   Desktop sections sit on an 80 margin with 120 vertical padding; tablet and phone use the DS breakpoint margins
+   (tablet/margin 24, mobile/margin 16) and 64 vertical padding. Widths cap at the 1280 content of the 1440 frame. */
+.lp {
+  --lp-gutter: calc(var(--spacing-64) + var(--spacing-16)); /* 80 */
+  --lp-section-y: calc(var(--spacing-64) * 2 - var(--spacing-8)); /* 120 */
+  --lp-content: calc(var(--spacing-layout-page-width) - var(--spacing-64) * 2 - var(--spacing-32)); /* 1280 */
+  --lp-hero-bg: calc(var(--spacing-64) * 16 + var(--spacing-32) + var(--spacing-4)); /* 1060 */
+}
+
+@media (width < 80rem) {
+  .lp {
+    --lp-gutter: var(--spacing-tablet-margin);
+    --lp-section-y: var(--spacing-64);
+    --lp-hero-bg: calc(var(--spacing-64) * 12 + var(--spacing-24) + var(--spacing-4)); /* 796 */
+  }
+}
+
+@media (width < 48rem) {
+  .lp {
+    --lp-gutter: var(--spacing-mobile-margin);
+    --lp-hero-bg: calc(var(--spacing-64) * 12 - var(--spacing-12)); /* 756 */
+  }
+}
+
+/* Text links (nav, footer): colour only. */
+.lp-link {
+  border-radius: var(--radius-small);
+  outline: none;
+  transition: color var(--dur-hover) var(--ease-hover);
+}
+.lp-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-accent-primary);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lp-link:hover {
+    color: var(--color-text-accent);
+  }
+}
+
+/* FAQ row: answer row collapses to 0 (grid 0fr ↔ 1fr); question → answer gap is 8 (20 − 12). */
+.lp-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+.lp-faq-panel[data-open] {
+  grid-template-rows: 1fr;
+  margin-top: calc(var(--spacing-12) * -1);
+}
+.lp-faq-panel:not([data-open]) > * {
+  visibility: hidden;
+}
+/* Second minus = the plus's vertical bar: upright while closed, flat (hidden in the first) while open. */
+.lp-faq-bar {
+  transform: rotate(90deg);
+}
+[aria-expanded="true"] .lp-faq-bar {
+  transform: rotate(0deg);
+}
+
+/* ── Motion (find-animation-opportunities, 2026-11-23) ─────────────────────────────────────────────────────────
+   Shared tokens only (motion.css). Reduced motion: --list-from-y / --stagger-step are 0 there, so every entrance
+   below becomes a plain fade; the FAQ rows snap. */
+
+/* 6 · Anchor jumps scroll instead of teleporting (motion.css turns smooth scrolling off for reduced motion). */
+html:has(.lp) {
+  scroll-behavior: smooth;
+}
+
+/* 1 · Hero entrance — once per visit: headline → copy → product window, 50 ms apart, blur → sharp with the fade.
+   @starting-style only, so nothing waits on JS and the LCP image is never held back. */
+[data-hero] {
+  transition-property: opacity, transform, filter;
+  transition-duration: var(--dur-modal);
+  transition-timing-function: var(--ease-out);
+}
+[data-hero]:nth-child(2) {
+  transition-delay: var(--stagger-step);
+}
+[data-hero-window] {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+@starting-style {
+  [data-hero] {
+    opacity: 0;
+    transform: translateY(var(--list-from-y));
+    filter: blur(var(--cascade-from-blur));
+  }
+}
+
+/* 2 · Scroll reveal — each [data-reveal] fades + rises once when it enters the viewport (LandingMotion adds
+   [data-shown]). Only hidden when the script runs (html.lp-js), so content never depends on it. Siblings in one
+   group stagger via --reveal-i (set by the script, capped at 5 steps). */
+.lp-js [data-reveal] {
+  transition-property: opacity, transform;
+  transition-duration: calc(var(--dur-modal) + var(--dur-press));
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc(var(--reveal-i, 0) * var(--stagger-step));
+}
+.lp-js [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(var(--list-from-y));
+}
+
+/* 3 · FAQ — the answer row opens (0fr → 1fr, the accordion exception) and fades; the plus's bar rotates flat. */
+.lp-faq-panel {
+  transition-property: grid-template-rows, margin-top;
+  transition-duration: var(--dur-collapse);
+  transition-timing-function: var(--ease-out);
+}
+.lp-faq-panel > * {
+  transition: opacity var(--dur-collapse) var(--ease-out), visibility 0s linear var(--dur-collapse);
+}
+.lp-faq-panel:not([data-open]) > * {
+  opacity: 0;
+}
+.lp-faq-panel[data-open] > * {
+  transition-delay: 0s;
+}
+.lp-faq-bar {
+  transition: transform var(--dur-collapse) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-faq-panel {
+    transition-duration: 0ms;
+  }
+}
+
+/* 4 · Floating nav: a shadow fades in once the bar sits over content (opacity only). */
+[data-lp-nav] {
+  position: relative;
+}
+[data-lp-nav]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: var(--shadow-floating);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-popover) var(--ease-out);
+}
+[data-lp-nav][data-scrolled]::after {
+  opacity: 1;
+}

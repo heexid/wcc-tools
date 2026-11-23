@@ -70,7 +70,19 @@ for (const t of styles.text) {
   out.push(`  --text-${n}: ${t.fontSize}px;`);
   out.push(`  --text-${n}--line-height: ${t.lineHeight}px;`);
   out.push(`  --text-${n}--font-weight: ${weight[t.fontStyle]};`);
-  out.push(`  --text-${n}--letter-spacing: ${+t.letterSpacing.toFixed(2)}px;`);
+  // Figma PERCENT letter-spacing (Marketing/*) stays relative (em) so the tablet / mobile sizes keep −2%.
+  out.push(`  --text-${n}--letter-spacing: ${+t.letterSpacing.toFixed(2)}${t.letterSpacingUnit ?? "px"};`);
+}
+// The Mobile/… styles are also real Figma styles in their own right: the landing page uses them at every width
+// (Mobile/Text · Body for section intros, Mobile/UI · Button on 44 CTAs) → text-mobile-body, text-mobile-ui-button…
+out.push(``, `  /* Mobile/… text styles at every width (marketing pages) */`);
+for (const m of styles.mobileText ?? []) {
+  const rest = m.name.slice("Mobile/".length).replace(" · ", "/");
+  if (rest.startsWith("Marketing/")) continue; // only steps the Marketing/* sizes down below 768
+  const n = `mobile-${textName(rest)}`;
+  out.push(`  --text-${n}: ${m.fontSize}px;`);
+  out.push(`  --text-${n}--line-height: ${m.lineHeight}px;`);
+  out.push(`  --text-${n}--font-weight: ${weight[m.fontStyle]};`);
 }
 out.push(``, `  /* Effect styles */`);
 for (const e of styles.effects) {
@@ -119,6 +131,12 @@ for (const [device, max] of [["tablet", bp("desktop", "min-width")], ["mobile", 
   for (const [css, key] of responsive) out.push(`    ${css}: var(--spacing-${device}-${key});`);
   out.push(`    --safe-area-bottom: max(var(--spacing-${device}-safe-area-bottom), env(safe-area-inset-bottom, 0px));`);
   // Mobile type scale (Figma text styles "Mobile/…", 2026-11-23): the phone size + line height of each desktop style.
+  // Tablet type scale (Figma "Marketing/Display Tablet"): only the landing-page display steps down at 768–1279.
+  if (device === "tablet")
+    for (const m of styles.tabletText ?? []) {
+      const n = textName(m.name.slice("Tablet/".length).replace(" · ", "/"));
+      out.push(`    --text-${n}: ${m.fontSize}px;`, `    --text-${n}--line-height: ${m.lineHeight}px;`);
+    }
   if (device === "mobile")
     for (const m of styles.mobileText ?? []) {
       const n = textName(m.name.slice("Mobile/".length).replace(" · ", "/"));
@@ -145,6 +163,10 @@ const manifest = {
   })),
   mobileText: (styles.mobileText ?? []).map((m) => ({ figma: m.name, css: `--text-${textName(m.name.slice(7).replace(" · ", "/"))}`, fontSize: m.fontSize, lineHeight: m.lineHeight })),
   text: styles.text.map((t) => ({ figma: t.name, css: `--text-${textName(t.name)}`, fontSize: t.fontSize, lineHeight: t.lineHeight, fontWeight: weight[t.fontStyle], letterSpacing: +t.letterSpacing.toFixed(2) })),
+  // Static Mobile/… sizes (text-mobile-*): listed so cn()'s tailwind-merge reads them as font sizes, not colours.
+  mobileText: (styles.mobileText ?? [])
+    .filter((m) => !m.name.includes("Marketing"))
+    .map((m) => ({ figma: m.name, css: `--text-mobile-${textName(m.name.slice("Mobile/".length).replace(" · ", "/"))}`, fontSize: m.fontSize, lineHeight: m.lineHeight })),
   effects: styles.effects.map((e) => ({ figma: e.name, css: `--${e.type === "INNER_SHADOW" ? "inset-shadow" : "shadow"}-${slug(e.name.split("/")[1])}` })),
   paints: styles.paints.map((p) => ({ figma: p.name, css: `--gradient-${slug(p.name.split("/")[1])}` })),
 };

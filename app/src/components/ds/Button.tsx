@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import Link from "next/link";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 import { Icon, type IconName } from "./Icon";
 import { Txt } from "./Txt";
 import { cn, type ForceState } from "./cn";
@@ -73,8 +74,13 @@ const ring =
   "after:pointer-events-none after:absolute after:hidden after:rounded-pill after:border-2 after:border-accent-primary after:content-[''] " +
   "focus-visible:after:block data-[force=focus]:after:block focus-visible:border-transparent data-[force=focus]:border-transparent";
 
+// Size lg — the landing page's content CTAs (Figma: Button instances overridden to mobile/control-height 44, pad 4/20,
+// label Mobile/UI · Button 15/20). Below 768 every button is already 44 / 15, so lg only changes tablet + desktop.
+const large = "h-[var(--spacing-mobile-control-height)] px-20 text-mobile-ui-button";
+
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
+  size?: "md" | "lg";
   icon?: IconName;
   /** Icon-only button — `aria-label` is required. */
   iconOnly?: boolean;
@@ -83,7 +89,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children?: ReactNode;
 };
 
-export function Button({ variant = "primary", icon, iconOnly, loading, forceState, className, children, disabled, ...rest }: ButtonProps) {
+export function Button({ variant = "primary", size = "md", icon, iconOnly, loading, forceState, className, children, disabled, ...rest }: ButtonProps) {
   // Primary stacks fill (z-0) → highlight ::before (z-1) → content (z-2).
   const layer = variant === "primary" ? "relative z-2" : undefined;
   const shape = iconOnly ? content.iconOnly : icon || loading ? content.icon : content.label;
@@ -101,6 +107,7 @@ export function Button({ variant = "primary", icon, iconOnly, loading, forceStat
         variants[variant],
         variant === "ghost" && "after:-inset-2",
         variant === "primary" && (iconOnly ? primaryFocusHighlight.iconOnly : primaryFocusHighlight.hug),
+        size === "lg" && !iconOnly && large,
         className,
       )}
     >
@@ -112,6 +119,39 @@ export function Button({ variant = "primary", icon, iconOnly, loading, forceStat
       )}
       {!iconOnly && children != null && <Txt className={layer}>{children}</Txt>}
     </button>
+  );
+}
+
+/** The same Button as a link (navigation: Log in, Get started, in-page anchors). Label buttons only. */
+export function ButtonLink({
+  href,
+  variant = "primary",
+  size = "md",
+  icon,
+  className,
+  children,
+  ...rest
+}: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & { href: string; variant?: Variant; size?: "md" | "lg"; icon?: IconName; children: ReactNode }) {
+  const layer = variant === "primary" ? "relative z-2" : undefined;
+  return (
+    <Link
+      href={href}
+      {...rest}
+      className={cn(
+        base,
+        ring,
+        icon ? content.icon : content.label,
+        variants[variant],
+        variant === "ghost" && "after:-inset-2",
+        variant === "primary" && primaryFocusHighlight.hug,
+        size === "lg" && large,
+        className,
+      )}
+    >
+      {variant === "primary" && <span aria-hidden className={primaryFill} />}
+      {icon && <Icon name={icon} className={cn("size-icon-sm", layer)} />}
+      <Txt className={layer}>{children}</Txt>
+    </Link>
   );
 }
 

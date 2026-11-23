@@ -27,8 +27,8 @@ describe("F0 · token generation", () => {
     expect(css).toMatch(/@theme static \{\n\s+--\*: initial;/);
   });
 
-  it("emits all 20 text styles, 5 effects and 3 paints", () => {
-    expect(manifest.text).toHaveLength(20);
+  it("emits all 22 text styles (20 app + Marketing/Display, Marketing/Heading), 5 effects and 3 paints", () => {
+    expect(manifest.text).toHaveLength(22);
     expect(manifest.effects).toHaveLength(5);
     expect(manifest.paints).toHaveLength(3);
     for (const t of manifest.text) expect(css).toContain(`${t.css}--line-height: ${t.lineHeight}px;`);

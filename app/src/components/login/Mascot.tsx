@@ -10,7 +10,20 @@ import type { MascotApi, MascotState } from "./mascotScene";
 
 export type { MascotApi, MascotState };
 
-export function Mascot({ state, apiRef }: { state: MascotState; apiRef?: Ref<MascotApi | null> }) {
+// Sizes: 64 (login, Figma Asset/mascot-large at 64) and 120 (landing final CTA, Asset/mascot-large at 120).
+// The canvas overflows the box by a quarter of its size on every side (glow + bounce room).
+const SIZES = {
+  64: { box: "size-64", inset: "-inset-16", png: "/assets/mascot-64.png", png2x: "/assets/mascot-64@2x.png" },
+  120: {
+    box: "size-[calc(var(--spacing-64)+var(--spacing-48)+var(--spacing-8))]",
+    inset: "-inset-[calc(var(--spacing-24)+var(--spacing-6))]",
+    png: "/assets/mascot-large.png",
+    png2x: "/assets/mascot-large@2x.png",
+  },
+} as const;
+
+export function Mascot({ state, apiRef, size = 64 }: { state: MascotState; apiRef?: Ref<MascotApi | null>; size?: keyof typeof SIZES }) {
+  const s = SIZES[size];
   const host = useRef<HTMLDivElement>(null);
   const api = useRef<MascotApi | null>(null);
   const [ready, setReady] = useState(false);
@@ -39,15 +52,15 @@ export function Mascot({ state, apiRef }: { state: MascotState; apiRef?: Ref<Mas
   }, [state, ready]);
 
   return (
-    <div aria-hidden data-mascot-state={state} data-mascot-ready={ready || undefined} className="relative size-64 shrink-0">
+    <div aria-hidden data-mascot-state={state} data-mascot-ready={ready || undefined} className={`relative shrink-0 ${s.box}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/assets/mascot-64.png"
-        srcSet="/assets/mascot-64.png 1x, /assets/mascot-64@2x.png 2x"
+        src={s.png}
+        srcSet={`${s.png} 1x, ${s.png2x} 2x`}
         alt=""
-        className={ready ? "invisible absolute inset-0 size-64" : "absolute inset-0 block size-64"}
+        className={ready ? `invisible absolute inset-0 ${s.box}` : `absolute inset-0 block ${s.box}`}
       />
-      <div ref={host} className="absolute -inset-16" />
+      <div ref={host} className={`absolute ${s.inset}`} />
     </div>
   );
 }
