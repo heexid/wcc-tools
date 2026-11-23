@@ -64,7 +64,7 @@ function Hero() {
               Bookings, packages, payments and invoices in one place, with totals that add up themselves
             </p>
             <ButtonLink href={GET_STARTED_HREF} variant="secondary" size="lg" className="max-tablet:w-full">
-              Book a demo
+              Start your first booking
             </ButtonLink>
             <p className="text-caption text-text-primary">Free setup by our team</p>
           </div>
@@ -531,14 +531,6 @@ function FaqSection() {
           <h2 id="faq-title" data-reveal className="text-marketing-heading text-text-primary">
             Questions, answered
           </h2>
-          <p data-reveal className="text-mobile-body text-text-secondary">
-            Still unsure? Book a demo and we will walk you through your own bookings
-          </p>
-          <div data-reveal>
-            <ButtonLink href={GET_STARTED_HREF} variant="secondary" size="lg">
-              Book a demo
-            </ButtonLink>
-          </div>
         </div>
         <Faq />
       </Container>
@@ -563,7 +555,7 @@ function FinalCtaAndFooter() {
           </div>
           <nav aria-label="Footer" className="flex gap-64 max-tablet:gap-48">
             <FooterColumn title="Product" links={[["Features", "#features"], ["Pricing", "#pricing"], ["FAQ", "#faq"]]} />
-            <FooterColumn title="Company" links={[["Book a demo", GET_STARTED_HREF], ["Log in", LOGIN_HREF]]} />
+            <FooterColumn title="Company" links={[["Log in", LOGIN_HREF]]} />
           </nav>
         </footer>
       </Container>

@@ -55,9 +55,6 @@ export function FinalCta() {
         <ButtonLink href={GET_STARTED_HREF} size="lg" {...cheer}>
           Start your first booking
         </ButtonLink>
-        <ButtonLink href={GET_STARTED_HREF} variant="secondary" size="lg" {...cheer}>
-          Book a demo
-        </ButtonLink>
       </div>
     </div>
   );
