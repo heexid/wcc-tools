@@ -15,7 +15,7 @@ import { LIMITS } from "@/lib/booking/calc";
 import { now } from "@/lib/clock";
 import { changePassword, getBusiness, getProfile, passwordRules, updateDisplayName } from "@/lib/data/repo";
 import type { Business, Profile } from "@/lib/data/types";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { BusinessModal, BusinessRows } from "./BusinessInformation";
 import { formatDate, initials, isoToLocalDate } from "@/lib/format";
 
@@ -27,13 +27,13 @@ import { formatDate, initials, isoToLocalDate } from "@/lib/format";
 
 const ROLE_NOTE = {
   admin: "Full access to Booking and Package Library. Set by your workspace admin.",
-  viewer: "Can view bookings and download invoices. Set by your workspace admin.",
+  crew: "Can view bookings and download invoices. Set by your workspace admin.",
 } as const;
 
 export function AccountSettings() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const entering = useEntrance(!!profile && !!business); // module entrance cascade (motion.css) — starts once the profile is in
   const [modal, setModal] = useState<null | "name" | "password" | "business">(null);
   const [toast, setToastState] = useState<{ text: string; open: boolean } | null>(null);
@@ -50,7 +50,7 @@ export function AccountSettings() {
   if (!profile || !business) return <div className="flex-1" aria-busy="true" />;
 
   const today = isoToLocalDate(now().toISOString());
-  const role = profile.role === "admin" ? "Admin" : "Viewer";
+  const role = profile.role === "admin" ? "Admin" : "Crew";
   const done = (p: Profile, text: string) => {
     setProfile(p);
     setModal(null);
@@ -90,7 +90,7 @@ export function AccountSettings() {
                 <Txt>{role}</Txt>
               </span>
             }
-            note={ROLE_NOTE[profile.role]}
+            note={ROLE_NOTE[profile.role === "admin" ? "admin" : "crew"]}
             locked
           />
         </Card>
@@ -107,7 +107,7 @@ export function AccountSettings() {
           title="Business information"
           caption="Printed in the header of every invoice PDF."
           action={
-            !viewer && (
+            !readOnly && (
               <Button variant="secondary" icon="pencil" onClick={() => setModal("business")}>
                 Edit
               </Button>

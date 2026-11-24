@@ -3,7 +3,7 @@ import { resetDb, sql } from "./db";
 
 // P7 · Booking write path on local Supabase: edit + diff strip (lane B3), total-below-paid guard (rule 10),
 // archived package kept (rule 13), leave guard (lane G), cancel (lane H, rule 12), optimistic concurrency (two
-// browsers), viewer kept off /edit. Same selectors and copy as the mock suites (F13, F14). New booking → Draft and
+// browsers), crew kept off /edit. Same selectors and copy as the mock suites (F13, F14). New booking → Draft and
 // DP invoice are covered by smoke.spec.ts. Each test uses its own seeded booking, so order doesn't matter.
 
 test.beforeAll(() => resetDb());
@@ -129,7 +129,7 @@ test("P7 · two people edit one booking: the second save is refused with the rel
   await b.context().close();
 });
 
-test("viewer · /edit opens the read-only page (6.4)", async ({ page }) => {
+test("crew · /edit opens the read-only page (6.4)", async ({ page }) => {
   await signIn(page, "crew@bs-moment.test", "crewview26");
   await page.goto("/bookings/BK-2026-0142/edit");
   await expect(page).toHaveURL(/\/bookings\/[^/?]+$/);

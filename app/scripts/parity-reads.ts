@@ -147,7 +147,7 @@ async function main() {
     const g = { ...strip(got), invoices: (got.invoices as Row[]).map(strip) };
     check(`detail · ${ref}`, want, g);
   }
-  for (const c of db.crew) {
+  for (const c of db.crew.filter((x) => !x.userId)) { // linked entries are added by SQL
     const mine = filterBookings(db, { view: "calendar", crewIds: [c.id] });
     const want = { crew: { ...c, id: uuid(c.id) }, monthCount: mine.filter((b) => b.bookingDate.slice(0, 7) === TODAY.slice(0, 7)).length, upcoming: mine.filter((b) => b.bookingDate >= TODAY).map((r) => mapRow(r as unknown as Row)) };
     const got = await q<Row>(pg, "select public.get_crew_schedule($1::uuid, $2::date) as r", [uuid(c.id), TODAY]);

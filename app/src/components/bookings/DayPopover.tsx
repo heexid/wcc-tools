@@ -9,7 +9,7 @@ import { cn } from "@/components/ds/cn";
 import type { Presence } from "@/components/ds/usePresence";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDateWithDay, formatDayMonth, type ISODate } from "@/lib/format";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { prefetchBooking } from "@/lib/data/prefetch";
 
 // Figma Bookings 17 · "Day popover" (also Week overflow 31 → F8): 360 wide, pad popover/inset (6) inside a
@@ -45,7 +45,7 @@ export function DayPopover({
   onOpenDay: (d: ISODate) => void;
 }) {
   const titleId = useId();
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const listRef = useRef<HTMLUListElement>(null);
   const n = bookings.length;
 
@@ -94,7 +94,7 @@ export function DayPopover({
         ))}
       </ul>
       <div className="flex w-full items-start justify-between border-t border-border-default p-micro">
-        {viewer ? (
+        {readOnly ? (
           <span aria-hidden />
         ) : (
           <Button variant="ghost" icon="plus" onClick={() => onNew(date)}>

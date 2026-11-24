@@ -21,7 +21,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { archivePackage, listPackages, NetworkError, restorePackage, savePackage, type PackageErrors, type PackageRow } from "@/lib/data/repo";
 import { fetchCached, peek } from "@/lib/data/cache";
 import { formatDate, formatIDR } from "@/lib/format";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 
 // Figma: Package Lib 01–08 (PRD US-0, INTERACTIONS §5). Layout/List: title + "New package", toolbar
 // (Active / Archived tabs · 280 search), table card (header 36, rows 62, columns 644 / 180 / 140 / 160 /
@@ -202,7 +202,7 @@ function PackageLibrary() {
   const [initial] = useState(() => peek<PackageLists>(packagesKey("active", ""))?.value);
   const [rows, setRows] = useState<PackageRow[] | null>(initial?.[0] ?? null);
   const [counts, setCounts] = useState({ active: initial?.[1].length ?? 0, archived: initial?.[2].length ?? 0 });
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [archiving, setArchiving] = useState<Draft | null>(null);
   // Content stays while the toast animates out; only `open` flips (else an Error toast would turn Success mid-exit).
@@ -268,7 +268,7 @@ function PackageLibrary() {
           <p className="text-caption text-text-secondary">Packages used when creating bookings. Price changes never alter existing bookings.</p>
         </div>
         <span className="flex-1" />
-        {!viewer && !mobile && (
+        {!readOnly && !mobile && (
           <Button icon="plus" onClick={() => setEditing(EMPTY)}>
             New package
           </Button>
@@ -303,7 +303,7 @@ function PackageLibrary() {
         <ul aria-label={tab === "active" ? "Active packages" : "Archived packages"} className="flex flex-col gap-control">
           {(rows ?? []).map((p) => (
             <li key={p.id}>
-              <PackageCard p={p} viewer={viewer} onEdit={() => setEditing(toDraft(p))} onRestore={() => restore(p)} />
+              <PackageCard p={p} readOnly={readOnly} onEdit={() => setEditing(toDraft(p))} onRestore={() => restore(p)} />
             </li>
           ))}
         </ul>
@@ -320,7 +320,7 @@ function PackageLibrary() {
             <p className="w-[calc(var(--spacing-64)*6+var(--spacing-32)+var(--spacing-4))] text-center text-body text-text-secondary max-tablet:w-full max-tablet:px-base">
               Create the packages your team sells. They appear in the package picker when you add a booking, and their price is copied into each booking.
             </p>
-            {!viewer && (
+            {!readOnly && (
               <Button icon="plus" onClick={() => setEditing(EMPTY)}>
                 Create first package
               </Button>
@@ -369,7 +369,7 @@ function PackageLibrary() {
                     <StatusPill tone={p.isActive ? "positive" : "neutral"}>{p.isActive ? "Active" : "Archived"}</StatusPill>
                   </div>
                   <div role="cell" className={`${COLS.actions} flex h-20 items-start justify-end gap-micro`}>
-                    {viewer ? null : p.isActive ? (
+                    {readOnly ? null : p.isActive ? (
                       <>
                         <Button variant="ghost" onClick={() => setEditing(toDraft(p))} aria-label={`Edit ${p.name}`}>
                           Edit
@@ -413,7 +413,7 @@ function PackageLibrary() {
         </ToastRegion>
       )}
     </main>
-    {mobile && !viewer && !nothingAtAll && (
+    {mobile && !readOnly && !nothingAtAll && (
       <ActionBar className="sticky bottom-0 z-30">
         <Button icon="plus" onClick={() => setEditing(EMPTY)}>
           New package
@@ -427,7 +427,7 @@ function PackageLibrary() {
 /** Figma Booking components › Mobile/Package list item (MP1 / MP2): card (radius card, border, pad base, gap tight):
  *  name Body Strong + price Body Strong · description Caption secondary (2 lines) · usage · updated Caption secondary +
  *  Active / Archived pill. Active: the card opens Edit package. Archived: Restore (44, full width). */
-function PackageCard({ p, viewer, onEdit, onRestore }: { p: PackageRow; viewer: boolean; onEdit: () => void; onRestore: () => void }) {
+function PackageCard({ p, readOnly, onEdit, onRestore }: { p: PackageRow; readOnly: boolean; onEdit: () => void; onRestore: () => void }) {
   const body = (
     <>
       <span className="flex items-center gap-compact">
@@ -442,7 +442,7 @@ function PackageCard({ p, viewer, onEdit, onRestore }: { p: PackageRow; viewer: 
     </>
   );
   const card = "flex w-full flex-col gap-tight rounded-card border border-border-default bg-surface-default p-base text-left";
-  if (p.isActive && !viewer)
+  if (p.isActive && !readOnly)
     return (
       <button type="button" onClick={onEdit} aria-label={`Edit ${p.name}`} className={cn(card, "cursor-pointer outline-none transition-[transform] focus-visible:shadow-focus-ring active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out)")}>
         {body}
@@ -451,7 +451,7 @@ function PackageCard({ p, viewer, onEdit, onRestore }: { p: PackageRow; viewer: 
   return (
     <div className={card}>
       {body}
-      {!p.isActive && !viewer && (
+      {!p.isActive && !readOnly && (
         <Button variant="secondary" onClick={onRestore} aria-label={`Restore ${p.name}`} className="mt-micro w-full">
           Restore
         </Button>

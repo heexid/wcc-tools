@@ -22,7 +22,7 @@ const QUESTIONS: Array<{ q: string; a: string }> = [
   },
   {
     q: "Who on my team can see the data?",
-    a: "Admins create and edit bookings and invoices, and Viewers see bookings, invoices and PDFs without changing anything",
+    a: "Admins create and edit bookings and invoices, and crew see bookings, invoices and PDFs without changing anything",
   },
   {
     q: "Can I send invoices to clients?",

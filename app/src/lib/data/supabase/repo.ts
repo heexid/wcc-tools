@@ -97,13 +97,13 @@ export const peekCatalog: typeof Mock.peekCatalog = () => null;
 export const loadCatalog: typeof Mock.loadCatalog = async () => {
   const [packages, crewRes, settings] = await Promise.all([
     listPackages({}),
-    supabaseBrowser().from("crew").select("id, name, role, is_active").order("created_at").order("id"),
+    supabaseBrowser().from("crew").select("id, name, role, is_active, user_id").order("created_at").order("id"),
     getSettings(),
   ]);
   if (crewRes.error) throw new NetworkError("loadCatalog");
   return {
     packages: packages.map(({ bookings: _b, ...p }) => p),
-    crew: crewRes.data.map((c) => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active })),
+    crew: crewRes.data.map((c) => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active, userId: c.user_id })),
     terms: settings.defaultTerms,
     payment: settings.defaultPayment,
   } satisfies Catalog;
@@ -156,12 +156,12 @@ export const restorePackage: typeof Mock.restorePackage = async (id) => {
 export const listCrew: typeof Mock.listCrew = async () => {
   let res;
   try {
-    res = await supabaseBrowser().from("crew").select("id, name, role, is_active").eq("is_active", true).order("created_at").order("id");
+    res = await supabaseBrowser().from("crew").select("id, name, role, is_active, user_id").eq("is_active", true).order("created_at").order("id");
   } catch {
     throw new NetworkError("listCrew");
   }
   if (res.error) throw new NetworkError("listCrew");
-  return res.data.map((c): Crew => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active }));
+  return res.data.map((c): Crew => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active, userId: c.user_id }));
 };
 
 // ── Bookings: read ──────────────────────────────────────────────────────────────────────────────

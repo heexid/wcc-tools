@@ -1,18 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 import { signIn } from "../helpers/session";
 
-// F17 — INTERACTIONS 6.4 (viewer role) and 6.3 (loading). /dev/role flips the mock profile.
+// F17 — INTERACTIONS 6.4 (crew role) and 6.3 (loading). /dev/role flips the mock profile.
 
 test.beforeEach(async ({ page }) => signIn(page));
 
-async function asViewer(page: Page) {
+async function asCrew(page: Page) {
   await page.goto("/dev/role");
-  await page.getByRole("button", { name: "Viewer" }).click();
-  await expect(page.getByRole("status")).toContainText("Viewer");
+  await page.getByRole("button", { name: "Crew" }).click();
+  await expect(page.getByRole("status")).toContainText("Crew");
 }
 
-test("6.4 · viewer: no New booking anywhere on the dashboard, Everything else stays", async ({ page }) => {
-  await asViewer(page);
+test("6.4 · crew: no New booking anywhere on the dashboard, Everything else stays", async ({ page }) => {
+  await asCrew(page);
   await page.goto("/bookings");
   await expect(page.getByRole("heading", { name: "Bookings", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /New booking/ })).toHaveCount(0);
@@ -22,8 +22,8 @@ test("6.4 · viewer: no New booking anywhere on the dashboard, Everything else s
   await expect(page.getByRole("button", { name: /New booking/ })).toHaveCount(0);
 });
 
-test("6.4 · viewer: detail sheet has no Edit booking; ↗ opens the read-only page", async ({ page }) => {
-  await asViewer(page);
+test("6.4 · crew: detail sheet has no Edit booking; ↗ opens the read-only page", async ({ page }) => {
+  await asCrew(page);
   await page.goto("/bookings?tab=table");
   await page.getByRole("table", { name: "Bookings" }).getByRole("row").nth(1).click();
   const sheet = page.getByRole("dialog", { name: "Booking detail" });
@@ -35,8 +35,8 @@ test("6.4 · viewer: detail sheet has no Edit booking; ↗ opens the read-only p
   await expect(page.getByRole("region", { name: "Cancel booking" })).toHaveCount(0);
 });
 
-test("6.4 · viewer: direct links to New / Edit booking are redirected", async ({ page }) => {
-  await asViewer(page);
+test("6.4 · crew: direct links to New / Edit booking are redirected", async ({ page }) => {
+  await asCrew(page);
   await page.goto("/bookings/new");
   await expect(page).toHaveURL(/\/bookings$/);
   await page.goto("/bookings?tab=table");
@@ -47,8 +47,8 @@ test("6.4 · viewer: direct links to New / Edit booking are redirected", async (
   await expect(page).toHaveURL(new RegExp(`/bookings/${id}$`));
 });
 
-test("6.4 · viewer: Package library has no New package / Edit / Archive / Restore", async ({ page }) => {
-  await asViewer(page);
+test("6.4 · crew: Package library has no New package / Edit / Archive / Restore", async ({ page }) => {
+  await asCrew(page);
   await page.goto("/packages");
   await expect(page.getByRole("heading", { name: "Package library" })).toBeVisible();
   await expect(page.getByRole("button", { name: /New package|^Edit |^Archive |^Restore /i })).toHaveCount(0);

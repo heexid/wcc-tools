@@ -19,7 +19,8 @@ export type Package = {
   legacyBookings: number;
 };
 
-export type Crew = { id: string; name: string; role: string; isActive: boolean };
+/** `role` is the job title; `userId` links the entry to a login (only the crew lists carry it, not booking detail). */
+export type Crew = { id: string; name: string; role: string; isActive: boolean; userId?: string | null };
 
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
@@ -111,7 +112,7 @@ export type Invoice = {
   createdBy: string;
 };
 
-export type Role = "admin" | "viewer";
+export type Role = "admin" | "crew";
 
 export type Profile = {
   id: string;

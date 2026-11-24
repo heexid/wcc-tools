@@ -22,7 +22,7 @@ import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, 
 import { useShellCrumb } from "@/components/shell/AppShell";
 import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
 import { CrewSchedulePopover, type CrewPopoverAnchor } from "./CrewSchedule";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { Loader } from "@/components/ds/Loading";
 
 // Figma Bookings 06 / 21 / 24 / 27 — Booking detail (PRD US-9, PLAN §7, INTERACTIONS 4.1–4.10). Read-only.
@@ -47,7 +47,7 @@ type Props = {
 };
 
 export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBooking, onSeeInCalendar }: Props) {
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const [crewAnchor, setCrewAnchor] = useState<CrewPopoverAnchor | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastPresence = usePresence(!!toast);
@@ -100,7 +100,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <span className="flex-1" />
           {mode === "sheet" && (
             <>
-              <Button variant="ghost" iconOnly icon="external-link" aria-label="Open full page" onClick={() => onOpenFull?.(canceled || viewer)} />
+              <Button variant="ghost" iconOnly icon="external-link" aria-label="Open full page" onClick={() => onOpenFull?.(canceled || readOnly)} />
               <Button variant="ghost" iconOnly icon="x" aria-label="Close" data-close onClick={onClose} />
             </>
           )}
@@ -109,7 +109,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <Txt>{b.bookingName}</Txt>
         </h2>
         <div className="flex gap-compact">
-          {!canceled && !viewer && (
+          {!canceled && !readOnly && (
             <Button icon="pencil" onClick={onEdit}>
               Edit booking
             </Button>
@@ -258,7 +258,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
               <p className="flex text-body-strong text-text-primary">
                 <Txt>No invoices yet</Txt>
               </p>
-              <p className="w-full text-caption text-text-secondary">{viewer ? "No invoice has been created for this booking yet." : "Open Edit booking to create the first invoice (DP or full price). Invoices are created inside the booking screen."}</p>
+              <p className="w-full text-caption text-text-secondary">{readOnly ? "No invoice has been created for this booking yet." : "Open Edit booking to create the first invoice (DP or full price). Invoices are created inside the booking screen."}</p>
             </DashedBox>
           )}
         </section>
@@ -277,14 +277,14 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           onSeeInCalendar(crewId);
         }}
       />
-      {mobile && (b.invoices.length > 0 || (!canceled && !viewer)) && (
+      {mobile && (b.invoices.length > 0 || (!canceled && !readOnly)) && (
         <ActionBar className="shrink-0">
           {b.invoices.length > 0 && (
             <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
               Download PDF
             </Button>
           )}
-          {!canceled && !viewer && (
+          {!canceled && !readOnly && (
             <Button icon="pencil" onClick={onEdit}>
               Edit booking
             </Button>

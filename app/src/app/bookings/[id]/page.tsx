@@ -5,7 +5,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { BookingReadOnly } from "@/components/bookings/BookingReadOnly";
 import { AppShell } from "@/components/shell/AppShell";
 import { getBooking, type BookingDetail } from "@/lib/data/repo";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 
 // /bookings/[id] — the full booking page. An editable booking's full page is the Edit booking screen (decision
 // 2026-11-11), so it redirects to /bookings/[id]/edit. A canceled booking can't be edited (PRD US-12): it renders the
@@ -15,19 +15,19 @@ import { useIsViewer } from "@/lib/role";
 function FullPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const [state, setState] = useState<{ id: string; b: BookingDetail } | null>(null);
   useEffect(() => {
     let live = true;
     getBooking(id).then((b) => {
       if (!live) return;
-      if (b?.status === "canceled" || (b && viewer)) return setState({ id, b });
+      if (b?.status === "canceled" || (b && readOnly)) return setState({ id, b });
       router.replace(b ? `/bookings/${id}/edit` : `/bookings?booking=${encodeURIComponent(id)}`);
     });
     return () => {
       live = false;
     };
-  }, [id, router, viewer]);
+  }, [id, router, readOnly]);
   const b = state?.id === id ? state.b : null;
   // ‹ / Esc → back to Bookings with the detail sheet closed (H5 note).
   const back = useCallback(() => router.push("/bookings"), [router]);

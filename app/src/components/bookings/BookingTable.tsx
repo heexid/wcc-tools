@@ -12,7 +12,7 @@ import type { SortKey } from "@/lib/booking/filters";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDate, formatIDR, formatPhone } from "@/lib/format";
 import { BOOKING_COLS, BookingTableHeader } from "./BookingTableHeader";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
 import { prefetchBooking } from "@/lib/data/prefetch";
 
@@ -119,7 +119,7 @@ export function BookingTable({
   onReset: () => void;
   onNew: () => void;
 }) {
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const first = (page - 1) * size + 1;
   return (
     <section aria-label="Bookings table" className={cn("motion-swap flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", className)}>
@@ -145,7 +145,7 @@ export function BookingTable({
             <Button variant="secondary" onClick={onReset}>
               Reset filters
             </Button>
-            {!viewer && (
+            {!readOnly && (
               <Button icon="plus" onClick={onNew}>
                 New booking
               </Button>

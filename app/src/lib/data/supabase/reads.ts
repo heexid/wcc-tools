@@ -25,11 +25,11 @@ export const listPackagesWith = (sb: Sb, q: { tab?: "active" | "archived"; searc
 
 /** Packages + crew (every crew member incl. inactive, every package incl. archived). */
 export async function filterCatalogWith(sb: Sb): ReturnType<typeof Mock.loadFilterCatalog> {
-  const [packages, crewRes] = await Promise.all([listPackagesWith(sb), sb.from("crew").select("id, name, role, is_active").order("created_at").order("id")]);
+  const [packages, crewRes] = await Promise.all([listPackagesWith(sb), sb.from("crew").select("id, name, role, is_active, user_id").order("created_at").order("id")]);
   if (crewRes.error) throw new NetworkError("loadCatalog");
   return {
     packages: packages.map(({ bookings: _b, ...p }) => p),
-    crew: crewRes.data.map((c) => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active })),
+    crew: crewRes.data.map((c) => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active, userId: c.user_id })),
   };
 }
 

@@ -27,10 +27,10 @@ describe("seed — PLAN §2.7 shape", () => {
     expect([count("pkg_wedding_classic"), count("pkg_studio_mini")]).toEqual([31, 12]);
     for (const p of db.packages) expect(p.legacyBookings).toBeGreaterThanOrEqual(0);
   });
-  it("6 crew with Figma roles (03b / 02b)", () =>
+  it("6 crew with Figma roles (03b / 02b), plus the admin's linked entry", () =>
     expect(db.crew.map((c) => `${c.name} · ${c.role}`)).toEqual([
       "Raka Pratama · Lead photographer", "Dinda Ayu · Videographer", "Bima Saputra · Photographer",
-      "Nadia Putri · Event organizer", "Fajar Nugroho · Assistant", "Sinta Dewi · Make-up artist",
+      "Nadia Putri · Event organizer", "Fajar Nugroho · Assistant", "Sinta Dewi · Make-up artist", "bs.moment · ",
     ]));
   it("every invoice snapshot is intact and every booking's ledger adds up", () => {
     for (const i of db.invoices) expect(snapshotIntact(i)).toBe(true);

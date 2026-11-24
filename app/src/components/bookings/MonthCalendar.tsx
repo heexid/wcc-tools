@@ -10,7 +10,7 @@ import { useDismiss } from "@/components/shell/useDismiss";
 import type { BookingRow } from "@/lib/data/repo";
 import { addDays, formatDateLongDay, parseISODate, toISODate, type ISODate } from "@/lib/format";
 import { DayPopover, DAY_POPOVER_WIDTH } from "./DayPopover";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
 import { prefetchBooking } from "@/lib/data/prefetch";
 
@@ -55,7 +55,7 @@ export function MonthCalendar({
   onNewBooking: (d: ISODate) => void;
   onOpenDay: (d: ISODate) => void;
 }) {
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   const days = useMemo(() => monthGrid(anchor), [anchor]);
   const month = anchor.slice(0, 7);
   const byDate = useMemo(() => {
@@ -122,7 +122,7 @@ export function MonthCalendar({
     if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) {
       e.preventDefault();
       if (byDate.get(date)?.length) openDay(date, true);
-      else if (!viewer) onNewBooking(date);
+      else if (!readOnly) onNewBooking(date);
     }
   };
 
@@ -170,7 +170,7 @@ export function MonthCalendar({
                   // A click on the date itself (not a booking chip or "+N more") starts a New booking on that date —
                   // also on dates that already have bookings (decision 2026-11-11). Chips still open their booking.
                   onClick={(e: MouseEvent) => {
-                    if (!viewer && (e.target === e.currentTarget || !(e.target as HTMLElement).closest("button"))) onNewBooking(date);
+                    if (!readOnly && (e.target === e.currentTarget || !(e.target as HTMLElement).closest("button"))) onNewBooking(date);
                   }}
                   onKeyDown={(e) => onKey(e, date)}
                   more={extra > 0 && <CalendarMore n={extra} aria-haspopup="dialog" aria-expanded={pop?.date === date} onClick={() => openDay(date)} />}
@@ -225,7 +225,7 @@ export function MonthCalendar({
  * Enter on the date.
  */
 function EmptyDateTarget({ date, onNew }: { date: ISODate; onNew: (d: ISODate) => void }) {
-  if (useIsViewer()) return null;
+  if (useIsReadOnly()) return null;
   return (
     <button
       type="button"
