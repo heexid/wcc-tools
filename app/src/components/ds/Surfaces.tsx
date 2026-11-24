@@ -34,8 +34,8 @@ export function MetricCard({
           <Txt>{label}</Txt>
         </h3>
         {info && (
-          <Tooltip content={info} variant="popover">
-            <button type="button" aria-label={`About ${typeof label === "string" ? label : "this metric"}`} className="flex cursor-default rounded-pill text-text-secondary outline-none focus-visible:shadow-focus-ring">
+          <Tooltip content={info} variant="popover" tappable>
+            <button type="button" aria-label={`About ${typeof label === "string" ? label : "this metric"}`} className="relative flex cursor-default rounded-pill text-text-secondary max-tablet:before:absolute max-tablet:before:-inset-12 max-tablet:before:content-[''] outline-none focus-visible:shadow-focus-ring">
               <Icon name="info" className="size-[calc(var(--spacing-12)+var(--spacing-2))]" />
             </button>
           </Tooltip>

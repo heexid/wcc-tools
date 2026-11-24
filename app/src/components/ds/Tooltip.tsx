@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "./cn";
 import { usePresence } from "./usePresence";
@@ -28,11 +28,14 @@ export function Tooltip({
   children,
   className,
   variant = "dark",
+  tappable = false,
 }: {
   content: ReactNode;
   children: ReactElement;
   className?: string;
   variant?: keyof typeof surfaces;
+  /** For a trigger with no action of its own (KPI ⓘ): a touch tap toggles it, a touch anywhere else closes it. */
+  tappable?: boolean;
 }) {
   const id = useId();
   const [open, setOpen] = useState(false);
@@ -53,6 +56,15 @@ export function Tooltip({
     setOpen(false);
   };
   const wrap = useRef<HTMLSpanElement>(null);
+  const openAtPress = useRef(false);
+  useEffect(() => {
+    if (!tappable || !open) return;
+    const outside = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" && !wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", outside, true);
+    return () => document.removeEventListener("pointerdown", outside, true);
+  }, [tappable, open]);
   const tip = useRef<HTMLSpanElement>(null);
   const [pos, setPos] = useState<{ left: number; top: number; above: boolean } | null>(null);
   useLayoutEffect(() => {
@@ -78,8 +90,14 @@ export function Tooltip({
     <span
       ref={wrap}
       className={cn("relative inline-flex", className)}
-      onPointerEnter={() => show(400)}
-      onPointerLeave={hide}
+      onPointerEnter={(e) => !(tappable && e.pointerType === "touch") && show(400)}
+      onPointerLeave={(e) => !(tappable && e.pointerType === "touch") && hide()}
+      onPointerDown={() => (openAtPress.current = open)}
+      onClick={(e) => {
+        if (!tappable || (e.nativeEvent as PointerEvent).pointerType !== "touch") return;
+        if (openAtPress.current) hide();
+        else show(0);
+      }}
       onFocus={() => show(0)}
       onBlur={hide}
       onKeyDown={(e) => e.key === "Escape" && hide()}
