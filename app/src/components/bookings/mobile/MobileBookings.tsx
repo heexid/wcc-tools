@@ -17,6 +17,7 @@ import { fetchCached, peek } from "@/lib/data/cache";
 import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import type { Crew, Package } from "@/lib/data/types";
 import { addDays, formatMonthYear, parseISODate, toISODate, type ISODate } from "@/lib/format";
+import { useOpeningNewBooking } from "@/components/shell/LeaveGuard";
 import { useIsReadOnly } from "@/lib/role";
 import { MobileAgendaItem, MobileBookingCard } from "./MobileBookingCards";
 import { MobileFiltersSheet } from "./MobileFilters";
@@ -62,6 +63,7 @@ export function MobileBookings({
   const params = useSearchParams();
   const router = useRouter();
   const path = usePathname();
+  const openingNew = useOpeningNewBooking();
   const readOnly = useIsReadOnly();
   const { filters, update } = useBookingFilters();
   const view = params.get("tab") === "table" ? "table" : "calendar";
@@ -120,7 +122,7 @@ export function MobileBookings({
       </main>
       {!readOnly && (
         <ActionBar className="sticky bottom-0 z-30">
-          <Button icon="plus" onClick={onNew}>
+          <Button icon="plus" loading={openingNew} onClick={onNew}>
             New booking
           </Button>
         </ActionBar>

@@ -132,7 +132,12 @@ export function AccountSettings() {
       <ChangePasswordModal
         open={modal === "password"}
         onClose={() => setModal(null)}
-        onSaved={() => getProfile().then((p) => done(p, "Password updated · other devices were logged out"))}
+        onSaved={() =>
+          // The password is already changed: a failed profile refresh must not hide that.
+          getProfile()
+            .catch(() => profile)
+            .then((p) => done(p, "Password updated · other devices were logged out"))
+        }
       />
       {toastPresence.mounted && (
         <ToastRegion>
@@ -212,7 +217,7 @@ function ChangeNameModal({ open, current, onClose, onSaved }: { open: boolean; c
             Cancel
           </Button>
           <Button type="submit" loading={busy}>
-            Save name
+            {busy ? "Saving…" : "Save name"}
           </Button>
         </>
       }
@@ -235,7 +240,7 @@ function ChangeNameModal({ open, current, onClose, onSaved }: { open: boolean; c
 
 /** Change password (AC5 / AC6 / AC7, 6.9): current / new / confirm with show-hide; live rules under New password;
  *  inline errors on Update ("Current password is incorrect.", "Passwords don’t match."; unmet rules stay grey ×). */
-function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => Promise<void> }) {
   const empty = { current: "", next: "", confirm: "" };
   const [v, setV] = useState(empty);
   const [errors, setErrors] = useState<{ current?: string; confirm?: string }>({});
@@ -252,6 +257,7 @@ function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClos
   const save = async () => {
     setBusy(true);
     const r = await changePassword(v).catch(() => null);
+    if (r?.ok) await onSaved(); // stays busy until the refreshed profile closes the modal
     setBusy(false);
     if (!r) return setErrors({ current: "Couldn’t update. Check your connection and try again." });
     if (!r.ok) {
@@ -260,7 +266,6 @@ function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClos
         confirm: r.errors.confirm ? "Passwords don’t match." : undefined,
       });
     }
-    onSaved();
   };
   const set = (k: keyof typeof v) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setV((s) => ({ ...s, [k]: e.target.value }));
@@ -280,7 +285,7 @@ function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClos
             Cancel
           </Button>
           <Button type="submit" loading={busy}>
-            Update password
+            {busy ? "Updating…" : "Update password"}
           </Button>
         </>
       }

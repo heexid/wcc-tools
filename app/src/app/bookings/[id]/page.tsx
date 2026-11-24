@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { BookingReadOnly } from "@/components/bookings/BookingReadOnly";
+import { Loader } from "@/components/ds/Loading";
 import { AppShell } from "@/components/shell/AppShell";
 import { getBooking, type BookingDetail } from "@/lib/data/repo";
 import { useIsReadOnly } from "@/lib/role";
@@ -34,7 +35,11 @@ function FullPage() {
   // The shell renders while the booking loads, so the header stays put through the check / redirect.
   return (
     <AppShell module="booking" page={b?.ref} editor>
-      {b ? <BookingReadOnly key={b.id} b={b} onBack={back} /> : <div className="flex-1" aria-busy="true" />}
+      {b ? <BookingReadOnly key={b.id} b={b} onBack={back} /> : (
+      <div className="flex flex-1 items-center justify-center" aria-busy="true">
+        <Loader label="Loading booking…" />
+      </div>
+      )}
     </AppShell>
   );
 }

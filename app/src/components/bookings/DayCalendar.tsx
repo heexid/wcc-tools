@@ -9,6 +9,7 @@ import type { BookingRow } from "@/lib/data/repo";
 import type { Crew } from "@/lib/data/types";
 import { formatDayMonth, formatIDR, parseISODate, type ISODate } from "@/lib/format";
 import { CrewAvatars } from "./WeekCalendar";
+import { useOpeningNewBooking } from "@/components/shell/LeaveGuard";
 import { useIsReadOnly } from "@/lib/role";
 import { prefetchBooking } from "@/lib/data/prefetch";
 
@@ -35,6 +36,7 @@ export function DayCalendar({
   onOpenBooking: (id: string) => void;
   onNewBooking: (d: ISODate) => void;
 }) {
+  const openingNew = useOpeningNewBooking();
   const readOnly = useIsReadOnly();
   const list = rows.filter((r) => r.bookingDate === date);
   const n = list.length;
@@ -50,7 +52,7 @@ export function DayCalendar({
           <Txt>Nothing is scheduled for this date with the current filters.</Txt>
         </p>
         {!readOnly && (
-          <Button icon="plus" onClick={() => onNewBooking(date)}>
+          <Button icon="plus" loading={openingNew} onClick={() => onNewBooking(date)}>
             New booking on this date
           </Button>
         )}
@@ -82,7 +84,7 @@ export function DayCalendar({
       </ul>
       {!readOnly && (
         <div className="flex px-base py-control">
-          <Button variant="ghost" icon="plus" onClick={() => onNewBooking(date)}>
+          <Button variant="ghost" icon="plus" loading={openingNew} onClick={() => onNewBooking(date)}>
             New booking on this date
           </Button>
         </div>

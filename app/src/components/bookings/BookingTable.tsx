@@ -12,6 +12,7 @@ import type { SortKey } from "@/lib/booking/filters";
 import type { BookingRow } from "@/lib/data/repo";
 import { formatDate, formatIDR, formatPhone } from "@/lib/format";
 import { BOOKING_COLS, BookingTableHeader } from "./BookingTableHeader";
+import { useOpeningNewBooking } from "@/components/shell/LeaveGuard";
 import { useIsReadOnly } from "@/lib/role";
 import { Skeleton } from "@/components/ds/Loading";
 import { prefetchBooking } from "@/lib/data/prefetch";
@@ -119,6 +120,7 @@ export function BookingTable({
   onReset: () => void;
   onNew: () => void;
 }) {
+  const openingNew = useOpeningNewBooking();
   const readOnly = useIsReadOnly();
   const first = (page - 1) * size + 1;
   return (
@@ -146,7 +148,7 @@ export function BookingTable({
               Reset filters
             </Button>
             {!readOnly && (
-              <Button icon="plus" onClick={onNew}>
+              <Button icon="plus" loading={openingNew} onClick={onNew}>
                 New booking
               </Button>
             )}

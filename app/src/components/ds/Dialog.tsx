@@ -139,6 +139,7 @@ export function FormModal({
   onClose,
   title,
   children,
+  locked,
   footerStart,
   footer,
   onSubmit,
@@ -147,6 +148,8 @@ export function FormModal({
   onClose: () => void;
   title: string;
   children: ReactNode;
+  /** A request is in flight: Esc / scrim / × do not close. */
+  locked?: boolean;
   footerStart?: ReactNode;
   footer: ReactNode;
   onSubmit: () => void;
@@ -157,7 +160,7 @@ export function FormModal({
     // Mobile (Figma MP3–MP5): DS sheet title row; the footer becomes a full-width row of equal buttons, the start
     // slot (e.g. Archive) its own row below.
     return (
-      <BottomSheet open={open} onClose={onClose} title={title}>
+      <BottomSheet open={open} onClose={onClose} locked={locked} title={title}>
         <form noValidate onSubmit={(e) => (e.preventDefault(), onSubmit())} className="flex flex-col gap-base">
           {children}
           <div className="flex gap-compact pt-4 *:flex-1">{footer}</div>
@@ -166,7 +169,7 @@ export function FormModal({
       </BottomSheet>
     );
   return (
-    <Dialog open={open} onClose={onClose} labelledBy={titleId} width="w-[calc(var(--spacing-64)*10)]">
+    <Dialog open={open} onClose={onClose} locked={locked} labelledBy={titleId} width="w-[calc(var(--spacing-64)*10)]">
       <form
         noValidate
         onSubmit={(e) => {
@@ -176,7 +179,7 @@ export function FormModal({
         className="flex flex-col"
       >
         <header className="flex items-center gap-control bg-surface-header px-inset py-base">
-          <Button variant="ghost" iconOnly icon="x" aria-label="Close" data-close onClick={onClose} />
+          <Button variant="ghost" iconOnly icon="x" aria-label="Close" data-close disabled={locked} onClick={onClose} />
           <h2 id={titleId} className="text-heading-section text-text-primary">
             {title}
           </h2>

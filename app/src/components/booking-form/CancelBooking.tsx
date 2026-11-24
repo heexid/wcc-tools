@@ -17,7 +17,7 @@ import { formatIDR } from "@/lib/format";
 
 /** Section at the end of the booking form (33): Heading/Section title · row (gap group): explanation Body
  *  text/secondary (fills) · Warning button "Cancel booking". Only for a saved Draft / Partially paid booking. */
-export function CancelBookingSection({ onCancel }: { onCancel: () => void }) {
+export function CancelBookingSection({ onCancel, disabled }: { onCancel: () => void; disabled?: boolean }) {
   return (
     <section aria-labelledby="sec-cancel" className="flex flex-col gap-base">
       <SectionHeader id="sec-cancel" title="Cancel booking" />
@@ -25,7 +25,7 @@ export function CancelBookingSection({ onCancel }: { onCancel: () => void }) {
         <p className="min-w-0 flex-1 text-body text-text-secondary">
           Canceling makes this booking read-only: no edits and no new invoices. Existing invoices stay on record. A canceled booking can’t be reopened.
         </p>
-        <WarningButton onClick={onCancel}>Cancel booking</WarningButton>
+        <WarningButton disabled={disabled} onClick={onCancel}>Cancel booking</WarningButton>
       </div>
     </section>
   );
@@ -94,7 +94,7 @@ export function CancelBookingDialog({
     </Button>
   );
   const cancel = (
-    <WarningButton disabled={busy || tooLong} aria-busy={busy || undefined} onClick={() => onConfirm(reason)}>
+    <WarningButton loading={busy} disabled={tooLong} onClick={() => onConfirm(reason)}>
       {busy ? "Canceling…" : "Cancel booking"}
     </WarningButton>
   );

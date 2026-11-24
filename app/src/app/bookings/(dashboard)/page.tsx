@@ -7,7 +7,7 @@ import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { cascade, useEntrance } from "@/components/ds/useEntrance";
 import { AppShell } from "@/components/shell/AppShell";
-import { useLeaveGuard } from "@/components/shell/LeaveGuard";
+import { useLeaveGuard, useOpeningNewBooking } from "@/components/shell/LeaveGuard";
 import { BookingTableHeader } from "@/components/bookings/BookingTableHeader";
 import { BookingCalendar, initialCalendarWindow } from "@/components/bookings/BookingCalendar";
 import { ActiveFilters, BookingToolbar, type View } from "@/components/bookings/BookingFilters";
@@ -58,6 +58,7 @@ function useDashboardData(today: ISODate, mobile: boolean) {
 }
 
 function FirstUse({ onNew, className }: { onNew: () => void; className?: string }) {
+  const openingNew = useOpeningNewBooking();
   const readOnly = useIsReadOnly();
   return (
     <section aria-label="Bookings" className={cn("flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", className)}>
@@ -72,7 +73,7 @@ function FirstUse({ onNew, className }: { onNew: () => void; className?: string 
           <Txt>{readOnly ? "Bookings created by your team appear on the calendar and in this table." : "Create your first booking. It appears on the calendar and in this table right away."}</Txt>
         </p>
         {!readOnly && (
-          <Button icon="plus" onClick={onNew}>
+          <Button icon="plus" loading={openingNew} onClick={onNew}>
             New booking
           </Button>
         )}
@@ -86,6 +87,7 @@ function Dashboard() {
   const router = useRouter();
   const path = usePathname();
   const { navigate } = useLeaveGuard();
+  const openingNew = useOpeningNewBooking();
   const readOnly = useIsReadOnly();
   // Below 768 the page is the mobile view (R04, Figma M01–M03); it runs its own list / agenda queries.
   const mobile = useIsMobile();
@@ -189,7 +191,7 @@ function Dashboard() {
           <span className="flex-1" />
           {/* No Package library button here (removed 2026-11-11) — Packages is reached from the app launcher. */}
           {!readOnly && (
-            <Button icon="plus" onClick={() => navigate("/bookings/new")}>
+            <Button icon="plus" loading={openingNew} onClick={() => navigate("/bookings/new")}>
               New booking
             </Button>
           )}

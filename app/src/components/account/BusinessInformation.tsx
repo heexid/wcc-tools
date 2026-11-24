@@ -164,7 +164,7 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
         Cancel
       </Button>
       <Button type="submit" loading={busy}>
-        Save changes
+        {busy ? "Saving…" : "Save changes"}
       </Button>
     </>
   );

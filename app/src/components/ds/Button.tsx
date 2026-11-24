@@ -85,11 +85,17 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   /** Icon-only button — `aria-label` is required. */
   iconOnly?: boolean;
   loading?: boolean;
+  /** The action just succeeded: green fill + check until the caller clears it. */
+  success?: boolean;
   forceState?: ForceState;
   children?: ReactNode;
 };
 
-export function Button({ variant = "primary", size = "md", icon, iconOnly, loading, forceState, className, children, disabled, ...rest }: ButtonProps) {
+const successFill =
+  "border-status-positive bg-status-positive text-text-on-accent hover:bg-status-positive hover:border-status-positive " +
+  "active:bg-status-positive active:border-status-positive";
+
+export function Button({ variant = "primary", size = "md", icon, iconOnly, loading, success, forceState, className, children, disabled, ...rest }: ButtonProps) {
   // Primary stacks fill (z-0) → highlight ::before (z-1) → content (z-2).
   const layer = variant === "primary" ? "relative z-2" : undefined;
   const shape = iconOnly ? content.iconOnly : icon || loading ? content.icon : content.label;
@@ -108,14 +114,15 @@ export function Button({ variant = "primary", size = "md", icon, iconOnly, loadi
         variant === "ghost" && "after:-inset-2",
         variant === "primary" && (iconOnly ? primaryFocusHighlight.iconOnly : primaryFocusHighlight.hug),
         size === "lg" && !iconOnly && large,
+        success && !loading && successFill,
         className,
       )}
     >
-      {variant === "primary" && <span aria-hidden className={primaryFill} />}
+      {variant === "primary" && !(success && !loading) && <span aria-hidden className={primaryFill} />}
       {loading ? (
         <Icon name="loader" className={cn("size-icon-sm motion-safe:animate-spin", layer)} />
       ) : (
-        icon && <Icon name={icon} className={cn("size-icon-sm", layer)} />
+        (success || icon) && <Icon name={success ? "circle-check" : icon!} className={cn("size-icon-sm", layer)} />
       )}
       {!iconOnly && children != null && <Txt className={layer}>{children}</Txt>}
     </button>
@@ -159,14 +166,18 @@ export function ButtonLink({
 // pad 0/14, gap 6, radius pill, stroke status/danger, label UI/Button status/danger, icon circle-x.
 export function WarningButton({
   forceState,
+  loading,
+  disabled,
   className,
   children,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { forceState?: ForceState }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { forceState?: ForceState; loading?: boolean }) {
   return (
     <button
       type="button"
       {...rest}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       data-force={forceState}
       className={cn(
     "inline-flex shrink-0 items-center gap-tight h-control-height rounded-pill px-[calc(var(--spacing-base)-var(--spacing-2))]",
@@ -179,7 +190,7 @@ export function WarningButton({
         className,
       )}
     >
-      <Icon name="circle-x" className="size-icon-sm" />
+      <Icon name={loading ? "loader" : "circle-x"} className={cn("size-icon-sm", loading && "motion-safe:animate-spin")} />
       <Txt>{children}</Txt>
     </button>
   );

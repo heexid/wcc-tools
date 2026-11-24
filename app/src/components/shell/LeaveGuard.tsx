@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useRef, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useRef, useState, useTransition, type ReactNode } from "react";
 
 // Leave guard (PRD US-1 / US-11, INTERACTIONS 2.1 / 2.1b / 6.1a). Every in-app navigation the shell
 // offers (module link, breadcrumb, App launcher tiles, Account menu) goes through `navigate()`.
@@ -18,14 +18,22 @@ type Ctx = {
   confirmLeave: (href: string, proceed: () => void) => void;
   setGuard: (g: Guard | null) => void;
 };
+/** Where the app is navigating to right now (null when idle): buttons that open a screen show Loading meanwhile. */
+const PendingNavContext = createContext<string | null>(null);
 const LeaveGuardContext = createContext<Ctx | null>(null);
 
 export function LeaveGuardProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const guard = useRef<Guard | null>(null);
+  // The transition stays pending until the next screen commits.
+  const [pending, startTransition] = useTransition();
+  const [target, setTarget] = useState<string | null>(null);
   const navigate = useCallback(
     (href: string) => {
-      const go = () => router.push(href);
+      const go = () => {
+        setTarget(href);
+        startTransition(() => router.push(href));
+      };
       if (!guard.current || guard.current(href, go)) go();
     },
     [router],
@@ -36,7 +44,20 @@ export function LeaveGuardProvider({ children }: { children: ReactNode }) {
   const setGuard = useCallback((g: Guard | null) => {
     guard.current = g;
   }, []);
-  return <LeaveGuardContext.Provider value={{ navigate, confirmLeave, setGuard }}>{children}</LeaveGuardContext.Provider>;
+  return (
+    <LeaveGuardContext.Provider value={{ navigate, confirmLeave, setGuard }}>
+      <PendingNavContext.Provider value={pending ? target : null}>{children}</PendingNavContext.Provider>
+    </LeaveGuardContext.Provider>
+  );
+}
+
+export function usePendingNav(): string | null {
+  return useContext(PendingNavContext);
+}
+
+/** True while New booking is opening, with or without a prefilled date. */
+export function useOpeningNewBooking(): boolean {
+  return /^\/bookings\/new(\?|$)/.test(usePendingNav() ?? "");
 }
 
 export function useLeaveGuard(): Ctx {

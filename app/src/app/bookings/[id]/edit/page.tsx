@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentProps } from "react";
 import { BookingForm } from "@/components/booking-form/BookingForm";
+import { Loader } from "@/components/ds/Loading";
 import { AppShell } from "@/components/shell/AppShell";
 import { bookingToValues } from "@/lib/booking/form";
 import { getBooking } from "@/lib/data/repo";
@@ -57,7 +58,12 @@ function EditBooking({ id }: { id: string }) {
       live = false;
     };
   }, [id, key, router, readOnly]);
-  if (!state || state.key !== key) return <div className="flex-1" aria-busy="true" />;
+  if (!state || state.key !== key)
+    return (
+      <div className="flex flex-1 items-center justify-center" aria-busy="true">
+        <Loader label="Loading booking…" />
+      </div>
+    );
   if (state.data === "missing") return <p className="p-section text-body text-text-secondary">This booking doesn’t exist.</p>;
   return <BookingForm key={key} date={null} initial={state.data} />;
 }

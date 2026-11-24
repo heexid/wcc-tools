@@ -8,6 +8,7 @@ import { Dialog } from "@/components/ds/Dialog";
 import { DashedBox, EditorPageHeader, IconAction, InlineInput, LINE_COLS, LineItemHeader, SectionHeader, SummaryRow } from "@/components/ds/Editor";
 import { Alert, Toast, ToastRegion, type ToastTone } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
+import { Loader } from "@/components/ds/Loading";
 import { InputField } from "@/components/ds/InputField";
 import { PaymentStatusBadge, type BookingStatus } from "@/components/ds/Badges";
 import { TextArea } from "@/components/ds/TextArea";
@@ -20,7 +21,7 @@ import { InvoiceCard } from "@/components/ds/InvoiceCard";
 import { MobileChildBar } from "@/components/shell/MobileTopBar";
 import { ActionBar } from "@/components/ds/BottomSheet";
 import { EditorActions, HeaderDivider, useShellCrumb } from "@/components/shell/AppShell";
-import { useLeaveGuard } from "@/components/shell/LeaveGuard";
+import { useLeaveGuard, usePendingNav } from "@/components/shell/LeaveGuard";
 import { LIMITS, type InvoiceError } from "@/lib/booking/calc";
 import { bookingSchema, countErrors, emptyItem, itemSubtotal, maskAmount, maskQty, MSG, toBookingInput, type BookingFormValues } from "@/lib/booking/form";
 import { now } from "@/lib/clock";
@@ -183,7 +184,9 @@ function BelowPaidTotals({ l }: { l: Ledger }) {
 /** Invoices (n) card (US-1 / US-2, Figma 03 / 05 / 05c): status badge; (0) → dashed empty state with Create invoice
  *  (disabled + tooltip until client name and phone are valid — INTERACTIONS 2.12); (n) → Invoice cards, newest first
  *  and highlighted (Latest), then a full-width Secondary "Create invoice" (hidden once Paid — PRD US-5). */
-function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf, pdfBusyId }: {
+function InvoicesSection({ saving, status, invoices, fresh, canInvoice, onCreate, onPdf, pdfBusyId }: {
+  /** The booking is being saved: no invoice can start meanwhile. */
+  saving: boolean;
   status: BookingStatus;
   invoices: Invoice[];
   /** Invoice created in this session — its card enters with motion. */
@@ -195,7 +198,7 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf,
   pdfBusyId: string | null;
 }) {
   const button = (
-    <Button icon="plus" disabled={!canInvoice} onClick={onCreate} className={cn(!canInvoice && "pointer-events-none")}>
+    <Button icon="plus" disabled={!canInvoice || saving} onClick={onCreate} className={cn(!canInvoice && "pointer-events-none")}>
       Create invoice
     </Button>
   );
@@ -224,7 +227,7 @@ function InvoicesSection({ status, invoices, fresh, canInvoice, onCreate, onPdf,
             />
           ))}
           {status !== "paid" && status !== "canceled" && (
-            <Button variant="secondary" icon="plus" onClick={onCreate} className="w-full">
+            <Button variant="secondary" icon="plus" disabled={saving} onClick={onCreate} className="w-full">
               Create invoice
             </Button>
           )}
@@ -361,7 +364,12 @@ function DiscardDialog({ open, editing, changes, onKeep, onDiscard }: { open: bo
 /** Opens once the catalog is known: the form's defaults (terms, payment instruction) are read once at mount. */
 export function BookingForm(props: Props) {
   const catalog = useCatalog();
-  return catalog ? <BookingFormReady {...props} catalog={catalog} /> : null;
+  if (catalog) return <BookingFormReady {...props} catalog={catalog} />;
+  return (
+    <div className="flex flex-1 items-center justify-center" aria-busy="true">
+      <Loader label="Loading booking form…" />
+    </div>
+  );
 }
 
 function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog & { refresh: () => void } }) {
@@ -392,6 +400,10 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
   const [fresh, setFresh] = useState<string | null>(null);
   const [invoiceUi, setInvoiceUi] = useState<{ open: boolean; busy: boolean; failed: boolean; rejected: InvoiceError | null }>({ open: false, busy: false, failed: false, rejected: null });
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false); // Enter in a field submits too: one save at a time, even before the re-render
+  const [savedFlash, setSavedFlash] = useState(false); // Save reads "Saved" for a moment after it succeeds
+  const [reloading, setReloading] = useState(false);
+  const leavingPage = usePendingNav() === "/bookings";
   const pdf = useInvoicePdf(); // invoice card Download PDF (2.14)
   const router = useRouter();
   const [cancelUi, setCancelUi] = useState({ open: false, busy: false, failed: false });
@@ -482,6 +494,12 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
     return () => clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    if (!savedFlash) return;
+    const t = setTimeout(() => setSavedFlash(false), 2500);
+    return () => clearTimeout(t);
+  }, [savedFlash]);
+
   const scrollToFirstError = () =>
     requestAnimationFrame(() => {
       const el = document.querySelector<HTMLElement>("main [aria-invalid='true'], main [data-invalid='true']");
@@ -499,10 +517,11 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
     total: b.total,
     totalPaid: b.totalPaid,
   });
-  const onSave = handleSubmit(
+  const submitForm = handleSubmit(
     async (values) => {
       if (belowPaid) return;
       setAttention(0);
+      setSavedFlash(false);
       setSaving(true);
       const res = await saveBooking(withVersion(toBookingInput(values, savedId ?? undefined))).catch(() => null);
       setSaving(false);
@@ -513,6 +532,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
       setVersion(res.booking.updatedAt);
       setSaved((s) => ({ ...s, ...savedFrom(res.booking) }));
       setJustSaved(true);
+      setSavedFlash(true);
       reset(values); // the saved state is the new baseline (edit mode)
       setToast(res.booking.status === "draft" ? (editing ? "Changes saved" : "Booking saved as Draft") : "Changes saved"); // 2.2 / 2.3
       // Stay on the screen, now in edit mode (INTERACTIONS 2.2) — the URL follows without remounting.
@@ -523,6 +543,16 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
       scrollToFirstError();
     },
   );
+  const onSave = async (e?: React.SyntheticEvent) => {
+    e?.preventDefault();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    try {
+      await submitForm(e);
+    } finally {
+      savingRef.current = false;
+    }
+  };
   // Confirm in the invoice modal (3.6): save the booking if it's new or edited + create the invoice, one transaction.
   const onConfirmInvoice = async (req: InvoiceModalRequest) => {
     setInvoiceUi((u) => ({ ...u, busy: true, rejected: null }));
@@ -581,7 +611,9 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
   const liveCount = formState.submitCount || attention ? countErrors(errors) : 0;
   const showAlert = attention > 0 && liveCount > 0;
 
-  const saveState = !editing ? "Draft · not saved" : dirty ? "Unsaved changes" : justSaved ? "Saved just now" : saved.status === "draft" ? "Draft · saved" : "All changes saved";
+  const showSaved = savedFlash && !dirty;
+  const saveLabel = saving ? "Saving…" : showSaved ? "Saved" : savedId ? "Save changes" : "Save booking";
+  const saveState = saving ? "Saving…" : !editing ? "Draft · not saved" : dirty ? "Unsaved changes" : justSaved ? "Saved just now" : saved.status === "draft" ? "Draft · saved" : "All changes saved";
   return (
     <>
       {/* Below 768 (R05, Figma M05 / ME1): Mobile/Top bar Type=Child replaces the editor header + page header. */}
@@ -593,11 +625,11 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
         </span>
         <HeaderDivider />
         <span className="flex gap-tight">
-          <Button variant="secondary" onClick={() => navigate("/bookings")}>
+          <Button variant="secondary" loading={leavingPage} disabled={saving} onClick={() => navigate("/bookings")}>
             Cancel
           </Button>
-          <Button icon="check" loading={saving} disabled={belowPaid} onClick={() => onSave()}>
-            {savedId ? "Save changes" : "Save booking"}
+          <Button icon="check" loading={saving} success={showSaved} disabled={belowPaid || leavingPage} onClick={() => onSave()}>
+            {saveLabel}
           </Button>
         </span>
       </EditorActions>
@@ -701,7 +733,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
               // the destructive action stays last on the page in DOM order too (Figma ME1).
               <div className="contents max-tablet:hidden">
                 <Divider />
-                <CancelBookingSection onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
+                <CancelBookingSection disabled={saving} onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
               </div>
             )}
           </form>
@@ -714,7 +746,9 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
               <div className="flex pt-micro">
                 <Button
                   variant="secondary"
+                  loading={reloading}
                   onClick={() => {
+                    setReloading(true);
                     discarding.current = true;
                     setGuard(null);
                     window.location.reload();
@@ -746,6 +780,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             <BookingSummary control={control} packages={packages} priceOf={priceOf} />
           )}
           {!belowPaid && <InvoicesSection
+            saving={saving}
             status={saved.status}
             invoices={saved.invoices}
             fresh={fresh}
@@ -765,16 +800,16 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
         {canCancel && (
           <div className="flex flex-col gap-group px-layout-gutter pb-group tablet:hidden">
             <Divider />
-            <CancelBookingSection onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
+            <CancelBookingSection disabled={saving} onCancel={() => setCancelUi({ open: true, busy: false, failed: false })} />
           </div>
         )}
       </div>
       <ActionBar className="sticky bottom-0 z-30 tablet:hidden">
-        <Button variant="secondary" onClick={() => navigate("/bookings")}>
+        <Button variant="secondary" loading={leavingPage} disabled={saving} onClick={() => navigate("/bookings")}>
           Cancel
         </Button>
-        <Button icon="check" loading={saving} disabled={belowPaid} onClick={() => onSave()}>
-          {savedId ? "Save changes" : "Save booking"}
+        <Button icon="check" loading={saving} success={showSaved} disabled={belowPaid || leavingPage} onClick={() => onSave()}>
+          {saveLabel}
         </Button>
       </ActionBar>
 

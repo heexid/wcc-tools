@@ -57,6 +57,7 @@ function PackageModal({ draft, onClose, onSaved, onArchive }: { draft: Draft | n
   const msg = errorText(errors, form.name);
 
   const submit = async () => {
+    if (saving) return;
     setSaving(true);
     try {
       const r = await savePackage({ id: form.id, name: form.name, price: form.price, summary: form.summary, description: form.description });
@@ -78,23 +79,24 @@ function PackageModal({ draft, onClose, onSaved, onArchive }: { draft: Draft | n
   return (
     <FormModal
       open={!!draft}
+      locked={saving}
       onClose={onClose}
       title={editing ? "Edit package" : "New package"}
       onSubmit={submit}
       footerStart={
         editing ? (
-          <Button variant="ghost" onClick={() => onArchive(form)}>
+          <Button variant="ghost" disabled={saving} onClick={() => onArchive(form)}>
             Archive
           </Button>
         ) : undefined
       }
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" disabled={saving} onClick={onClose}>
             Cancel
           </Button>
           <Button type="submit" loading={saving}>
-            {failed ? "Try again" : editing ? "Save package" : "Create package"}
+            {saving ? "Saving…" : failed ? "Try again" : editing ? "Save package" : "Create package"}
           </Button>
         </>
       }
@@ -145,7 +147,7 @@ function PackageModal({ draft, onClose, onSaved, onArchive }: { draft: Draft | n
   );
 }
 
-function ArchiveDialog({ pkg, onCancel, onConfirm }: { pkg: Draft | null; onCancel: () => void; onConfirm: () => void }) {
+function ArchiveDialog({ pkg, busy, onCancel, onConfirm }: { pkg: Draft | null; busy: boolean; onCancel: () => void; onConfirm: () => void }) {
   const titleId = useId();
   const [shown, setShown] = useState(pkg); // keep content while the exit animation runs
   if (pkg && pkg !== shown) setShown(pkg);
@@ -154,20 +156,20 @@ function ArchiveDialog({ pkg, onCancel, onConfirm }: { pkg: Draft | null; onCanc
   if (mobile)
     // Mobile (Figma MP6): sheet titled with the question · explanation · Cancel / Archive package (44, equal).
     return (
-      <BottomSheet open={!!pkg} onClose={onCancel} role="alertdialog" title={`Archive “${p?.name ?? ""}”?`} initialFocus="[data-cancel]">
+      <BottomSheet open={!!pkg} locked={busy} onClose={onCancel} role="alertdialog" title={`Archive “${p?.name ?? ""}”?`} initialFocus="[data-cancel]">
         <p className="text-body text-text-secondary">
           It will no longer appear when creating bookings. The {p?.bookings} bookings that use it keep their package and price. You can restore it from the Archived tab.
         </p>
         <div className="flex gap-compact pt-4 *:flex-1">
-          <Button variant="secondary" data-cancel onClick={onCancel}>
+          <Button variant="secondary" data-cancel disabled={busy} onClick={onCancel}>
             Cancel
           </Button>
-          <Button onClick={onConfirm}>Archive package</Button>
+          <Button loading={busy} onClick={onConfirm}>{busy ? "Archiving…" : "Archive package"}</Button>
         </div>
       </BottomSheet>
     );
   return (
-    <Dialog open={!!pkg} onClose={onCancel} role="alertdialog" labelledBy={titleId} top="confirm" width="w-[calc(var(--spacing-64)*7-var(--spacing-8))]" initialFocus="[data-cancel]">
+    <Dialog open={!!pkg} locked={busy} onClose={onCancel} role="alertdialog" labelledBy={titleId} top="confirm" width="w-[calc(var(--spacing-64)*7-var(--spacing-8))]" initialFocus="[data-cancel]">
       <div className="flex gap-base p-group">
         <span className="flex size-[calc(var(--spacing-32)+var(--spacing-8))] shrink-0 items-center justify-center rounded-pill bg-surface-warning text-status-warning">
           <Icon name="archive" className="size-icon-md" />
@@ -182,10 +184,10 @@ function ArchiveDialog({ pkg, onCancel, onConfirm }: { pkg: Draft | null; onCanc
         </div>
       </div>
       <footer className="flex justify-end gap-compact border-t border-border-default bg-surface-subtle px-group py-base">
-        <Button variant="secondary" data-cancel onClick={onCancel}>
+        <Button variant="secondary" data-cancel disabled={busy} onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={onConfirm}>Archive package</Button>
+        <Button loading={busy} onClick={onConfirm}>{busy ? "Archiving…" : "Archive package"}</Button>
       </footer>
     </Dialog>
   );
@@ -204,6 +206,8 @@ function PackageLibrary() {
   const [counts, setCounts] = useState({ active: initial?.[1].length ?? 0, archived: initial?.[2].length ?? 0 });
   const readOnly = useIsReadOnly();
   const [editing, setEditing] = useState<Draft | null>(null);
+  const [archiveBusy, setArchiveBusy] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
   const [archiving, setArchiving] = useState<Draft | null>(null);
   // Content stays while the toast animates out; only `open` flips (else an Error toast would turn Success mid-exit).
   const [toast, setToastState] = useState<{ text: string; tone: ToastTone; open: boolean } | null>(null);
@@ -236,8 +240,15 @@ function PackageLibrary() {
   const toDraft = (p: PackageRow): Draft => ({ id: p.id, name: p.name, price: p.price, summary: p.summary, description: p.description, bookings: p.bookings });
 
   const confirmArchive = async () => {
-    if (!archiving?.id) return;
-    await archivePackage(archiving.id);
+    if (!archiving?.id || archiveBusy) return;
+    setArchiveBusy(true);
+    try {
+      await archivePackage(archiving.id);
+    } catch {
+      return setToast("Couldn’t archive the package. Check your connection and try again.", "danger");
+    } finally {
+      setArchiveBusy(false);
+    }
     setArchiving(null);
     setEditing(null);
     setToast(`“${archiving.name}” archived`);
@@ -246,7 +257,12 @@ function PackageLibrary() {
     requestAnimationFrame(() => document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true }));
   };
   const restore = async (p: PackageRow) => {
-    const r = await restorePackage(p.id);
+    if (restoringId) return;
+    setRestoringId(p.id);
+    const r = await restorePackage(p.id)
+      .catch(() => null)
+      .finally(() => setRestoringId(null));
+    if (!r) return setToast("Couldn’t restore the package. Check your connection and try again.", "danger");
     if (r.ok) setToast(`“${p.name}” restored`);
     else setToast(`An active package is already named “${p.name}” — rename it first`, "danger");
     void load();
@@ -303,7 +319,7 @@ function PackageLibrary() {
         <ul aria-label={tab === "active" ? "Active packages" : "Archived packages"} className="flex flex-col gap-control">
           {(rows ?? []).map((p) => (
             <li key={p.id}>
-              <PackageCard p={p} readOnly={readOnly} onEdit={() => setEditing(toDraft(p))} onRestore={() => restore(p)} />
+              <PackageCard p={p} restoring={restoringId === p.id} locked={!!restoringId} readOnly={readOnly} onEdit={() => setEditing(toDraft(p))} onRestore={() => restore(p)} />
             </li>
           ))}
         </ul>
@@ -377,7 +393,7 @@ function PackageLibrary() {
                         <Button variant="ghost" iconOnly icon="archive" aria-label={`Archive ${p.name}`} onClick={() => setArchiving(toDraft(p))} />
                       </>
                     ) : (
-                      <Button variant="secondary" onClick={() => restore(p)} aria-label={`Restore ${p.name}`}>
+                      <Button variant="secondary" loading={restoringId === p.id} disabled={!!restoringId} onClick={() => restore(p)} aria-label={`Restore ${p.name}`}>
                         Restore
                       </Button>
                     )}
@@ -404,7 +420,7 @@ function PackageLibrary() {
         onSaved={(m) => (setEditing(null), setToast(m), void load())}
         onArchive={(d) => setArchiving(d)}
       />
-      <ArchiveDialog pkg={archiving} onCancel={() => setArchiving(null)} onConfirm={confirmArchive} />
+      <ArchiveDialog pkg={archiving} busy={archiveBusy} onCancel={() => setArchiving(null)} onConfirm={confirmArchive} />
       {t.mounted && (
         <ToastRegion>
           <Toast presence={t.presence} tone={toast?.tone}>
@@ -427,7 +443,7 @@ function PackageLibrary() {
 /** Figma Booking components › Mobile/Package list item (MP1 / MP2): card (radius card, border, pad base, gap tight):
  *  name Body Strong + price Body Strong · description Caption secondary (2 lines) · usage · updated Caption secondary +
  *  Active / Archived pill. Active: the card opens Edit package. Archived: Restore (44, full width). */
-function PackageCard({ p, readOnly, onEdit, onRestore }: { p: PackageRow; readOnly: boolean; onEdit: () => void; onRestore: () => void }) {
+function PackageCard({ p, restoring, locked, readOnly, onEdit, onRestore }: { p: PackageRow; restoring: boolean; locked: boolean; readOnly: boolean; onEdit: () => void; onRestore: () => void }) {
   const body = (
     <>
       <span className="flex items-center gap-compact">
@@ -452,7 +468,7 @@ function PackageCard({ p, readOnly, onEdit, onRestore }: { p: PackageRow; readOn
     <div className={card}>
       {body}
       {!p.isActive && !readOnly && (
-        <Button variant="secondary" onClick={onRestore} aria-label={`Restore ${p.name}`} className="mt-micro w-full">
+        <Button variant="secondary" loading={restoring} disabled={locked} onClick={onRestore} aria-label={`Restore ${p.name}`} className="mt-micro w-full">
           Restore
         </Button>
       )}

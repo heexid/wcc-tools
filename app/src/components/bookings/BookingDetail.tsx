@@ -20,6 +20,7 @@ import { bookingDetailKey, loadBookingDetail } from "@/lib/data/prefetch";
 import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import { formatDate, formatDateTime, formatDateWithDay, formatIDR, formatPhone, initials, isoToLocalDate, waLink } from "@/lib/format";
 import { useShellCrumb } from "@/components/shell/AppShell";
+import { usePendingNav } from "@/components/shell/LeaveGuard";
 import { useInvoicePdf } from "@/components/pdf/useInvoicePdf";
 import { CrewSchedulePopover, type CrewPopoverAnchor } from "./CrewSchedule";
 import { useIsReadOnly } from "@/lib/role";
@@ -48,6 +49,9 @@ type Props = {
 
 export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBooking, onSeeInCalendar }: Props) {
   const readOnly = useIsReadOnly();
+  const pendingNav = usePendingNav();
+  const openingEdit = pendingNav === `/bookings/${id}/edit`;
+  const openingPage = pendingNav === `/bookings/${id}`;
   const [crewAnchor, setCrewAnchor] = useState<CrewPopoverAnchor | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const toastPresence = usePresence(!!toast);
@@ -100,7 +104,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
           <span className="flex-1" />
           {mode === "sheet" && (
             <>
-              <Button variant="ghost" iconOnly icon="external-link" aria-label="Open full page" onClick={() => onOpenFull?.(canceled || readOnly)} />
+              <Button variant="ghost" iconOnly icon="external-link" loading={openingPage} disabled={openingEdit} aria-label="Open full page" onClick={() => onOpenFull?.(canceled || readOnly)} />
               <Button variant="ghost" iconOnly icon="x" aria-label="Close" data-close onClick={onClose} />
             </>
           )}
@@ -110,7 +114,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
         </h2>
         <div className="flex gap-compact">
           {!canceled && !readOnly && (
-            <Button icon="pencil" onClick={onEdit}>
+            <Button icon="pencil" loading={openingEdit} onClick={onEdit}>
               Edit booking
             </Button>
           )}
@@ -285,7 +289,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
             </Button>
           )}
           {!canceled && !readOnly && (
-            <Button icon="pencil" onClick={onEdit}>
+            <Button icon="pencil" loading={openingEdit} onClick={onEdit}>
               Edit booking
             </Button>
           )}
