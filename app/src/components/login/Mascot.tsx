@@ -10,9 +10,10 @@ import type { MascotApi, MascotState } from "./mascotScene";
 
 export type { MascotApi, MascotState };
 
-// Sizes: 64 (login, Figma Asset/mascot-large at 64) and 120 (landing final CTA, Asset/mascot-large at 120).
+// Sizes: 32 (landing nav, Figma Asset/mascot), 64 (login, Figma Asset/mascot-large at 64) and 120 (landing final CTA, Asset/mascot-large at 120).
 // The canvas overflows the box by a quarter of its size on every side (glow + bounce room).
 const SIZES = {
+  32: { box: "size-32", inset: "-inset-8", png: "/assets/mascot-64.png", png2x: "/assets/mascot-64@2x.png" },
   64: { box: "size-64", inset: "-inset-16", png: "/assets/mascot-64.png", png2x: "/assets/mascot-64@2x.png" },
   120: {
     box: "size-[calc(var(--spacing-64)+var(--spacing-48)+var(--spacing-8))]",
@@ -22,7 +23,21 @@ const SIZES = {
   },
 } as const;
 
-export function Mascot({ state, apiRef, size = 64 }: { state: MascotState; apiRef?: Ref<MascotApi | null>; size?: keyof typeof SIZES }) {
+export function Mascot({
+  state,
+  apiRef,
+  size = 64,
+  calm = false,
+  delay = 0,
+}: {
+  state: MascotState;
+  apiRef?: Ref<MascotApi | null>;
+  size?: keyof typeof SIZES;
+  /** No cursor tracking, sleepy state or click reaction; pointer events pass through. */
+  calm?: boolean;
+  /** ms before the scene is created, so an entrance animation isn't interrupted. */
+  delay?: number;
+}) {
   const s = SIZES[size];
   const host = useRef<HTMLDivElement>(null);
   const api = useRef<MascotApi | null>(null);
@@ -30,11 +45,12 @@ export function Mascot({ state, apiRef, size = 64 }: { state: MascotState; apiRe
 
   useEffect(() => {
     let disposed = false;
-    import("./mascotScene")
-      .then(({ createMascot }) => {
+    const wait = new Promise<void>((resolve) => (delay ? setTimeout(resolve, delay) : resolve()));
+    Promise.all([import("./mascotScene"), wait])
+      .then(([{ createMascot }]) => {
         if (disposed || !host.current) return;
         // bubble ≈ 50 of the 96 canvas, the same size as in the 64 PNG. The state effect below applies `state`.
-        api.current = createMascot(host.current, { fit: 0.52 });
+        api.current = createMascot(host.current, { fit: 0.52, ...(calm && { track: false, poke: false, sleepAfter: 0 }) });
         setRef(apiRef, api.current);
         setReady(true);
       })
@@ -44,8 +60,9 @@ export function Mascot({ state, apiRef, size = 64 }: { state: MascotState; apiRe
       api.current?.destroy();
       api.current = null;
       setRef(apiRef, null);
+      setReady(false);
     };
-  }, [apiRef]);
+  }, [apiRef, calm, delay]);
 
   useEffect(() => {
     api.current?.setState(state);
@@ -60,7 +77,7 @@ export function Mascot({ state, apiRef, size = 64 }: { state: MascotState; apiRe
         alt=""
         className={ready ? `invisible absolute inset-0 ${s.box}` : `absolute inset-0 block ${s.box}`}
       />
-      <div ref={host} className={`absolute ${s.inset}`} />
+      <div ref={host} className={`absolute ${s.inset} ${calm ? "pointer-events-none" : ""}`} />
     </div>
   );
 }

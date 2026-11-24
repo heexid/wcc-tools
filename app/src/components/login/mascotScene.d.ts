@@ -10,6 +10,8 @@ export interface MascotOptions {
   sleepAfter?: number;
   /** Clicking the mascot makes it giggle. Default true. */
   poke?: boolean;
+  /** Idle follows the cursor. Default true. */
+  track?: boolean;
   /** Body diameter as a fraction of the canvas height. Default 0.72. */
   fit?: number;
 }
