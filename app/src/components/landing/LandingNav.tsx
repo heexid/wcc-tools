@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { Button, ButtonLink } from "@/components/ds/Button";
 import { useFocusTrap } from "@/components/ds/Dialog";
 import { Icon } from "@/components/ds/Icon";
 import { usePresence } from "@/components/ds/usePresence";
 import { useScrollLock } from "@/components/ds/useScrollLock";
+import { NavMascot } from "./NavMascot";
 import { GET_STARTED_HREF, LOGIN_HREF } from "./parts";
 
 // Figma LP-D › Navbar (231:80486): 1368 × 58 floating bar, 16 from the top / 36 from the sides, radius 16,
@@ -35,6 +36,17 @@ export function LandingNav() {
     history.replaceState(null, "", hash);
   };
 
+  // Logo: already home, so scroll back up to the hero and drop any #section from the URL. Modified clicks
+  // (new tab / window) keep the normal link.
+  const goTop = (e: MouseEvent) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    setOpen(false);
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" }));
+    history.replaceState(null, "", window.location.pathname);
+  };
+
   return (
     <header className="sticky top-16 z-30 mt-16 px-[calc(var(--spacing-32)+var(--spacing-4))] max-desktop:px-24 max-tablet:top-12 max-tablet:mt-12 max-tablet:px-16">
       <nav
@@ -43,9 +55,8 @@ export function LandingNav() {
         className="mx-auto flex h-[calc(var(--spacing-48)+var(--spacing-8)+var(--spacing-2))] max-w-[calc(var(--spacing-layout-page-width)-var(--spacing-64)-var(--spacing-8))] items-center justify-between rounded-sheet bg-surface-default pr-8 pl-20 max-tablet:h-mobile-header-height max-tablet:pr-6 max-tablet:pl-16"
       >
         <div className="flex items-center gap-48">
-          <Link href="/" aria-label="CIR home" className="flex items-center gap-8 rounded-control outline-none focus-visible:ring-2 focus-visible:ring-accent-primary">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/mascot-64.png" alt="" width={32} height={32} className="size-32" />
+          <Link href="/" aria-label="CIR home" onClick={goTop} className="flex items-center gap-8 rounded-control outline-none focus-visible:ring-2 focus-visible:ring-accent-primary">
+            <NavMascot intro />
             <span className="text-heading-panel text-text-primary">CIR</span>
           </Link>
           <ul className="flex items-center gap-32 max-desktop:hidden">
@@ -79,12 +90,22 @@ export function LandingNav() {
         />
       </nav>
 
-      <FullscreenMenu open={open} onClose={() => setOpen(false)} onGo={go} />
+      <FullscreenMenu open={open} onClose={() => setOpen(false)} onGo={go} onHome={goTop} />
     </header>
   );
 }
 
-function FullscreenMenu({ open, onClose, onGo }: { open: boolean; onClose: () => void; onGo: (hash: string) => void }) {
+function FullscreenMenu({
+  open,
+  onClose,
+  onGo,
+  onHome,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onGo: (hash: string) => void;
+  onHome: (e: MouseEvent) => void;
+}) {
   // The exit only moves (no fade), so there's no opacity transitionend to unmount on: unmount once the exit
   // (--dur-modal, 250ms) has run, instead of usePresence's 600ms default holding the scroll lock and focus trap.
   const { mounted, presence } = usePresence(open, 300);
@@ -112,9 +133,9 @@ function FullscreenMenu({ open, onClose, onGo }: { open: boolean; onClose: () =>
       className="lp-menu fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-surface-default px-16 pt-12 pb-(--safe-area-bottom) max-desktop:px-[calc(var(--spacing-24)+var(--spacing-16))] max-tablet:px-16"
     >
       <div className="flex h-mobile-header-height shrink-0 items-center justify-between">
-        <Link href="/" aria-label="CIR home" onClick={onClose} className="flex items-center gap-8 rounded-control outline-none focus-visible:ring-2 focus-visible:ring-accent-primary">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/mascot-64.png" alt="" width={32} height={32} className="size-32" />
+        <Link href="/" aria-label="CIR home" onClick={onHome} className="flex items-center gap-8 rounded-control outline-none focus-visible:ring-2 focus-visible:ring-accent-primary">
+          {/* after the menu has slid in (--dur-modal) */}
+          <NavMascot delay={320} />
           <span className="text-heading-panel text-text-primary">CIR</span>
         </Link>
         <Button variant="ghost" iconOnly icon="x" aria-label="Close menu" data-menu-close onClick={onClose} className="[&_svg]:size-icon-md" />

@@ -193,13 +193,14 @@ function haloTexture() {
 
 /**
  * @param {HTMLElement} container  element the canvas fills (give it a size; square works best)
- * @param {{ state?: string, sleepAfter?: number, poke?: boolean, fit?: number }} [options]
+ * @param {{ state?: string, sleepAfter?: number, poke?: boolean, track?: boolean, fit?: number }} [options]
  *   sleepAfter: ms of no input before idle turns sleepy (0 disables, default 20000)
  *   poke: clicking the mascot makes it giggle (default true)
+ *   track: idle follows the cursor (default true)
  *   fit: body diameter as a fraction of the canvas height (default 0.72); the rest is room for glow and bounce
  */
 export function createMascot(container, options = {}) {
-  const { sleepAfter = 20000, poke = true, fit = 0.72 } = options;
+  const { sleepAfter = 20000, poke = true, track = true, fit = 0.72 } = options;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
@@ -354,7 +355,7 @@ export function createMascot(container, options = {}) {
   const onActivity = () => (lastActivity = performance.now());
   const onLeave = () => (pointer = null);
   const onPoke = () => react("giggle");
-  window.addEventListener("pointermove", onPointerMove, { passive: true });
+  if (track) window.addEventListener("pointermove", onPointerMove, { passive: true });
   window.addEventListener("keydown", onActivity);
   window.addEventListener("pointerdown", onActivity, { passive: true });
   document.documentElement.addEventListener("pointerleave", onLeave);
@@ -505,6 +506,7 @@ export function createMascot(container, options = {}) {
     shadowMat.map?.dispose();
     haloMat.map?.dispose();
     renderer.dispose();
+    renderer.forceContextLoss(); // browsers cap live WebGL contexts; free this one now
     canvas.remove();
   }
 
