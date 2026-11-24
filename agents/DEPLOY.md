@@ -54,7 +54,12 @@ Open the site, log in with the account from step 1.4, and you're live. From now 
 
 All six work → you're live.
 
-**Before real client data:** make sure your Supabase plan includes backups (the free plan has none; Pro has daily backups) under *Project Settings → Add-ons / Backups*.
+**Before real client data:** make sure your Supabase plan includes backups (the free plan has none; Pro has daily backups) under *Project Settings → Add-ons / Backups*. **Checked 2026-11-24: the live project lists no backups.** Until that changes, take a dump before every migration and keep it outside the repo (it holds client data):
+```bash
+umask 077; mkdir -p ~/wcc-tools-backups/YYYY-MM-DD
+app/node_modules/.bin/supabase db dump --linked -f ~/wcc-tools-backups/YYYY-MM-DD/schema.sql
+app/node_modules/.bin/supabase db dump --linked --data-only --use-copy -s public,auth,storage -f ~/wcc-tools-backups/YYYY-MM-DD/data.sql
+```
 
 ## Accounts (admin and crew)
 
@@ -97,6 +102,8 @@ select count(*) from public.profiles where active and role = 'admin';   -- must 
 ```
 
 ## Upgrade to crew types (databases set up before 2026-11-24)
+
+**The live database was upgraded on 2026-11-24.** Keep these steps for any other database. Run migration files one at a time inside `begin; … commit;`, not with `supabase db push`: a database created from `setup-production.sql` may have no migration history.
 
 1. **Back up**, then list the viewers. **Every active one becomes an admin.** Keep the list, and revoke any that should not:
    ```sql

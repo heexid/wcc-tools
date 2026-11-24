@@ -196,7 +196,7 @@ Route: `/account`. Opened from the profile menu (avatar, name and role at the to
 - **Profile card:** name (editable with **Edit name**, 2–50 characters), email (read-only), role (read-only).
 - **Security card:** **Change password** with show/hide on each field and a live checklist: at least 8 characters, contains a letter and a number, and different from the current password.
   - On success you stay logged in on this device, all other sessions are logged out, and the row shows "Last changed today".
-- **Log out** is in the same profile menu. It asks for confirmation first.
+- **Log out** is in the same profile menu. It asks for confirmation first. After you confirm, the button is disabled and shows "Logging out…" until the Login page opens.
 - Changing your name updates the header and the "Created by" label on new bookings. Existing records keep the name they were created with.
 
 ## 17. Business information
