@@ -17,6 +17,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Bookings on mobile: the Calendar | List tabs (52 high) stick under the header, so scroll targets clear them too. */
+  html:has([data-sticky-tabs]) {
+    scroll-padding-top: calc(var(--spacing-layout-header-height) + var(--spacing-48) + var(--spacing-4) + var(--spacing-base));
+  }
+
   /* Scrollbars: transparent track, light see-through thumb (not the browser's default black) — every scroller. */
   * {
     scrollbar-width: thin;

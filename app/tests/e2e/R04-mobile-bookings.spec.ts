@@ -27,7 +27,7 @@ test.describe("M01 · list", () => {
     await expect(first).toContainText("Rp 1.750.000");
     await expect(first).toContainText("10 Nov 2026 · Aulia Rahma");
     await expect(page.getByText("40 bookings")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Upcoming" })).toHaveCount(0); // no rail / KPIs on mobile
+    await expect(page.getByRole("heading", { name: "Upcoming" })).toHaveCount(0); // no rail on mobile
   });
 
   test("infinite scroll replaces pagination (25 + 15)", async ({ page }) => {
@@ -63,10 +63,10 @@ test.describe("M01 · list", () => {
     await expect(page).toHaveURL(/\/bookings\/new$/);
   });
 
-  // G3 on the frame's top (top bar → chips). The search value is masked: code renders field text at 16px (iOS zoom
-  // rule, R01) where the CIR Search field in Figma is 13px.
+  // G3 on the frame's top (top bar → chips). Masked: the first KPI's sample value + trend, and the search value (code
+  // renders field text at 16px (iOS zoom rule, R01) where the CIR Search field in Figma is 13px).
   test("M01 header region matches Figma", async ({ page }) => {
-    await expectMatchesFigma(page, "mobile-m01", undefined, { clip: { x: 0, y: 0, w: 390, h: 290 }, frameViewport: true, masks: [{ x: 50, y: 186, w: 300, h: 40 }] });
+    await expectMatchesFigma(page, "mobile-m01", undefined, { clip: { x: 0, y: 0, w: 390, h: 460 }, frameViewport: true, masks: [{ x: 30, y: 188, w: 238, h: 74 }, { x: 50, y: 356, w: 300, h: 40 }] });
   });
 });
 
@@ -116,10 +116,10 @@ test.describe("M03 · calendar agenda", () => {
     expect(accent).toBeTruthy();
   });
 
-  test("opens scrolled to Today (under the sticky top bar)", async ({ page }) => {
+  test("opens scrolled to Today (under the sticky top bar + tabs)", async ({ page }) => {
     const top = (await page.locator("#day-2026-11-10").boundingBox())!.y;
-    expect(top).toBeGreaterThanOrEqual(56);
-    expect(top).toBeLessThan(56 + 40);
+    expect(top).toBeGreaterThanOrEqual(56 + 52);
+    expect(top).toBeLessThan(56 + 52 + 40);
   });
 
   test("month nav: ‹ October 2026, Today returns", async ({ page }) => {
@@ -138,9 +138,41 @@ test.describe("M03 · calendar agenda", () => {
     expect((await item.boundingBox())!.width).toBe(356); // inside the 1px card border
   });
 
-  // G3 on the frame's top (top bar → chips); the "n bookings this month" line is masked (Figma sample count).
+  // G3 on the frame's top (top bar → chips); the first KPI's sample value + trend is masked.
   test("M03 header region matches Figma", async ({ page }) => {
     await page.evaluate(() => window.scrollTo(0, 0));
-    await expectMatchesFigma(page, "mobile-m03", undefined, { clip: { x: 0, y: 0, w: 390, h: 300 }, frameViewport: true });
+    await expectMatchesFigma(page, "mobile-m03", undefined, { clip: { x: 0, y: 0, w: 390, h: 474 }, frameViewport: true, masks: [{ x: 30, y: 192, w: 238, h: 74 }] });
+  });
+});
+
+test.describe("KPIs + sticky tabs", () => {
+  test("the three desktop KPI cards sit between the title and the tabs and swipe sideways", async ({ page }) => {
+    await page.goto("/bookings?tab=table");
+    const row = page.getByRole("group", { name: "Key metrics" });
+    for (const name of ["Bookings this month", "Outstanding balance", "Collected this month"]) await expect(row.getByRole("heading", { name })).toBeAttached();
+    await expect(row).toContainText("Rp ");
+    const box = (await row.boundingBox())!;
+    expect(box).toMatchObject({ x: 0, width: 390 });
+    expect(box.y + box.height).toBeLessThanOrEqual((await page.getByRole("tablist", { name: "View" }).boundingBox())!.y);
+    expect(await row.evaluate((e) => e.scrollWidth > e.clientWidth)).toBe(true);
+  });
+
+  for (const tab of ["", "?tab=table"])
+    test(`tabs stay under the top bar while scrolling (${tab || "calendar"})`, async ({ page }) => {
+      await page.goto(`/bookings${tab}`);
+      const tabs = page.getByRole("tablist", { name: "View" });
+      await expect(page.getByText(/\d+ bookings/).last()).toBeVisible();
+      await page.evaluate(() => window.scrollTo(0, 900));
+      await expect.poll(async () => (await tabs.boundingBox())!.y).toBe(56);
+    });
+
+  test("switching to List while stuck starts at the top of the list", async ({ page }) => {
+    await page.goto("/bookings");
+    await expect(page.getByText(/bookings? this month/)).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 1500));
+    await page.getByRole("tab", { name: "List" }).click();
+    await expect(cards(page).first()).toBeInViewport();
+    await expect(page.getByRole("searchbox", { name: "Search bookings" })).toBeInViewport();
+    expect((await page.getByRole("tablist", { name: "View" }).boundingBox())!.y).toBe(56);
   });
 });

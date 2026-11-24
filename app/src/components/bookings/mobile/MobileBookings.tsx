@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { ActionBar } from "@/components/ds/BottomSheet";
 import { Button } from "@/components/ds/Button";
 import { Skeleton } from "@/components/ds/Loading";
@@ -9,9 +9,10 @@ import { SearchField } from "@/components/ds/SearchField";
 import { Tab, TabList } from "@/components/ds/Tabs";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
+import { KpiCards } from "@/components/bookings/KpiCards";
 import { useBookingFilters } from "@/components/bookings/useBookingFilters";
 import { STATUS_OPTIONS, rangeChip, toQuery, type BookingFilters } from "@/lib/booking/filters";
-import { listAllBookings, listBookings, type BookingRow } from "@/lib/data/repo";
+import { listAllBookings, listBookings, type getKpis, type BookingRow } from "@/lib/data/repo";
 import { fetchCached, peek } from "@/lib/data/cache";
 import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import type { Crew, Package } from "@/lib/data/types";
@@ -21,7 +22,8 @@ import { MobileAgendaItem, MobileBookingCard } from "./MobileBookingCards";
 import { MobileFiltersSheet } from "./MobileFilters";
 
 // Figma: Bookings › Booking · Mobile (390) — M01 List · M02 Filters sheet · M03 Calendar (agenda). Below 768 the
-// Bookings page is this view (the desktop dashboard's KPIs and Upcoming rail are not shown on mobile).
+// Bookings page is this view (the desktop dashboard's Upcoming rail is not shown on mobile; its KPI cards are, in a row
+// that swipes sideways, and the tabs stick under the top bar).
 // Body: surface/default, pad 20/16/24/16 (mobile/margin), gap control (12) in List / base (16) in Calendar.
 // Title Heading/Page · Calendar | List tabs (equal width) · List: search 44 · chips (Filters + status, scroll-x) ·
 // result meta Caption secondary · Mobile/Booking list item cards (infinite scroll replaces pagination).
@@ -42,6 +44,7 @@ export function MobileBookings({
   crew,
   packages,
   total,
+  kpis,
   loading,
   onOpen,
   onNew,
@@ -51,6 +54,7 @@ export function MobileBookings({
   packages: Package[];
   /** Bookings that exist at all (null while loading) — 0 = first use. */
   total: number | null;
+  kpis: Awaited<ReturnType<typeof getKpis>> | null | undefined;
   loading: boolean;
   onOpen: (id: string) => void;
   onNew: () => void;
@@ -62,6 +66,14 @@ export function MobileBookings({
   const { filters, update } = useBookingFilters();
   const view = params.get("tab") === "table" ? "table" : "calendar";
   const [sheet, setSheet] = useState(false);
+  const tabs = useRef<HTMLDivElement>(null);
+  const wasStuckRef = useRef(false);
+  const setView = (v: string | null) => {
+    const el = tabs.current;
+    const mark = el?.previousElementSibling;
+    wasStuckRef.current = !!el && !!mark && mark.getBoundingClientRect().bottom < el.getBoundingClientRect().top;
+    setParam("tab", v);
+  };
   const setParam = (k: string, v: string | null) => {
     const p = new URLSearchParams(window.location.search);
     if (v) p.set(k, v);
@@ -72,19 +84,24 @@ export function MobileBookings({
   const firstUse = total === 0;
 
   return (
-    <div className="flex flex-1 flex-col">
+    // No scroll anchoring: rows replacing skeletons after a tab switch would drag the page down with them.
+    <div className="flex flex-1 flex-col [overflow-anchor:none]">
       <main className={cn("flex flex-1 flex-col px-layout-gutter pt-20 pb-24", view === "table" ? "gap-control" : "gap-base")}>
         <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
           <Txt>Bookings</Txt>
         </h1>
-        <TabList label="View" className="flex">
-          <Tab active={view === "calendar"} onClick={() => setParam("tab", null)} className="flex-1">
-            Calendar
-          </Tab>
-          <Tab active={view === "table"} onClick={() => setParam("tab", "table")} className="flex-1">
-            List
-          </Tab>
-        </TabList>
+        <KpiCards mobile kpis={kpis} firstUse={firstUse} />
+        <ViewTop key={view} wasStuckRef={wasStuckRef} className={view === "table" ? "-mb-(--spacing-control)" : "-mb-(--spacing-base)"} />
+        <div ref={tabs} data-sticky-tabs className="sticky top-layout-header-height z-20 -mx-layout-gutter bg-surface-default px-layout-gutter">
+          <TabList label="View" className="flex">
+            <Tab active={view === "calendar"} onClick={() => setView(null)} className="flex-1">
+              Calendar
+            </Tab>
+            <Tab active={view === "table"} onClick={() => setView("table")} className="flex-1">
+              List
+            </Tab>
+          </TabList>
+        </div>
         {view === "table" ? (
           <MobileList filters={filters} update={update} today={today} crew={crew} filterCount={filterCount} onFilters={() => setSheet(true)} onOpen={onOpen} firstUse={firstUse} loading={loading} />
         ) : (
@@ -111,6 +128,23 @@ export function MobileBookings({
       <MobileFiltersSheet open={sheet} onClose={() => setSheet(false)} filters={filters} update={update} today={today} crew={crew} packages={packages} view={view} />
     </div>
   );
+}
+
+/** Zero-height mark at the tabs' natural place. Keyed by view: switching with the tabs stuck starts the new view at its
+ *  top instead of mid-scroll. Rendered before the views, so the agenda's own scroll to Today runs after it. */
+function ViewTop({ className, wasStuckRef }: { className: string; wasStuckRef: RefObject<boolean> }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const tabs = el?.nextElementSibling;
+    if (!el || !tabs) return;
+    const stuck = parseFloat(getComputedStyle(tabs).top) || 0;
+    const past = el.getBoundingClientRect().bottom - stuck;
+    // Always set the position, even when the shorter view already clamped it: an unset clamp is undone once rows land.
+    if (wasStuckRef.current) window.scrollTo({ top: window.scrollY + past, behavior: "instant" });
+    wasStuckRef.current = false;
+  }, [wasStuckRef]);
+  return <div ref={ref} aria-hidden className={cn("h-0", className)} />;
 }
 
 /** Filters chip (sliders, "Filters · n") + single-select status chips (All · Draft · Partially paid · Paid · Canceled).
@@ -224,7 +258,7 @@ function MobileList({
       {firstUse ? (
         <Empty title="No bookings yet" body="Create your first booking. It appears on the calendar and in this list right away." />
       ) : loading || !current ? (
-        [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[calc(var(--spacing-64)+var(--spacing-32)+var(--spacing-8))] w-full rounded-card" />)
+        [0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-[calc(var(--spacing-64)+var(--spacing-32)+var(--spacing-8))] w-full rounded-card" />)
       ) : current.rows.length ? (
         <>
           <ul className="flex flex-col gap-control">
@@ -280,7 +314,7 @@ function MobileAgenda({
   const days: ISODate[] = [];
   for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
 
-  // Open on Today (once per month shown): the day section scrolls under the sticky top bar.
+  // Open on Today (once per month shown): the day section scrolls to just below the sticky top bar + tabs.
   const scrolled = useRef<string | null>(null);
   useLayoutEffect(() => {
     if (!rows || scrolled.current === from) return;
