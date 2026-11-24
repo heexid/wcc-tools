@@ -17,6 +17,16 @@ const inter = localFont({
 export const metadata: Metadata = {
   title: "CIR · Booking",
   description: "Booking & Invoice prototype",
+  manifest: "/manifest.json",
+  // Link previews. The image is opengraph-image.jpg (Figma "Fav Icon & Social Banner"); signed-out visitors land on
+  // /login, so every page shares the landing copy. Absolute URLs come from Vercel's production domain.
+  openGraph: {
+    type: "website",
+    siteName: "CIR",
+    title: "CIR · Every booking, every schedule, one place",
+    description: "Packages, payments and invoices, with clarity and centralised",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // viewport-fit=cover lets sticky bottom bars read env(safe-area-inset-bottom) (DS › Mobile rules).
