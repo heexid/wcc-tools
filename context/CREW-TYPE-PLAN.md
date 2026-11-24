@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Draft, 2026-11-24. Not started. |
+| **Status** | 2026-11-24: C1–C4 built on branch `crew-types`. Open: Supabase e2e (needs a local reset), Figma 02b / 03b, C5 release. |
 | **Goal** | Two account types: **admin** (full access, assignable to bookings) and **crew** (read-only). |
 | **Companions** | `PRD.md` US-1, US-7, §4.2–4.4 · `INTERACTIONS.md` 1.7, 2.9, 6.4 · `PRODUCTION-PLAN.md` P4, P10 |
 
@@ -44,7 +44,7 @@
 
 ## 3. Database: migration 014
 
-File: `supabase/migrations/<date>000014_crew_types.sql`. Mirror it in `setup-production.sql`.
+File: `supabase/migrations/20261124000014_crew_types.sql`. Mirror it in `setup-production.sql`.
 
 **Order inside the migration**
 1. Drop the `profiles.role` check.

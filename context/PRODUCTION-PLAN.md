@@ -14,7 +14,7 @@ IDs are the same ones the other docs use: **US-n**, **#x.y** (INTERACTIONS rows)
 ## 0. Ground rules
 
 ### 0.1 Scope of production v1
-- **Same product as the prototype MVP** (PRD §5.1 *MVP* row): Login, App launcher, Account, Package Library, Booking create / edit / cancel, DP / Full / Partial / Paid invoices, Calendar (month / week / day), Table + search + filters, Detail + Crew schedule, PDF, viewer role.
+- **Same product as the prototype MVP** (PRD §5.1 *MVP* row): Login, App launcher, Account, Package Library, Booking create / edit / cancel, DP / Full / Partial / Paid invoices, Calendar (month / week / day), Table + search + filters, Detail + Crew schedule, PDF, crew role.
 - **Out of scope** (PRD §5.1 v1.1+): tablet layouts (mobile shipped 2026-11-22, R01–R09), void invoice, refunds, VAT / discounts, WhatsApp / email sending, payment gateway, client portal.
 - **The UI does not get redesigned.** Every Figma-matching component, route, URL contract (`view`, `date`, `tab`, `?booking=`, `crew=`…) and motion rule from the prototype stays. Production work happens **below** the components: data, auth, storage, security, ops.
 - **Single swap point.** The prototype was built so that Supabase can replace `lib/data/*` without touching the UI (PROTOTYPE-PLAN §0.1). Production keeps that contract: the Supabase-backed repo implements the **same function names and result shapes** as `repo.ts`. Where the prototype cheats (below), P3 fixes the contract first.
@@ -25,7 +25,7 @@ IDs are the same ones the other docs use: **US-n**, **#x.y** (INTERACTIONS rows)
 | Whole DB lives in the browser (`getDb()`, `localStorage` key `proto:db`) | `lib/data/store.ts` | Postgres; the browser never holds the full dataset | P3 |
 | Components call **synchronous** helpers on the whole `Db` (`computeKpis(d)`, `filterBookings(d, q)`, `listCrew`) | `app/bookings/page.tsx`, `BookingTable`, calendars, `UpcomingRail` | Server queries: range-bounded calendar, server-side sort + pagination, KPI + rail queries | P3, P6 |
 | Mock auth: `proto:session` flag, one hard-coded admin, password in the `Db` | `repo.ts` `login`, `changePassword` | Supabase Auth, `profiles` + roles, RLS | P4 |
-| Viewer role is flipped by `/dev/role` | `lib/role.ts` | Role from `profiles.role`, enforced by RLS **and** hidden in the UI | P4, P10 |
+| Crew role is flipped by `/dev/role` | `lib/role.ts` | Role from `profiles.role`, enforced by RLS **and** hidden in the UI | P4, P10 |
 | Totals, status and numbering computed in TypeScript | `lib/data/ledger.ts` | DB triggers + RPCs (TS stays for live UI preview only) | P1, P2 |
 | Frozen clock `NEXT_PUBLIC_TODAY=2026-11-10` | `lib/clock.ts` | Real clock in prod; frozen only in test builds | P0 |
 | PDF built in the browser on download | `lib/pdf/download.ts` | Server render from the snapshot, stored in Storage, signed URL | P9 |
@@ -46,7 +46,7 @@ G1–G4 proved the UI is pixel-exact and are **kept as a regression guard** (run
 | **PG1 Static** | `tsc --noEmit`, `eslint`, `npm run g1`, `next build` with production env | 0 errors; no `/dev/*` route, `proto:` key or fixture hook in the production build output |
 | **PG2 Database** | `supabase db reset` from zero applies every migration; pgTAP suite (constraints, triggers, RPCs, RLS) | all green; migration is idempotent in CI; `supabase gen types` diff is empty |
 | **PG3 Parity** | One shared table of test vectors (the PLAN §3 matrix + PRD §2.4 rules 1–13) run against **three** implementations: `calc.ts`, the mock repo, the Supabase RPCs | identical results, identical error codes |
-| **PG4 Security** | RLS matrix: anon / viewer / admin × every table × select / insert / update / delete, plus RPC calls from each role | every cell matches the expected allow / deny table in P10; no service-role key in the browser bundle |
+| **PG4 Security** | RLS matrix: anon / crew / admin × every table × select / insert / update / delete, plus RPC calls from each role | every cell matches the expected allow / deny table in P10; no service-role key in the browser bundle |
 | **PG5 E2E real** | The existing Playwright lanes (Bookings A–H, Package A–D, Launchpad A–B, Profile A–E) run against **staging** with the real Supabase, real auth, real clock | all lanes green with a fresh seed; no `fixture` / `fail` / `latency` hooks used |
 | **PG6 Visual regression** | `npm run visual` on the **mock data source** with the frozen clock (unchanged harness) | no new diffs versus the last green run; the 53 inherited failures from F17 are tracked separately (§4.1) |
 | **PG7 Performance** | PRD §4.5 budgets measured on staging with the 10k-booking seed | calendar month < 200 ms, table page < 300 ms, live calc < 50 ms/keystroke; LCP and INP budgets in P11 |
@@ -118,7 +118,7 @@ Every slice P0…P14 follows the same loop. Do **not** start the next slice unti
 | P7 | Booking write path: new, edit, cancel | F10, F13, F14 | US-1, US-4, US-5, US-12 | PG3 PG5 |
 | P8 | Workspace Settings integration | hard-coded business / bank / terms | PRD §4.3 | PG5 |
 | P9 | Invoices + PDF: create, snapshot, Storage, signed URLs | F11, F15 | US-2, US-3, US-10 · PLAN §8 | PG3 PG4 PG5 |
-| P10 | Security hardening: RLS audit, viewer enforcement, PII, headers | — | PRD §4.4 | PG4 |
+| P10 | Security hardening: RLS audit, crew enforcement, PII, headers | — | PRD §4.4 | PG4 |
 | P11 | Performance: 10k seed, indexes, caching, budgets | — | PRD §4.5 | PG7 |
 | P12 | Full regression: all lanes on staging, a11y, visual guard | F17 | PLAN §9 | PG5 PG6 |
 | P13 | Operations: monitoring, backups, reconciliation cron, runbook | — | PLAN §9 | — |
@@ -258,10 +258,10 @@ Standard loop; biggest refactor in the plan — land it in small PRs by seam: (a
 **Feature**
 - Supabase Auth with `@supabase/ssr`: cookie session, `proxy`/middleware refresh, route guard (everything except `/login` redirects with `?next=`, INTERACTIONS 6.5), `redirect to ?next= or /bookings` after login.
 - Login errors E1–E6 from **real** auth errors (wrong credentials, locked, network, expired session E4 with prefilled email); **Forgot password?** keeps the Info alert E7 (no self-service reset, PRD §4.3).
-- `profiles` row created on first sign-in (trigger on `auth.users`); `role` ∈ `admin | viewer` from the workspace membership (D3); `useIsViewer()` reads the real role; `/dev/role` is removed from production.
+- `profiles` row created on first sign-in (trigger on `auth.users`); `role` ∈ `admin | crew` from the workspace membership (D3); `useIsReadOnly()` reads the real role; `/dev/role` is removed from production.
 - Account (US-13, PLAN §8b): change name (zod 2–50 trimmed + DB check; header and menu update), change password (re-verify current password, rules checklist client + server, **sign out other sessions** with scope `others`, `password_changed_at`), log out → `/login?loggedOut=1` after the leave guard.
 - Login hardening: rate limit / lockout via Supabase Auth settings, generic error text (no account enumeration).
-- **Done when:** PG4 (auth part) + PG5 green for Launchpad A–B and Profile A–D, an unauthenticated request to any app route or API returns a redirect / 401, and a viewer cannot reach a write path.
+- **Done when:** PG4 (auth part) + PG5 green for Launchpad A–B and Profile A–D, an unauthenticated request to any app route or API returns a redirect / 401, and a crew account cannot reach a write path.
 
 **Prompt**
 ```
@@ -277,7 +277,7 @@ security-review on the diff. Finish with §1 step 9.
 ```
 
 **Workflow**
-Standard loop; add `security-review` at step 6. E2E: Launchpad A–B, Profile A–D, plus "viewer cannot write" and "expired session".
+Standard loop; add `security-review` at step 6. E2E: Launchpad A–B, Profile A–D, plus "crew cannot write" and "expired session".
 
 ---
 
@@ -286,7 +286,7 @@ Standard loop; add `security-review` at step 6. E2E: Launchpad A–B, Profile A�
 **Feature**
 - `/packages` reads and writes through the Supabase repo: list by Active / Archived tab, search, pagination, create / edit with validation (duplicate **active** name → unique partial index + typed error, price ≥ 0, description ≤ 1000), archive / restore (`is_active`, `archived_at`), save-failed + Try again.
 - `listPackages({ tab: "active" })` is the same function the booking picker uses (archived hidden, empty library state).
-- Viewer: New / Edit / Archive hidden in UI **and** rejected by RLS (P10 verifies).
+- Crew: New / Edit / Archive hidden in UI **and** rejected by RLS (P10 verifies).
 - "n bookings" column = real count of bookings per package (view or aggregate), replacing `legacyBookings`.
 - **Done when:** INTERACTIONS 5.1–5.11 and Package lanes A–D pass on staging (PG5); PG3 for the package rules.
 
@@ -339,7 +339,7 @@ Standard loop. Parity: the 40-booking seed gives identical KPI / table / calenda
 **Feature**
 - `/bookings/new` → Save booking calls `save_booking` (status Draft, toast, switch to edit mode); validation summary "n fields need attention" fed by server error codes as well as zod (zod stays for instant feedback; server is authoritative).
 - `/bookings/[id]/edit`: diff strip, updated totals, total-below-paid guard (rule 10) shown inline from the server code `below_paid`; archived package kept on edit (rule 13); crew replace; T&C ≤ 255.
-- Cancel booking: section visible only for saved Draft / Partially paid, hidden for Paid / unsaved / viewer; modal with optional reason ≤ 255; after: status Canceled, edit redirects to detail, KPIs and calendar respect US-12.
+- Cancel booking: section visible only for saved Draft / Partially paid, hidden for Paid / unsaved / crew; modal with optional reason ≤ 255; after: status Canceled, edit redirects to detail, KPIs and calendar respect US-12.
 - Optimistic concurrency: `updated_at` (or a `version` column) is sent with the save; a stale save returns `conflict` and the UI shows a reload notice (new copy → add to INTERACTIONS and Figma note before building).
 - Leave guard, `beforeunload` and live summary (< 50 ms) are unchanged: calculation stays client-side for preview, server re-validates (PRD §4.4).
 - **Done when:** INTERACTIONS 2.x and 4.11, lanes A1 → A2 → Save (Draft), B3, G, H pass on staging; PG3 green on rules 2, 9, 10, 12, 13.
@@ -394,7 +394,7 @@ Standard loop; ask for the Settings access details (D3/D4) at step 1 if they are
 - Generate once on confirm, upload to private bucket `invoices/`, store `pdf_path`, serve through a **10-minute signed URL** (PRD §4.3); if the file is missing, regenerate from the snapshot and verify the figures equal the stored hash.
 - Generation failure → dialog 37 with Try again / Cancel; the invoice is never rolled back (US-10).
 - Download from card (2.14, 4.6) and Download latest PDF (4.2).
-- **Done when:** lane A (DP, Full, E1), B4 → B6 and A5 / A5b pass on staging; PG4 for the bucket (a viewer can download, anon cannot; an expired URL fails); regenerating an old invoice gives identical figures; two parallel invoice creations yield one invoice.
+- **Done when:** lane A (DP, Full, E1), B4 → B6 and A5 / A5b pass on staging; PG4 for the bucket (a crew account can download, anon cannot; an expired URL fails); regenerating an old invoice gives identical figures; two parallel invoice creations yield one invoice.
 
 **Prompt**
 ```
@@ -414,12 +414,12 @@ Standard loop. G3-style compare for the PDF reuses the F15 `pdfjs-dist` + `pixel
 
 ---
 
-### P10 — Security hardening: RLS audit, viewer enforcement, PII, headers
+### P10 — Security hardening: RLS audit, crew enforcement, PII, headers
 
 **Feature**
-- RLS on every table, default deny. Expected matrix (anon / viewer / admin):
+- RLS on every table, default deny. Expected matrix (anon / crew / admin):
 
-| Table | anon | viewer | admin |
+| Table | anon | crew | admin |
 |---|---|---|---|
 | `packages`, `crew`, `bookings`, `booking_items`, `booking_crew`, `invoices`, `profiles` (own row) | none | select | select |
 | writes to `packages`, `bookings`, `booking_items`, `booking_crew` | none | none | via RPC / policy only |
@@ -427,7 +427,7 @@ Standard loop. G3-style compare for the PDF reuses the F15 `pdfjs-dist` + `pixel
 | `invoice_counters`, `workspace_settings` | none | none | none direct (RPC / service role only) |
 | Storage `invoices/` | none | signed URL read | signed URL read + server write |
 
-- Viewer role enforced **server-side in every RPC and Server Action** (not only hidden buttons, INTERACTIONS 6.4).
+- Crew role enforced **server-side in every RPC and Server Action** (not only hidden buttons, INTERACTIONS 6.4).
 - PII (PRD §4.4): phone numbers only for authenticated staff; never in file names, URLs, logs or Sentry breadcrumbs (scrubber); `wa.me` link built client-side from the phone already on screen.
 - Money re-validation: any client-sent amount is recomputed; mismatches return a typed error (PRD §4.4).
 - Headers: CSP (self + Supabase + Sentry), `frame-ancestors`, `Referrer-Policy`, `X-Content-Type-Options`; cookies `Secure`, `HttpOnly`, `SameSite=Lax`; Server Actions origin check; service-role key only in server env, grep-checked out of the client bundle.
@@ -437,7 +437,7 @@ Standard loop. G3-style compare for the PDF reuses the F15 `pdfjs-dist` + `pixel
 **Prompt**
 ```
 Slice P10 of context/PRODUCTION-PLAN.md. Read PRD §4.4 and the RLS matrix in §3 P10 of this file.
-Audit every migration and Server Action. Write npm run test:rls: for anon, viewer and admin JWTs, try
+Audit every migration and Server Action. Write npm run test:rls: for anon, crew and admin JWTs, try
 select/insert/update/delete on every table and call every RPC, and assert allow/deny per the matrix.
 Add server-side role checks to every write path, scrub phone numbers from logs and Sentry, set CSP and
 security headers (read the Next.js 16 headers docs in node_modules), add a CI step that fails if the
@@ -531,8 +531,8 @@ Standard loop; step 8 = break something on staging on purpose and watch the aler
 ### P14 — UAT, cut-over and launch
 
 **Feature**
-- UAT on staging with the real users (admin + the Owner as viewer): a script of the hi-fi lanes in plain language, a defects list with owner and severity, sign-off recorded in the slice log.
-- Production environment: secrets set, domain + TLS, auth redirect URLs, first admin and viewer accounts created by an admin path (no self-signup), seed **not** applied (D5) — or import done (P14b if D5 changed).
+- UAT on staging with the real users (admins, including the Owner, and a crew account): a script of the hi-fi lanes in plain language, a defects list with owner and severity, sign-off recorded in the slice log.
+- Production environment: secrets set, domain + TLS, auth redirect URLs, first admin and crew accounts created by an admin path (no self-signup), seed **not** applied (D5) — or import done (P14b if D5 changed).
 - Launch checklist: PG1–PG7 all green on the release commit; migrations applied in order; smoke on production (login → create booking → DP invoice → PDF → cancel a test booking, then clean up through an admin path that is logged); feature entry point enabled in the App launcher (Booking and Package Lib tiles).
 - Rollback plan rehearsed: previous deploy re-promoted; database changes are forward-only, so each migration has a documented compensating step.
 - Hypercare (first 2 weeks): daily check of errors and the reconciliation result; defects triaged; v1.1 backlog started from PRD §5.1 (void invoice, tablet / mobile, refunds, discounts / VAT, send by WhatsApp / email, CSV export).
@@ -570,7 +570,7 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 | P7 Booking write path | [P7](#p7--booking-write-path-new-edit-cancel) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ parity 102/65/68 · pgTAP 156 | ✅ write lanes 7/7 (local Supabase) | — | — | ☐ |
 | P8 Workspace Settings | [P8](#p8--workspace-settings-integration) | ✅ | ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 010 | ✅ business lane 5/5 (local Supabase) | — | — | ☐ |
 | P9 Invoices + PDF | [P9](#p9--invoices--pdf-create-snapshot-storage-signed-urls) | ✅ | ✅ security (none) · ✅ code (10 fixed) | ✅ (272) | ✅ pgTAP 174 | ✅ PDF lane 5/5 (local Supabase) | ✅ bucket private, 401/404 | — | ☐ |
-| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-viewer-enforcement-pii-headers) | ✅ | ✅ whole-branch security (none) | — | ✅ RLS matrix 129 cells | — | ✅ PG4 | — | ☐ |
+| P10 Security hardening | [P10](#p10--security-hardening-rls-audit-crew-enforcement-pii-headers) | ✅ | ✅ whole-branch security (none) | — | ✅ RLS matrix 129 cells | — | ✅ PG4 | — | ☐ |
 | P11 Performance | [P11](#p11--performance-10k-seed-indexes-caching-budgets) | ✅ | ☐ | — | ✅ parity 76 | — | — | ✅ DB budgets 8/8 (local, 10k) · ☐ LCP/INP, staging | ☐ |
 | P12 Full regression | [P12](#p12--full-regression-all-lanes-on-staging-a11y-visual-guard) | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ | ☐ |
 | P13 Operations | [P13](#p13--operations-monitoring-backups-reconciliation-runbook) | ☐ | ☐ | — | ☐ | — | — | — | ☐ |

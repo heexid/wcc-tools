@@ -69,7 +69,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | Booking detail | Read-only side sheet. Booking information follows the form's order (client, phone, date · start time, location, notes, package, crew, payment, created); empty event rows are hidden. Invoice cards, PDF downloads, and a crew schedule popover. | US-9 |
 | Invoice PDF | A4, built from the snapshot only. Header: **Bill to** (client, phone) and **Event** (booking name, date · start time, location and notes, each cut to 2 lines so the invoice stays on one page). The brand row (business name, logo, address, contact) always uses the current business information. | US-10 |
 | Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
-| Roles | `admin` can do everything. `viewer` (the Owner) is read-only, enforced in the UI and by RLS. | §4.3 |
+| Roles | `admin` can do everything. `crew` sees everything but is read-only, enforced in the UI and by RLS. Every account has a crew entry, so admins can assign themself and filter by themself. Accounts are managed with SQL. | §4.3 |
 
 **Out of scope for v1:** tablet-specific layouts, voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
 
@@ -157,7 +157,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | P7 | Booking write path (new, edit, cancel, stale-save notice) | ✅ | ✅ | pgTAP 156 · write lanes 7/7 | ☐ |
 | P8 | Workspace settings and business information | ✅ | ✅ | Business lane 5/5 | ☐ |
 | P9 | Invoices and PDF (server render, Storage, signed URLs) | ✅ | ✅ | pgTAP 174 · PDF lane 5/5 · private bucket ✅ | ☐ |
-| P10 | Security hardening (RLS audit, viewer, PII, headers) | ✅ | ✅ | RLS matrix 129 cells ✅ | ☐ |
+| P10 | Security hardening (RLS audit, crew, PII, headers) | ✅ | ✅ | RLS matrix 129 cells ✅ | ☐ |
 | P11 | Performance (10k seed, indexes, budgets) | ✅ | ☐ | DB budgets 8/8 ✅ · LCP/INP on staging ☐ | ☐ |
 | P12 | Full regression on staging, a11y, visual guard | ☐ | ☐ | ☐ | ☐ |
 | P13 | Operations: monitoring, backups, reconciliation, runbook | ☐ | ☐ | ☐ | ☐ |
@@ -174,11 +174,15 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
 | Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
 | Apply migration 013 (event details) to any database deployed before 2026-11-21 | Deploy | Run `supabase/migrations/20261121000013_booking_event_details.sql` (see `agents/DEPLOY.md`) |
+| Crew types: release (app first, then migration 014). **Every active viewer becomes an admin**: check the list first | Deploy | `agents/DEPLOY.md` → "Upgrade to crew types" |
+| Supabase e2e for crew types (needs a local database reset) | Crew types | Reset, then `npm run e2e:supabase` |
+| Figma 02b / 03b: add the "Name (You)" row | Crew types | Figma update and PNG re-export |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
 | P2 and P11 code review | P2, P11 | Running `code-review` |
 
 ### Decisions on record
 
+- **Crew types (2026-11-24):** accounts are `admin` or `crew`; `viewer` is removed and existing viewers, including the Owner, become admins. Crew see everything, read-only. No account screen: the developer uses SQL. Built on branch `crew-types`, not released yet.
 - **Bank details and default terms:** stored in this module's own `workspace_settings` table and changed in SQL for now. There's no edit screen in v1 (decided 2026-11-16).
 - **Sessions:** end at 00:00 WIB every day (decided 2026-11-16).
 - **Hosting:** Vercel, plus separate Supabase projects for staging and production.
@@ -198,6 +202,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (96 rows, 1.1–6.12) with its Figma frame |
 | [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F19, pixel gates G1–G4, motion rules, the prototype tracker |
 | [`context/PRODUCTION-PLAN.md`](context/PRODUCTION-PLAN.md) | Production slices P0–P14, gates PG1–PG7, the RLS matrix, the production tracker, a paste-ready prompt for each slice |
+| [`context/CREW-TYPE-PLAN.md`](context/CREW-TYPE-PLAN.md) | Crew types (admin, crew): decisions, migration 014, slices C1–C5, release steps |
 | [`agents/DEPLOY.md`](agents/DEPLOY.md) | Going live on Supabase and Vercel |
 | [`agents/FEATURES.md`](agents/FEATURES.md) | Plain-language guide to every feature |
 | `app/docs/slices/`, `production/docs/slices/` | Per-slice logs: what changed, decisions, test results |

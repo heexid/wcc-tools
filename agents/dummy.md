@@ -311,6 +311,12 @@ select count(*) as crew_left from public.crew;
 
 Expected: `crew_left = 0`.
 
+This also removes the crew entries linked to accounts, so admins can't assign themselves. Restore them (migration 014 or later):
+
+```sql
+select public.ensure_crew_entry(id) from public.profiles where active;
+```
+
 ---
 
 ## Notes

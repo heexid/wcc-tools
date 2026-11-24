@@ -12,7 +12,7 @@ The app has two modules, **Booking** and **Package Library**, plus a login page 
 |---|---|---|---|
 | 1 | [Login and sessions](#1-login-and-sessions) | `/login` | Everyone |
 | 2 | [App launcher](#2-app-launcher) | Global header (⋮⋮) | Everyone |
-| 3 | [Package Library](#3-package-library) | `/packages` | Admin edits, Viewer reads |
+| 3 | [Package Library](#3-package-library) | `/packages` | Admin edits, Crew reads |
 | 4 | [Create a booking](#4-create-a-booking) | `/bookings/new` | Admin |
 | 5 | [First invoice (DP or Full)](#5-first-invoice-dp-or-full) | New booking screen | Admin |
 | 6 | [Follow-up invoice (Partial or Paid)](#6-follow-up-invoice-partial-or-paid) | Edit booking screen | Admin |
@@ -26,7 +26,7 @@ The app has two modules, **Booking** and **Package Library**, plus a login page 
 | 14 | [Crew schedule](#14-crew-schedule) | Popover from crew chips | Everyone |
 | 15 | [Invoice PDF](#15-invoice-pdf) | Invoice cards and dialogs | Everyone |
 | 16 | [Account settings](#16-account-settings) | `/account` | Everyone (own profile) |
-| 17 | [Business information](#17-business-information) | `/account` | Admin edits, Viewer reads |
+| 17 | [Business information](#17-business-information) | `/account` | Admin edits, Crew reads |
 | 18 | [Roles and permissions](#18-roles-and-permissions) | Whole app | — |
 | 19 | [Leave guard (unsaved changes)](#19-leave-guard-unsaved-changes) | New and Edit booking | Admin |
 
@@ -64,7 +64,7 @@ Route: `/bookings/new`. One form holds everything about a booking.
 
 - **Required:** client name (2–80 characters), phone (Indonesian format, saved as `+62…`, 9–15 digits), package (exactly one), and booking date.
 - **Optional:** booking name. If left blank it becomes `{client name} · {package}`.
-- **Crew:** assign zero or more crew members from the workspace crew list. Selected crew appear as removable chips. The dropdown has search and applies instantly.
+- **Crew:** assign zero or more crew members from the workspace crew list. Selected crew appear as removable chips. The dropdown has search and applies instantly. You are listed first as "Name (You)", but not selected for you.
 - **Additional items:** add or remove rows. Each row has a name, a price (whole Rupiah, 0 or more), and a quantity (1–999). The subtotal for each row is shown live.
 - **Live summary card:** package price, items total, subtotal and total update on every keystroke.
 - **Terms & Conditions:** prefilled from the workspace default and editable per booking (up to 255 characters, with a counter). The server also checks this.
@@ -109,7 +109,7 @@ Route: `/bookings/[id]/edit`. Opened from the **Edit booking** button in the det
 
 - **Manual only.** Nothing cancels a booking automatically, and there is no delete.
 - Allowed from **Draft** or **Partially paid**. Not allowed from **Paid**.
-- Found in a **Cancel booking** section at the bottom of the booking form. It is hidden for unsaved bookings, Paid bookings and Viewers.
+- Found in a **Cancel booking** section at the bottom of the booking form. It is hidden for unsaved bookings, Paid bookings and crew.
 - The confirmation dialog warns that the step can't be undone and takes an **optional reason** (up to 255 characters). **Keep booking** is the default choice.
 - After cancelling:
   - Status becomes **Canceled**, and a toast shows the booking reference.
@@ -146,7 +146,7 @@ Route: `/bookings`, Table tab.
 - **Filters:**
   - **Date:** Today, This week, This month, Next 7 days, Last month, or a custom range. Applies to the Table.
   - **Status:** Draft, Partially paid, Paid, Canceled (choose several).
-  - **Crew:** choose several crew members. A booking matches if any of its crew is selected.
+  - **Crew:** choose several crew members. A booking matches if any of its crew is selected. You are listed first as "Name (You)".
   - **Package:** choose several packages.
 - Filters combine with AND, and choices within one filter combine with OR.
 - Active filters appear as removable chips, with **Reset all**.
@@ -207,14 +207,16 @@ Shown as a card on `/account`, titled **Business information**. It holds the det
 - **Logo:** PNG, JPG or WebP, up to 1 MB. Square works best. The app resizes it to 256 px or smaller. Without a logo, the PDF shows initials.
 - **Edit** opens a modal prefilled with the saved values. Save checks every field at once and keeps the modal open if anything is wrong.
 - Saving changes only this card and future PDFs. Existing invoice figures stay the same.
-- **Viewers** see the card but can't edit it.
+- **Crew** see the card but can't edit it.
 
 ## 18. Roles and permissions
 
 | Role | What they can do |
 |---|---|
-| **Admin** | Everything: packages, bookings, invoices, cancelling, business information. |
-| **Viewer** (the Owner) | Read-only. Can view bookings, calendar, table, detail panels, PDFs and Package Library. Editing controls are hidden. |
+| **Admin** (including the Owner) | Everything: packages, bookings, invoices, cancelling, business information. Can assign themself to bookings. |
+| **Crew** | Read-only. Can view bookings, calendar, table, detail panels, PDFs and Package Library. Editing controls are hidden. |
+
+Every account, admin or crew, has an entry in the crew list, so it can be assigned to bookings. Crew members without a login can be listed too. Accounts are created, changed and revoked by the developer with SQL (see [`DEPLOY.md`](DEPLOY.md)).
 
 Permissions are enforced in two places: the screens hide the controls, and the database (Row Level Security) blocks the writes.
 
