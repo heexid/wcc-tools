@@ -176,3 +176,29 @@ test.describe("KPIs + sticky tabs", () => {
     expect((await page.getByRole("tablist", { name: "View" }).boundingBox())!.y).toBe(56);
   });
 });
+
+test.describe("KPI info on touch", () => {
+  test.use({ hasTouch: true, isMobile: true });
+
+  test("tap shows the tooltip and keeps it, second tap or a tap elsewhere closes it", async ({ page }) => {
+    await page.goto("/bookings?tab=table");
+    await expect(cards(page).first()).toBeVisible();
+    const info = page.getByRole("button", { name: "About Bookings this month" });
+    const tip = page.getByRole("tooltip");
+    await info.tap();
+    await expect(tip).toHaveText("Bookings with a booking date this month");
+    await page.waitForTimeout(600); // stays after the finger lifts
+    await expect(tip).toBeVisible();
+    const box = (await tip.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(8);
+    expect(box.x + box.width).toBeLessThanOrEqual(382);
+    await info.tap();
+    await expect(tip).toHaveCount(0);
+    await info.tap();
+    await expect(tip).toBeVisible();
+    await page.getByRole("heading", { name: "Bookings", exact: true }).tap();
+    await expect(tip).toHaveCount(0);
+    await page.getByRole("button", { name: "About Collected this month" }).tap();
+    await expect(tip).toHaveText("Sum of invoices created this month");
+  });
+});
