@@ -68,8 +68,9 @@ async function invoicePdf(invoiceId: string): Promise<{ blob: Blob; name: string
  * email, files…) through the Web Share API. Where files can't be shared (desktop browsers, older WebViews) it falls back
  * to a normal download. Resolves "shared" | "downloaded" | "dismissed" (the person closed the share sheet).
  */
-export async function shareInvoicePdf(invoiceId: string, title: string): Promise<"shared" | "downloaded" | "dismissed"> {
+export async function shareInvoicePdf(invoiceId: string, title: string, onReady?: () => void): Promise<"shared" | "downloaded" | "dismissed"> {
   const { blob, name } = await invoicePdf(invoiceId);
+  onReady?.();
   const file = new File([blob], name, { type: "application/pdf" });
   if (typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] })) {
     try {

@@ -184,7 +184,7 @@ function BelowPaidTotals({ l }: { l: Ledger }) {
 /** Invoices (n) card (US-1 / US-2, Figma 03 / 05 / 05c): status badge; (0) → dashed empty state with Create invoice
  *  (disabled + tooltip until client name and phone are valid — INTERACTIONS 2.12); (n) → Invoice cards, newest first
  *  and highlighted (Latest), then a full-width Secondary "Create invoice" (hidden once Paid — PRD US-5). */
-function InvoicesSection({ saving, status, invoices, fresh, canInvoice, onCreate, onPdf, pdfBusyId }: {
+function InvoicesSection({ saving, status, invoices, fresh, canInvoice, onCreate, onPdf, isPdfBusy }: {
   /** The booking is being saved: no invoice can start meanwhile. */
   saving: boolean;
   status: BookingStatus;
@@ -194,8 +194,8 @@ function InvoicesSection({ saving, status, invoices, fresh, canInvoice, onCreate
   canInvoice: boolean;
   onCreate: () => void;
   onPdf: (inv: Invoice) => void;
-  /** Invoice whose PDF is generating (its button shows Loading). */
-  pdfBusyId: string | null;
+  /** The invoice's PDF is generating (its button shows Loading). */
+  isPdfBusy: (id: string) => boolean;
 }) {
   const button = (
     <Button icon="plus" disabled={!canInvoice || saving} onClick={onCreate} className={cn(!canInvoice && "pointer-events-none")}>
@@ -222,7 +222,7 @@ function InvoicesSection({ saving, status, invoices, fresh, canInvoice, onCreate
               amount={formatIDR(inv.amount)}
               meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
               latest={i === 0}
-              pdfBusy={pdfBusyId === inv.id}
+              pdfBusy={isPdfBusy(inv.id)}
               onPdf={() => onPdf(inv)}
             />
           ))}
@@ -786,7 +786,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
             fresh={fresh}
             canInvoice={canInvoice}
             onPdf={pdf.pick}
-            pdfBusyId={pdf.busyId}
+            isPdfBusy={pdf.isBusy}
             onCreate={async () => {
               if (!(await trigger())) {
                 setAttention(countErrors(form.formState.errors));

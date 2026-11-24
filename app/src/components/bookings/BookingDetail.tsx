@@ -119,7 +119,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
             </Button>
           )}
           {b.invoices.length > 0 && (
-            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
+            <Button variant="secondary" icon="download" loading={pdf.isBusy(b.invoices[0].id)} onClick={() => pdf.download(b.invoices[0])}>
               Download latest PDF
             </Button>
           )}
@@ -251,7 +251,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
                 amount={formatIDR(inv.amount)}
                 meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                 latest={i === 0}
-                pdfBusy={pdf.busyId === inv.id}
+                pdfBusy={pdf.isBusy(inv.id)}
                 onPdf={() => pdf.pick(inv)}
               />
             ))
@@ -284,7 +284,7 @@ export function BookingDetail({ id, mode, onClose, onOpenFull, onEdit, onOpenBoo
       {mobile && (b.invoices.length > 0 || (!canceled && !readOnly)) && (
         <ActionBar className="shrink-0">
           {b.invoices.length > 0 && (
-            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
+            <Button variant="secondary" icon="download" loading={pdf.isBusy(b.invoices[0].id)} onClick={() => pdf.download(b.invoices[0])}>
               Download PDF
             </Button>
           )}

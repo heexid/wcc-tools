@@ -68,3 +68,35 @@ test("canceled booking: PDFs still download from the read-only view (US-12, 4.11
   const d = await download(page, () => sheet(page).getByRole("button", { name: "Download latest PDF" }).click());
   expect(d.suggestedFilename()).toBe("INV-2026-0201_sari-wulandari.pdf");
 });
+
+test("downloads show one info toast each, stacked, and clear themselves", async ({ page }) => {
+  await page.goto("/bookings?booking=BK-2026-0142&latency=2000");
+  const first = sheet(page).getByRole("button", { name: "Download PDF (INV-2026-0187)" });
+  const second = sheet(page).getByRole("button", { name: "Download PDF (INV-2026-0201)" });
+  const downloads: string[] = [];
+  page.on("download", (d) => downloads.push(d.suggestedFilename()));
+  await first.click();
+  await second.click();
+  await expect(first).toBeDisabled();
+  await expect(second).toBeDisabled();
+  const a = page.getByRole("status").filter({ hasText: "Downloading invoice INV-2026-0187…" });
+  const b = page.getByRole("status").filter({ hasText: "Downloading invoice INV-2026-0201…" });
+  await expect(a).toBeVisible();
+  await expect(b).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("stacked.png") });
+  const [boxA, boxB] = [(await a.boundingBox())!, (await b.boundingBox())!];
+  expect(boxB.y).toBeGreaterThanOrEqual(boxA.y + boxA.height);
+  // Closing the sheet keeps the toasts of downloads still running.
+  await sheet(page).getByRole("button", { name: "Close" }).click();
+  await expect(b).toBeVisible();
+  await expect.poll(() => downloads.length, { timeout: 30_000 }).toBe(2);
+  await expect(a).toHaveCount(0);
+  await expect(b).toHaveCount(0);
+});
+
+test("a failed download removes its toast", async ({ page }) => {
+  await page.goto("/bookings?booking=BK-2026-0142&fail=generatePdf");
+  await sheet(page).getByRole("button", { name: "Download PDF (INV-2026-0201)" }).click();
+  await expect(page.getByRole("alertdialog")).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Downloading invoice" })).toHaveCount(0);
+});

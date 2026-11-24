@@ -61,7 +61,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
         backLabel="Back to bookings"
         actions={
           n > 0 && (
-            <Button variant="secondary" icon="download" loading={pdf.busyId === b.invoices[0].id} onClick={() => pdf.download(b.invoices[0])}>
+            <Button variant="secondary" icon="download" loading={pdf.isBusy(b.invoices[0].id)} onClick={() => pdf.download(b.invoices[0])}>
               Download latest PDF
             </Button>
           )
@@ -185,7 +185,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
                   amount={formatIDR(inv.amount)}
                   meta={`Paid after this invoice: ${formatIDR(inv.snapshot.paidAfter)} of ${formatIDR(inv.snapshot.total)}`}
                   latest={i === 0}
-                  pdfBusy={pdf.busyId === inv.id}
+                  pdfBusy={pdf.isBusy(inv.id)}
                   onPdf={() => pdf.pick(inv)}
                 />
               ))

@@ -5,8 +5,10 @@ import { createContext, useContext, useEffect, useId, useState, useSyncExternalS
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
+import { ToastSlot, ToastStack } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
 import { Txt } from "@/components/ds/Txt";
+import { PdfToasts } from "@/components/pdf/PdfToasts";
 import { getProfile, hasSession, logout, peekProfile } from "@/lib/data/repo";
 import { PROFILE_CHANGED } from "@/lib/data/shared";
 import { nextStudioMidnight } from "@/lib/session-day";
@@ -242,6 +244,7 @@ export function EditorActions({ children }: { children: ReactNode }) {
  *  breadcrumb is just `page`, and without `module` no App launcher tile is current. */
 export function AppShell({ module, page, standalone, editor, children }: { module?: ModuleId; page?: string; standalone?: boolean; editor?: boolean; children: ReactNode }) {
   const [slot, setSlot] = useState<HTMLDivElement | null>(null);
+  const [toastSlot, setToastSlot] = useState<HTMLDivElement | null>(null);
   const [crumb, setCrumb] = useState<string | null>(null);
   const ok = useSessionGate();
   if (!ok) return <div className="min-h-screen bg-surface-header" aria-busy="true" />;
@@ -250,6 +253,7 @@ export function AppShell({ module, page, standalone, editor, children }: { modul
       <div className="flex min-h-screen flex-col bg-surface-header">
         <Header module={module} page={crumb ?? page} standalone={standalone} editor={editor} onSlot={setSlot} />
         <CrumbSetter.Provider value={setCrumb}>
+          <ToastSlot.Provider value={toastSlot}>
           <EditorSlot.Provider value={slot}>
             {standalone ? (
               // Standalone screen (Account settings, Figma AC2): no module workspace — the page sits on surface/subtle.
@@ -258,7 +262,12 @@ export function AppShell({ module, page, standalone, editor, children }: { modul
               <div className="motion-page flex flex-1 flex-col rounded-t-card border border-border-default bg-surface-default max-tablet:border-0">{children}</div>
             )}
           </EditorSlot.Provider>
+          </ToastSlot.Provider>
         </CrumbSetter.Provider>
+        <ToastStack>
+          <div ref={setToastSlot} className="contents" />
+          <PdfToasts />
+        </ToastStack>
       </div>
     </LeaveGuardProvider>
   );

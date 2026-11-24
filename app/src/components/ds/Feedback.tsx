@@ -1,4 +1,7 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { createContext, useContext, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import type { Presence } from "./usePresence";
 import { Icon, type IconName } from "./Icon";
 import { Txt } from "./Txt";
@@ -71,24 +74,34 @@ export function Toast({
       {...presence}
       className={cn(
         presence && "motion-toast",
-        "inline-flex items-center gap-control rounded-card border py-control pr-base pl-control text-text-inverse shadow-floating",
+        "inline-flex max-w-[calc(100vw-var(--spacing-layout-gutter)*2)] items-center gap-control rounded-card border py-control pr-base pl-control text-text-inverse shadow-floating",
         t.surface,
         className,
       )}
     >
       <Icon name={t.icon} className="size-icon-md" />
-      <Txt className="text-body-strong">{children}</Txt>
+      <Txt className="text-body-strong max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{children}</Txt>
     </div>
   );
 }
 
+/** The shell's toast stack: page toasts join it, so they stack with the PDF download toasts instead of overlapping. */
+export const ToastSlot = createContext<HTMLElement | null>(null);
+
 /** Where toasts live: top-centre, base (16) below the global header — or 32 from the top on screens without one
  *  (`at="page"`: Login, Figma LO2 / O3). Enter/exit through the top edge (motion.css). */
 export function ToastRegion({ children, at = "header" }: { children: ReactNode; at?: "header" | "page" }) {
+  const slot = useContext(ToastSlot);
+  if (slot && at === "header") return createPortal(children, slot);
+  return <ToastStack at={at}>{children}</ToastStack>;
+}
+
+/** The fixed stack itself (gap compact). */
+export function ToastStack({ children, at = "header" }: { children: ReactNode; at?: "header" | "page" }) {
   return (
     <div
       className={cn(
-        "pointer-events-none fixed inset-x-0 z-50 flex justify-center",
+        "pointer-events-none fixed inset-x-0 z-50 flex flex-col items-center gap-compact",
         at === "header" ? "top-[calc(var(--spacing-layout-header-height)+var(--spacing-base))]" : "top-section",
       )}
     >
