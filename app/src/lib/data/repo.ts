@@ -72,9 +72,11 @@ export async function login(email: string, password: string) {
 }
 export async function logout() {
   invalidateAll();
-  try {
-    localStorage.removeItem(SESSION);
-  } catch {}
+  return call(null, () => {
+    try {
+      localStorage.removeItem(SESSION);
+    } catch {}
+  });
 }
 export function hasSession(): boolean {
   try {

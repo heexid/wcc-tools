@@ -129,15 +129,17 @@ export function MobileTopBar({
 }
 
 /** Log out confirmation on mobile (Figma MS3): sheet "Log out?" · body Text/Body secondary · Cancel / Log out (44, equal). */
-export function MobileLogoutSheet({ open, onCancel, onConfirm }: { open: boolean; onCancel: () => void; onConfirm: () => void }) {
+export function MobileLogoutSheet({ open, busy, onCancel, onConfirm }: { open: boolean; busy: boolean; onCancel: () => void; onConfirm: () => void }) {
   return (
-    <BottomSheet open={open} onClose={onCancel} title="Log out?" role="alertdialog" initialFocus="[data-cancel]">
+    <BottomSheet open={open} locked={busy} onClose={onCancel} title="Log out?" role="alertdialog" initialFocus="[data-cancel]">
       <p className="text-body text-text-secondary">You’ll need to log in again to use Booking and Package Library.</p>
       <div className="flex gap-compact pt-8 *:flex-1">
-        <Button variant="secondary" data-cancel onClick={onCancel}>
+        <Button variant="secondary" data-cancel disabled={busy} onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={onConfirm}>Log out</Button>
+        <Button loading={busy} onClick={onConfirm}>
+          {busy ? "Logging out…" : "Log out"}
+        </Button>
       </div>
     </BottomSheet>
   );
