@@ -51,9 +51,18 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
   const [loggingOut, setLoggingOut] = useState(false);
   const mobile = useIsMobile();
   const roleLabel = profile && profile.role !== "admin" ? "Crew" : "Admin";
+  // Busy from the click until Login replaces this page: the dialog stays locked, so a second click can't run it again.
+  const [logoutBusy, setLogoutBusy] = useState(false);
   const confirmLogout = async () => {
-    await logout();
-    router.push("/login?loggedOut=1");
+    if (logoutBusy) return;
+    setLogoutBusy(true);
+    try {
+      await logout();
+      router.push("/login?loggedOut=1");
+    } catch (e) {
+      console.error("Log out failed", e);
+      setLogoutBusy(false);
+    }
   };
   // 6.10: an unsaved booking asks first (leave guard), then "Log out?" (LO1 desktop / MS3 mobile).
   const askLogout = () => confirmLeave("/login?loggedOut=1", () => setLoggingOut(true));
@@ -123,9 +132,9 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
         onLogout={askLogout}
       />
       {mobile ? (
-        <MobileLogoutSheet open={loggingOut} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
+        <MobileLogoutSheet open={loggingOut} busy={logoutBusy} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
       ) : (
-        <LogoutDialog open={loggingOut} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
+        <LogoutDialog open={loggingOut} busy={logoutBusy} onCancel={() => setLoggingOut(false)} onConfirm={confirmLogout} />
       )}
     </>
   );
@@ -181,10 +190,10 @@ export const PROFILE_EVENT = PROFILE_CHANGED;
 /** Log out confirmation (Figma LO1, INTERACTIONS 6.10): 440 wide, 260 from the top; 40 danger circle with log-out ·
  *  "Log out?" Heading/Section · body Text/Body secondary; footer (surface/subtle, top border) Cancel · Log out.
  *  Cancel / Esc / scrim keep the session. */
-function LogoutDialog({ open, onCancel, onConfirm }: { open: boolean; onCancel: () => void; onConfirm: () => void }) {
+function LogoutDialog({ open, busy, onCancel, onConfirm }: { open: boolean; busy: boolean; onCancel: () => void; onConfirm: () => void }) {
   const titleId = useId();
   return (
-    <Dialog open={open} onClose={onCancel} role="alertdialog" labelledBy={titleId} top="guard" width="w-[calc(var(--spacing-64)*7-var(--spacing-8))]" initialFocus="[data-cancel]">
+    <Dialog open={open} locked={busy} onClose={onCancel} role="alertdialog" labelledBy={titleId} top="guard" width="w-[calc(var(--spacing-64)*7-var(--spacing-8))]" initialFocus="[data-cancel]">
       <div className="flex gap-base p-group">
         <span className="flex size-[calc(var(--spacing-32)+var(--spacing-8))] shrink-0 items-center justify-center rounded-pill bg-surface-danger text-status-danger">
           <Icon name="log-out" className="size-icon-md" />
@@ -197,10 +206,12 @@ function LogoutDialog({ open, onCancel, onConfirm }: { open: boolean; onCancel: 
         </div>
       </div>
       <footer className="flex justify-end gap-compact border-t border-border-default bg-surface-subtle px-group py-base">
-        <Button variant="secondary" data-cancel onClick={onCancel}>
+        <Button variant="secondary" data-cancel disabled={busy} onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={onConfirm}>Log out</Button>
+        <Button loading={busy} onClick={onConfirm}>
+          {busy ? "Logging out…" : "Log out"}
+        </Button>
       </footer>
     </Dialog>
   );
