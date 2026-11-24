@@ -20,6 +20,7 @@
     "db:seed": "tsx scripts/gen-seed-sql.ts",
     "db:test": "tsx scripts/db-test.ts",
     "test:parity": "vitest run tests/unit/parity.test.ts && tsx scripts/parity-db.ts && tsx scripts/parity-reads.ts",
+    "test:migrate-014": "tsx scripts/db-migrate-014.ts",
     "e2e:supabase": "playwright test -c playwright.supabase.config.ts",
     "test:rls": "tsx scripts/db-test.ts 013_rls_matrix",
     "perf": "tsx scripts/perf.ts"

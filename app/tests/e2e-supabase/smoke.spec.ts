@@ -7,7 +7,7 @@ test.beforeAll(() => resetDb());
 // P3 done-check (PRODUCTION-PLAN §3 P3): /bookings, /packages, /bookings/new end-to-end on local Supabase with
 // the seed — read and write — with the UI unchanged (same selectors and copy as the mock-source suites).
 const ADMIN = { email: "bs-moment@email.com", password: "bsmoment26" };
-const VIEWER = { email: "owner@bs-moment.test", password: "ownerview26" };
+const VIEWER = { email: "crew@bs-moment.test", password: "crewview26" };
 
 // The seed is built around Figma's "today" (Tue 10 Nov 2026). The app computes today in the browser, so freeze
 // the browser clock (Playwright) — the server and database keep the real clock, as in staging.

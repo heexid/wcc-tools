@@ -98,7 +98,7 @@ select plan(8);
 
 select is((select count(*)::int from public.packages), ${db.packages.length}, 'seed: packages');
 select is((select count(*)::int from public.packages where is_active), ${db.packages.filter((p) => p.isActive).length}, 'seed: active packages');
-select is((select count(*)::int from public.crew), ${db.crew.length}, 'seed: crew');
+select is((select count(*)::int from public.crew where user_id is null), ${db.crew.length}, 'seed: crew');
 select is((select count(*)::int from public.bookings), ${db.bookings.length}, 'seed: bookings');
 select is((select count(*)::int from public.invoices), ${db.invoices.length}, 'seed: invoices');
 

@@ -64,7 +64,7 @@ select throws_ok(
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000f1'); -- no app role → no trigger profile (005)
 select throws_ok($$ insert into public.profiles (id, display_name) values ('00000000-0000-0000-0000-0000000000f1', 'A') $$, '23514', null, 'display name < 2 rejected');
 select throws_ok($$ insert into public.profiles (id, display_name) values ('00000000-0000-0000-0000-0000000000f1', repeat('a', 51)) $$, '23514', null, 'display name > 50 rejected');
-select throws_ok($$ insert into public.profiles (id, display_name, role) values ('00000000-0000-0000-0000-0000000000f1', 'Owner', 'owner') $$, '23514', null, 'role must be admin | viewer');
+select throws_ok($$ insert into public.profiles (id, display_name, role) values ('00000000-0000-0000-0000-0000000000f1', 'Owner', 'owner') $$, '23514', null, 'role must be admin | crew');
 
 select * from finish();
 rollback;

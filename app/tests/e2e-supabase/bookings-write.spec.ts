@@ -130,7 +130,7 @@ test("P7 · two people edit one booking: the second save is refused with the rel
 });
 
 test("viewer · /edit opens the read-only page (6.4)", async ({ page }) => {
-  await signIn(page, "owner@bs-moment.test", "ownerview26");
+  await signIn(page, "crew@bs-moment.test", "crewview26");
   await page.goto("/bookings/BK-2026-0142/edit");
   await expect(page).toHaveURL(/\/bookings\/[^/?]+$/);
   await expect(page.getByRole("button", { name: "Save changes" })).toHaveCount(0);

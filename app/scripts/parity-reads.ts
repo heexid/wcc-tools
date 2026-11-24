@@ -104,7 +104,7 @@ async function main() {
   const pg = await bootDb({ quiet: true });
   // Reads run as a signed-in staff member, under RLS.
   await pg.exec(`insert into auth.users (id) values ('00000000-0000-4000-8000-0000000000e1');
-                 insert into public.profiles (id, display_name, role) values ('00000000-0000-4000-8000-0000000000e1', 'Reader', 'viewer') on conflict (id) do nothing;
+                 insert into public.profiles (id, display_name, role) values ('00000000-0000-4000-8000-0000000000e1', 'Reader', 'crew') on conflict (id) do nothing;
                  set role authenticated; select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000e1"}', false);`);
   let pass = 0;
   const fails: string[] = [];

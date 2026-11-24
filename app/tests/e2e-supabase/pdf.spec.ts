@@ -86,7 +86,7 @@ test("who: a viewer can download; no session → 401; a signed URL stops working
   const anon = await request.get("/api/invoices/INV-2026-0187/pdf", { maxRedirects: 0 });
   expect(anon.status()).toBe(401);
 
-  await signIn(page, "owner@bs-moment.test", "ownerview26");
+  await signIn(page, "crew@bs-moment.test", "crewview26");
   const viewer = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
   expect(viewer.text).toContain("INV-2026-0187");
 

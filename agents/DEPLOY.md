@@ -13,7 +13,7 @@ About 15 minutes, all in the browser. Do Supabase first, then Vercel.
    ```sql
    update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}' where email = 'you@example.com';
    ```
-   For a read-only account (e.g. the Owner), add the user the same way and use `'{"role":"viewer"}'`.
+   For a read-only crew account, add the user the same way and use `'{"role":"crew"}'`.
 6. **Add your crew** (there is no crew screen yet), one line per person:
    ```sql
    insert into public.crew (name, role) values ('Raka Pratama', 'Lead photographer'), ('Dinda Ayu', 'Videographer');

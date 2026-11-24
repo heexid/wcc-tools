@@ -94,8 +94,8 @@ test("save fails (network) → inline message, nothing saved; Try again saves", 
 test("viewer sees the card but no Edit; Storage refuses a viewer's upload", async ({ page, context }) => {
   await context.clearCookies();
   await page.goto("/login?next=/account");
-  await page.getByLabel("Email").fill("owner@bs-moment.test");
-  await page.getByLabel("Password", { exact: true }).fill("ownerview26");
+  await page.getByLabel("Email").fill("crew@bs-moment.test");
+  await page.getByLabel("Password", { exact: true }).fill("crewview26");
   await page.getByRole("button", { name: "Login" }).click();
   await expect(card(page)).toBeVisible();
   await expect(card(page).getByRole("button", { name: "Edit" })).toHaveCount(0);
