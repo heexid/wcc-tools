@@ -68,8 +68,8 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | Dashboard | KPIs, Calendar (month / week / day), Table (sort, pagination), search, filters (status, crew, package, date), Upcoming rail, "Needs attention" cards. | US-6–US-8 |
 | Booking detail | Read-only side sheet. Booking information follows the form's order (client, phone, date · start time, location, notes, package, crew, payment, created); empty event rows are hidden. Invoice cards, PDF downloads, and a crew schedule popover. | US-9 |
 | Invoice PDF | A4, built from the snapshot only. Header: **Bill to** (client, phone) and **Event** (booking name, date · start time, location and notes, each cut to 2 lines so the invoice stays on one page). The brand row (business name, logo, address, contact) always uses the current business information. | US-10 |
-| Account | Change name, change password (signs out your other sessions), log out, and edit business information (admin only). | US-13, US-14 |
-| Roles | `admin` can do everything. `crew` sees everything but is read-only, enforced in the UI and by RLS. Every account has a crew entry, so admins can assign themself and filter by themself. Accounts are managed with SQL. | §4.3 |
+| Account | Change name, change password (signs out your other sessions), log out (the button shows "Logging out…" until Login opens), and edit business information (admin only). | US-13, US-14 |
+| Roles | `admin` can do everything. `crew` sees everything but is read-only, enforced in the UI and by RLS. Every account has a crew entry, so admins can assign themself and filter by themself ("Name (You)", listed first). Accounts are managed with SQL. | §4.3 |
 
 **Out of scope for v1:** tablet-specific layouts, voiding an invoice, refunds, VAT and discounts, sending by WhatsApp or email, payment gateway, client portal, due dates for remaining balances.
 
@@ -77,7 +77,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 
 ## Progress tracker
 
-*Last updated on 2026-11-23 from `context/`, the slice logs and git (`main` at `9a0214c`).*
+*Last updated on 2026-11-24 from `context/`, the slice logs and git (`main` at `92b3302`).*
 
 ### Overall
 
@@ -85,6 +85,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 |---|---|
 | Design (Figma `bs internal tools`) | ✅ All screens, interaction states and hi-fi flows done. 96 of 96 interactions defined. |
 | Prototype F0–F19 | ✅ All built. ⚠ Open: Figma PNG re-export, a11y contrast tokens, 2 ARIA fixes. |
+| Crew types and log out loading | ✅ Live 2026-11-24 ([plan and log](context/CREW-TYPE-PLAN.md)), Figma updated. |
 | Mobile layouts R01–R09 | ✅ Designed in Figma, built and live on `main` (PR #6, then fixes and the mobile type scale). |
 | Production P0–P11 | ✅ Built and tested on **local** Supabase. CI on GitHub (branch `production/p0-p10`). |
 | Production P12–P14 | ☐ Not started: full regression on staging, operations, UAT and launch. |
@@ -173,16 +174,16 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
 | Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
-| Apply migration 013 (event details) to any database deployed before 2026-11-21 | Deploy | Run `supabase/migrations/20261121000013_booking_event_details.sql` (see `agents/DEPLOY.md`) |
-| Crew types: release (app first, then migration 014). **Every active viewer becomes an admin**: check the list first | Deploy | `agents/DEPLOY.md` → "Upgrade to crew types" |
-| Supabase e2e for crew types (needs a local database reset) | Crew types | Reset, then `npm run e2e:supabase` |
-| Figma 02b / 03b: add the "Name (You)" row | Crew types | Figma update and PNG re-export |
+| **No backups on the live database** (checked 2026-11-24: none listed). One manual dump was taken before migration 014; it has not been test-restored | P13 | A Supabase plan with backups, or scheduled dumps |
+| Re-export the Figma PNGs for 02b / 03b, and add LO1b / MS3b to the visual gates | Crew types, log out | `npm run figma:receiver` (only when asked) |
+| Failing before crew types too: 14 a11y checks (contrast), `mobile-ms3` screenshot, booking detail overflow at 320 px, and the Supabase e2e "calendar loads only the visible range" (asks for one week, not the month) | P12 | Investigation |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
 | P2 and P11 code review | P2, P11 | Running `code-review` |
 
 ### Decisions on record
 
-- **Crew types (2026-11-24):** accounts are `admin` or `crew`; `viewer` is removed and existing viewers, including the Owner, become admins. Crew see everything, read-only. No account screen: the developer uses SQL. Built on branch `crew-types`, not released yet.
+- **Crew types (2026-11-24):** accounts are `admin` or `crew`; `viewer` is removed and existing viewers, including the Owner, become admins. Crew see everything, read-only. No account screen: the developer uses SQL. **Live since 2026-11-24** (app `493d2da`, migration 014; the live database had no viewers, so nobody was promoted).
+- **Log out (2026-11-24):** after confirming, the button is disabled with a spinner and "Logging out…", and the dialog is locked until Login opens (`92b3302`).
 - **Bank details and default terms:** stored in this module's own `workspace_settings` table and changed in SQL for now. There's no edit screen in v1 (decided 2026-11-16).
 - **Sessions:** end at 00:00 WIB every day (decided 2026-11-16).
 - **Hosting:** Vercel, plus separate Supabase projects for staging and production.

@@ -219,7 +219,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
   - A live rules checklist under New password: at least 8 characters; contains a letter and a number; different from the current password.
   - Errors appear inline: "Current password is incorrect.", unmet rules stay grey with ×, and "Passwords don't match."
   - On success: you stay logged in on this device, **other sessions are logged out**, the toast "Password updated · other devices were logged out" shows, and the row reads "Last changed today".
-- **Log out:** **Log out** in the account menu opens a centred confirmation, "Log out? You'll need to log in again to use Booking and Package Library.", with **Cancel** and **Log out**. Confirming ends the session and opens Login with the toast "You've logged out".
+- **Log out:** **Log out** in the account menu opens a centred confirmation, "Log out? You'll need to log in again to use Booking and Package Library.", with **Cancel** and **Log out**. Confirming starts the log out at once: the button is disabled and shows a spinner with "Logging out…", Cancel is disabled, and the dialog can't be closed until Login opens; if it fails, the button works again (2026-11-24). It ends the session and opens Login with the toast "You've logged out".
   - If a New or Edit booking has unsaved changes, the leave guard (screen 12 / lane G) shows first.
   - Cancel and Esc close the dialog, and you stay logged in.
 

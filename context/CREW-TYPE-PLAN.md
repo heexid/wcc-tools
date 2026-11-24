@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | 2026-11-24: C1–C4 built on branch `crew-types`. Open: Supabase e2e (needs a local reset), Figma 02b / 03b, C5 release. |
+| **Status** | **Live since 2026-11-24.** C1–C5 done; live hand checks and open items are in §10. |
 | **Goal** | Two account types: **admin** (full access, assignable to bookings) and **crew** (read-only). |
 | **Companions** | `PRD.md` US-1, US-7, §4.2–4.4 · `INTERACTIONS.md` 1.7, 2.9, 6.4 · `PRODUCTION-PLAN.md` P4, P10 |
 
@@ -171,3 +171,23 @@ C1 and C2 can run in parallel. C3 needs both.
 | Office-only admins clutter the crew list | Accepted (decision 5) |
 | `crew.role` (job title) confused with `profiles.role` (account type) | UI text uses "type" for accounts; no schema rename |
 | Crew can see client phones and money | Accepted (decision 3) |
+
+## 10. Release log (2026-11-24)
+
+| Step | Result |
+|---|---|
+| App | `main` `493d2da`, Vercel deployed before the migration; CI passed |
+| Backup | Manual dump (Supabase listed no backups). Kept outside the repo; not test-restored |
+| Accounts before | One active admin, no viewers, so nobody was promoted |
+| Migration 014 | Run as one transaction. Bookings, invoices and crew assignments identical before and after (row hashes) |
+| Crew logins | Two, linked to their existing crew entries by `crew_id`; no duplicates |
+| Follow-up | Log out loading state, `92b3302` |
+
+**Tests:** pgTAP 15 files, parity 69 + 76, unit 301, upgrade test 6/6 (`npm run test:migrate-014`). Supabase e2e ran on a separate temporary stack (the suite resets its database): 42 of 43 existing tests pass, and the one failure also fails on the code before this work; the 2 new crew-type tests pass.
+
+**Figma:** the DS `Crew dropdown` has the "bs.moment (You)" row first and a 320-high scrolling list, so 02b and 03b follow. New frames: LO1b and MS3b (log out in progress). Landing page LP-D / T / M say "Crew".
+
+**Open**
+- Hand checks on the live site: admin self-assign and filter; crew login read-only with a PDF download.
+- No automatic database backups.
+- Figma PNG re-export for 02b and 03b.

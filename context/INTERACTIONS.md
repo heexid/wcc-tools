@@ -1,12 +1,12 @@
 # Interaction spec — Booking & Package Library
 
-Companion to `context/PRD.md` (stories + rules), `context/PLAN.md` (architecture, DS mapping, Figma deliverables) and `context/PROTOTYPE-PLAN.md` (build slices F0–F17; every row below is assigned to a slice there). Last synced 2026-11-11.
+Companion to `context/PRD.md` (stories + rules), `context/PLAN.md` (architecture, DS mapping, Figma deliverables) and `context/PROTOTYPE-PLAN.md` (build slices F0–F17; every row below is assigned to a slice there). Last synced 2026-11-24 (crew types, log out).
 
 Audited and completed 2026-11-10 against Figma `bs internal tools`:
 - **Bookings page**: *Booking · Screens* (01–11), *Booking · Interaction states* (12–40) and *Booking · Hi-fi flow* (lanes A–H).
 - **Package Lib page**: screens 01–08 and the hi-fi flow (lanes A–D).
 - **Login page**: P1–P3 and errors E1–E7.
-- **Launchpad & Profile page**: *Launchpad · Hi-fi flow* (module switching), *Profile · Screens* (AC1–AC10, LO1–LO2) and *Profile · Hi-fi flow* (lanes A–E: account menu, change name, change password, log out, business information).
+- **Launchpad & Profile page**: *Launchpad · Hi-fi flow* (module switching), *Profile · Screens* (AC1–AC10, LO1–LO2, LO1b) and *Profile · Hi-fi flow* (lanes A–E: account menu, change name, change password, log out, business information).
 
 **Status legend**
 - ✅ **Designed**: a screen, state or flow step exists in Figma.
@@ -26,7 +26,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 1.4 | **Search** | Filters by booking / client / ref / phone (≥ 3 digits) after 250 ms debounce (`q=` in the URL). × clears at once. Applies to Calendar and Table | ✅ | 02, Flow B1 |
 | 1.5 | **No results** | Empty state "No bookings match your search and filters", with **Reset filters** and **New booking** | ✅ | **18** |
 | 1.6 | Filter **Status** (multi) | Same dropdown pattern as Crew: checkbox list Draft / Partially paid / Paid / Canceled, with "n selected", Clear (empties the draft) / Apply. Trigger: "All status" · the one status · "n status". `status=` | ✅ | Reuses `Crew dropdown` (02b) |
-| 1.7 | Filter **Crew** (multi) | Search (name or role), check, Clear / Apply. The signed-in person is first, as "Name (You)" (2026-11-24; Figma 02b not updated yet) → trigger "n crew", chip "Crew: …". Esc / outside click discard the draft and return focus to the trigger. `crew=` | ✅ | 02b |
+| 1.7 | Filter **Crew** (multi) | Search (name or role), check, Clear / Apply. The signed-in person is first, as "Name (You)" (2026-11-24) → trigger "n crew", chip "Crew: …". Esc / outside click discard the draft and return focus to the trigger. `crew=` | ✅ | 02b |
 | 1.8 | Filter **Package** (multi) | Same pattern as Status (Package has search). `package=`. *(The Invoice type filter was removed 2026-11-11 — it didn't help; an old `type=` link is ignored.)* | ✅ | Reuses `Crew dropdown` |
 | 1.9 | Filter **Date** (Table only) | Presets (Today, This week, This month, Next 7 days, Last month, Custom range) + two-month range calendar (two clicks pick a custom range), Clear / Apply. `range=` (`custom&from=&to=`); chip "Nov 2026" for month presets | ✅ | **16** |
 | 1.10 | Filter chip **×** / **Reset all** | Removes one filter / all filters (search too). Row: "n filters ·" + chips (date · status · package · invoice · crew) + Reset all + "Showing n of N bookings" (Table). New chips fade in (125 ms) | ✅ | 02 |
@@ -68,7 +68,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 2.6 | **Manage library** button (Package section header, top right; ghost button, 32 high) | Opens the Package module (Package Library, `/packages`) in a new tab; the form is kept. Used on every editable booking form. Not on the read-only Canceled page (H5) | ✅ | Section header `Show action` on all 40 editable-form frames: Screens 03, 03b, 04, 04c, 05, 05c, 07, 08, 09 · Hi-fi flow A2–A4b, B3–B6, E1, E3, G1–G2, H2–H3, I1–I2e · Interaction states 12–15, 22–23, 32–34, 38–40 · dropdown footer link in **13** unchanged |
 | 2.7 | **Booking date** | Month picker: today ringed, selected filled, Today shortcut. Past dates allowed with a warning | ✅ | **14** |
 | 2.8 | **Add item** / fields / **remove** | Adds a row (focus in its name; the row fades in); price takes digits only with a thousands mask (Rp 1.500.000); qty 1–999; subtotal and summary live; trash removes it (no confirm) | ✅ | PRD US-1 · 03 |
-| 2.9 | **Crew** select / chip × | Dropdown (opens above the box) with search by name or role, instant apply; the signed-in person is first, as "Name (You)", not preselected (2026-11-24; Figma 03b not updated yet); chip × removes; helper "3 crew assigned" | ✅ | 03b |
+| 2.9 | **Crew** select / chip × | Dropdown (opens above the box) with search by name or role, instant apply; the signed-in person is first, as "Name (You)", not preselected (2026-11-24); chip × removes; helper "3 crew assigned" | ✅ | 03b |
 | 2.10 | **Terms & Conditions** | Prefilled with the workspace default (174/255); counter, typing stops at 255, a longer paste is kept and shows "Max 255 characters" at once | ✅ | DS `Text area` |
 | 2.11 | **Create invoice** | Opens the invoice modal (form incomplete → field errors + "n fields need attention", no modal) | ✅ | Flow A2 → A3 / A3b, B3 → B4 |
 | 2.12 | Create invoice while the form is invalid | Disabled + tooltip "Complete client name and phone first" | ✅ | **15** |
@@ -140,7 +140,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 6.7 | **Account Setting** → Account settings page | Profile (name, email, role) + Security (password) | ✅ | **AC2** · flow A |
 | 6.8 | **Edit name** → modal → Save | 2–50 chars; error "Enter 2–50 characters."; toast "Name updated", header updates | ✅ | **AC3**, **AC3b**, **AC4** · flow B |
 | 6.9 | **Change password** → modal → Update | Current / new / confirm, live rules; errors inline; others logged out; toast | ✅ | **AC5**, **AC6**, **AC7** · flow C |
-| 6.10 | **Log out** → centred confirm → Login | Cancel / Esc stays. On confirm the button is disabled and shows a spinner with "Logging out…", and the dialog can't be closed until Login opens (2026-11-24). Unsaved booking → leave guard first (wired; not reachable today — New / Edit booking use the Editor header without the account menu); toast "You’ve logged out" (top-centre, 32 from the top on Login) | ✅ | **LO1**, **LO2** · flow D |
+| 6.10 | **Log out** → centred confirm → Login | Cancel / Esc stays. On confirm the button is disabled and shows a spinner with "Logging out…", and the dialog can't be closed until Login opens (2026-11-24). Unsaved booking → leave guard first (wired; not reachable today — New / Edit booking use the Editor header without the account menu); toast "You’ve logged out" (top-centre, 32 from the top on Login) | ✅ | **LO1**, **LO1b** (in progress), **LO2** · flow D · mobile **MS3**, **MS3b** |
 | 6.11 | **Edit** (Business information card) → modal | Admin only (crew: no button). Modal opens **prefilled**: logo upload (Upload / Replace + Remove), Business name, Address (text area, ≤ 150), Email, Phone number. Cancel / Esc / × discard the draft | ✅ | **AC8**, **AC9** · flow E |
 | 6.12 | **Save changes** (Business information) | Validates all fields at once: "Enter 2–60 characters." · "Enter the business address." · "Enter a valid email address." · "Enter a valid phone number." · logo "Use a PNG, JPG or WebP image." / "Logo must be 1 MB or smaller."; errors stay inline and clear as fixed. Success → close + toast "Business information updated"; the next invoice PDF's Brand row (logo/initials, name, address, phone · email) and From block show it. Failure → "Couldn't save…" inline | ✅ | **AC9b**, **AC10** · flow E · PDF 11 / 11b / 11c |
 

@@ -526,7 +526,7 @@ Standard loop. G3 for PDFs uses a PDF → PNG render (e.g. `pdf-to-img`) at the 
 - `/account` (AC2, 6.7): Profile card (name + Edit name, email locked, role tag locked) and Security card (password masked, "Last changed {date}").
 - Change name (AC3, AC3b, AC4, 6.8): 2–50 chars trimmed, "Enter 2–50 characters.", toast "Name updated", header + menu update.
 - Change password (AC5, AC6, AC7, 6.9): show/hide, live rules checklist, inline errors, toast "Password updated · other devices were logged out", "Last changed today".
-- Log out (LO1, LO2, 6.10): confirm dialog → leave guard first if a form is dirty → `/login?loggedOut=1` toast.
+- Log out (LO1, LO1b, LO2, 6.10; loading state added 2026-11-24): confirm dialog → leave guard first if a form is dirty → `/login?loggedOut=1` toast.
 - **Done when:** AC2–AC7, LO1, LO2 pass G1–G4; Profile lanes A–D run.
 
 **Prompt**
@@ -620,6 +620,16 @@ The prototype is the reference where it moved past Figma; Figma was updated to m
 | Module entrance cascade, press feedback on chips / crew chips | motion only (`motion.css`, F17) | none — not a static design property |
 
 Expected effect on the pixel gates: the ~20 dialog frames that failed G3 on placement and the Login frames that failed on the background pass after the Figma PNGs are re-exported (`npm run figma:receiver`). Not yet re-exported.
+
+### 4.2 Design sync · 2026-11-24
+
+| Area | App | Figma change |
+|---|---|---|
+| Crew picker and filter | Signed-in person first as "Name (You)", no second line without a job title; list 320 high, scrolls | DS `Crew dropdown` (feeds 02b, 03b) |
+| Log out in progress | Disabled Cancel, loading "Logging out…", locked | New LO1b (desktop) and MS3b (mobile) |
+| Landing | "Crew" replaces "Viewer" | LP-D / LP-T / LP-M trust card |
+
+PNGs not re-exported. Other Figma pages that mention viewers (References, Ideas Multiple Workspace) are left as they are.
 
 ## 5. Coverage check (sync with the other docs)
 

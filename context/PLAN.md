@@ -42,7 +42,7 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
    - `FOR UPDATE` on the booking, recompute the server-side total, validate per type and against remaining, `next_invoice_number(year)`, build the snapshot JSON + sha256, insert the invoice linked to `booking_id`. Returns the invoice + new booking status.
 4. RPC `cancel_booking(booking_id, reason?)`: `FOR UPDATE`, allowed only when status ∈ {draft, partially_paid}; sets `canceled_at/by/cancel_reason` (≤ 255) and status `canceled`. `save_booking` and `create_invoice` reject canceled bookings; `save_booking` rejects a newly picked archived package.
 5. RPC `save_booking(payload)`: upsert the booking + replace items + replace `booking_crew` rows in one transaction (new bookings start as `draft`, no invoice). Rejects `total < total_paid`. Returns the booking with its derived fields.
-6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `crew`.
+6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `crew`. Every active account has one linked `crew` row (`crew.user_id`, migration 014, trigger `profiles_sync_crew`).
 7. Seed: 8 packages (6 active, 2 archived — as in Figma Package Lib), 6 crew and 40 bookings across Oct–Dec covering every status, including Canceled. *(Built in prototype slice F2 from the Figma data: `app/src/lib/data/seed.ts`.)*
 
 ## 3. Domain logic (Day 3) — `lib/booking/calc.ts` (pure, 100% unit-tested) *(done in prototype slice F2)*
@@ -86,7 +86,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - `/account` page (server component) reading the signed-in user plus their `profiles` row (`display_name`, role from the workspace membership).
 - Change name: `profiles.display_name` update (2–50 characters, trimmed), validated with zod and a DB check. Bookings store `created_by` as an id, so the name resolves at read time; snapshots on invoices keep the old name.
 - Change password: re-verify the current password, then update the password through Supabase Auth and sign out other sessions (scope "others"). Use the same rules client-side (checklist) and server-side.
-- Log out: `<AccountMenu>` → `<ConfirmDialog>` → sign out → redirect to `/login?loggedOut=1` (toast). Goes through `useLeaveGuard` first.
+- Log out: `<AccountMenu>` → `<ConfirmDialog>` → sign out → redirect to `/login?loggedOut=1` (toast). While it runs, the dialog / sheet is `locked`, Cancel is disabled and the button is `loading` ("Logging out…"). Goes through `useLeaveGuard` first.
 
 ## 8c. Business information (Day 11)
 - `/account` gets a third `<Card>` "Business information" (read-only rows + admin-only **Edit**), data from `getBusiness()`; crew role hides the button.
@@ -140,7 +140,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - **Launchpad** page → section **Launchpad · Hi-fi flow** (module switching with the App launcher):
   - A: Booking → Package Library: L1 Bookings → clicks ⋮⋮ → L2 launcher open (Booking current, hover Package Lib) → *Unsaved New / Edit booking?* → No → L3 Package Library → End. Yes → leave guard (Bookings lane G). Esc / × / outside click → closes and stays.
   - B: Package Library → Booking: M1 Package Library → ⋮⋮ → M2 launcher (Package Lib current, hover Booking) → M3 Bookings (last view + filters restored) → End. Clicking the current tile only closes the launcher.
-- **Launchpad & Profile** page → *Profile · Screens*: AC1 Account menu open · AC2 Account settings · AC3 Change name · AC3b Name error · AC4 Name updated · AC5 Change password · AC6 Password errors · AC7 Password updated · LO1 Log out confirm · LO2 Login after logout · **AC8 Business information (full page) · AC9 Edit business information · AC9b Validation errors + logo error · AC10 Business information updated**. AC1–AC7 and LO1 show the third card peeking below Security. *Profile · Hi-fi flow* lanes:
+- **Launchpad & Profile** page → *Profile · Screens*: AC1 Account menu open · AC2 Account settings · AC3 Change name · AC3b Name error · AC4 Name updated · AC5 Change password · AC6 Password errors · AC7 Password updated · LO1 Log out confirm · LO1b Log out in progress · LO2 Login after logout · **AC8 Business information (full page) · AC9 Edit business information · AC9b Validation errors + logo error · AC10 Business information updated**. AC1–AC7 and LO1 show the third card peeking below Security. *Profile · Hi-fi flow* lanes:
   - A: profile → account menu → Account settings.
   - B: change name (*2–50 characters?* loop).
   - C: change password (*current correct, rules met, match?* loop).

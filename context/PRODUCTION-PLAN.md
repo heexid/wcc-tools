@@ -587,7 +587,7 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 | PG5 E2E real | ☐ | |
 | PG6 Visual regression | ☐ | |
 | PG7 Performance | ☐ | |
-| Backups restored once | ☐ | |
+| Backups restored once | ☐ | 2026-11-24: the live project lists no backups; one manual dump exists, never restored |
 | Reconciliation caught a planted error | ☐ | |
 | UAT signed off | ☐ | |
 
@@ -599,6 +599,7 @@ Gates per row: **Build** · **Review** (code-review / security-review) · **Unit
 | F17: 53 inherited G3 failures; Figma PNGs need re-export after the 2026-11-14 design sync | PROTOTYPE-PLAN §4, §4.1 | P12 |
 | F17: contrast tokens + 2 ARIA fixes open; contrast needs a design decision | PROTOTYPE-PLAN §4 F17 | P12 |
 | F17: G2 column unchecked (`☐`) | PROTOTYPE-PLAN §4 F17 | P12 |
+| Supabase e2e "calendar loads only the visible range" fails (found 2026-11-24, also on `392860d`): one week is requested instead of the month | crew types run | P12 |
 | Tablet / mobile layouts and void-invoice dialog not designed | PRD §5.1 v1.1 | out of scope |
 
 ## 5. Coverage check (sync with the other docs)
