@@ -1,13 +1,13 @@
--- P10 · PG4 RLS matrix (PRODUCTION-PLAN §3 P10): anon / viewer / admin × every table × select / insert / update /
+-- P10 · PG4 RLS matrix (PRODUCTION-PLAN §3 P10): anon / crew / admin × every table × select / insert / update /
 -- delete, plus every API function. Each cell runs in its own subtransaction and records 'ok', the SQLSTATE, or
 -- 'rows=N' for selects; the whole matrix is compared to the expected table at once, so a failure shows every
--- wrong cell. Roles: anon = no JWT; viewer / admin = provisioned staff signed in today.
+-- wrong cell. Roles: anon = no JWT; crew / admin = provisioned staff signed in today.
 begin;
 select plan(3);
 
 insert into auth.users (id, email, raw_app_meta_data) values
   ('00000000-0000-4000-8000-0000000000a5', 'rls-admin@bs-moment.test', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-0000000000a6', 'rls-viewer@bs-moment.test', '{"role":"viewer"}');
+  ('00000000-0000-4000-8000-0000000000a6', 'rls-crew@bs-moment.test', '{"role":"crew"}');
 
 create temp table got (who text, obj text, op text, result text);
 grant all on got to anon, authenticated;
@@ -52,7 +52,7 @@ declare
   bk text := (select id::text from public.bookings where ref = 'BK-2026-0144');
   pk text := (select package_id::text from public.bookings where ref = 'BK-2026-0144'); -- read as the owner, up front
 begin
-  foreach who in array array['anon', 'viewer', 'admin'] loop
+  foreach who in array array['anon', 'crew', 'admin'] loop
     perform pg_temp.as_role(who);
     foreach t in array tables loop
       -- profiles: only (id, display_name, role) are granted (column-level), so read exactly those.
@@ -89,23 +89,23 @@ select w.who, t.t, o.op,
     when o.op = 'select' then 'rows'
     else '42501' -- no direct writes for anyone through the API
   end
-from (values ('anon'), ('viewer'), ('admin')) w(who),
+from (values ('anon'), ('crew'), ('admin')) w(who),
      unnest(array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings']) t(t),
      (values ('select'), ('update'), ('delete')) o(op)
 union all
-select w.who, 'profiles', 'select_private', '42501' from (values ('anon'), ('viewer'), ('admin')) w(who) -- private column: only via my_profile()
+select w.who, 'profiles', 'select_private', '42501' from (values ('anon'), ('crew'), ('admin')) w(who) -- private column: only via my_profile()
 union all
-select w.who, x.obj, 'insert', '42501' from (values ('anon'), ('viewer'), ('admin')) w(who), (values ('packages'), ('invoices')) x(obj)
+select w.who, x.obj, 'insert', '42501' from (values ('anon'), ('crew'), ('admin')) w(who), (values ('packages'), ('invoices')) x(obj)
 union all
 select w.who, r.obj, r.op,
   case
     when w.who = 'anon' then '42501'                                          -- not granted to anon at all
     when r.obj in ('next_invoice_number', 'save_booking_tx') then '42501'      -- internal, never callable
     when r.op = 'select' then 'rows'                                          -- staff reads
-    when w.who = 'viewer' then 'P0001'                                        -- 'forbidden' from require_admin()
+    when w.who = 'crew' then 'P0001'                                        -- 'forbidden' from require_admin()
     else 'ok'                                                                 -- admin writes through RPCs
   end
-from (values ('anon'), ('viewer'), ('admin')) w(who),
+from (values ('anon'), ('crew'), ('admin')) w(who),
      (values ('save_booking', 'rpc'), ('create_invoice', 'rpc'), ('cancel_booking', 'rpc'), ('save_package', 'rpc'), ('update_business', 'rpc'),
              ('list_bookings', 'select'), ('get_settings', 'select'), ('my_profile', 'select'), ('next_invoice_number', 'rpc'), ('save_booking_tx', 'rpc')) r(obj, op);
 

@@ -12,6 +12,8 @@ import { cn } from "@/components/ds/cn";
 import { CrewChip } from "@/components/ds/Editor";
 import { DATE_PRESETS, rangeChip, rangeLabel, toQuery, type BookingFilters, type DatePreset } from "@/lib/booking/filters";
 import { listBookings } from "@/lib/data/repo";
+import { crewOptions } from "@/lib/booking/crew";
+import { useMyId } from "@/lib/role";
 import type { Crew, Package } from "@/lib/data/types";
 import { initials, type ISODate } from "@/lib/format";
 
@@ -41,6 +43,7 @@ export function MobileFiltersSheet({
   packages: Package[];
   view: "calendar" | "table";
 }) {
+  const myId = useMyId();
   const [draft, setDraft] = useState<Draft>(() => pick(filters));
   const [picker, setPicker] = useState<"date" | "crew" | "pkg" | null>(null);
   const [count, setCount] = useState<number | null>(null);
@@ -120,7 +123,7 @@ export function MobileFiltersSheet({
         title="Crew"
         multiple
         search="Search crew by name or role"
-        options={crew.filter((c) => c.isActive || draft.crew.includes(c.id)).map((c) => ({ value: c.id, label: c.name, sub: c.role, avatar: initials(c.name) }))}
+        options={crewOptions(crew, draft.crew, myId).map((c) => ({ value: c.id, label: c.label, sub: c.role, avatar: initials(c.name) }))}
         selected={draft.crew}
         onPick={(v) => setDraft((d) => ({ ...d, crew: d.crew.includes(v) ? d.crew.filter((x) => x !== v) : [...d.crew, v] }))}
       />

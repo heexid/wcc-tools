@@ -128,7 +128,7 @@ function ScheduleBody({
             <span className="flex min-w-0 flex-1 flex-col">
               {/* Mobile: long names end in "…" and the role / count line wraps — nothing runs past the sheet edge. */}
               <Txt className="text-body-strong text-text-primary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:truncate">{s.crew.name}</Txt>
-              <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:whitespace-normal">{`${s.crew.role} · ${s.monthCount} ${s.monthCount === 1 ? "booking" : "bookings"} in ${month}`}</Txt>
+              <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:min-w-0 max-tablet:max-w-full max-tablet:shrink max-tablet:whitespace-normal">{`${s.crew.role ? `${s.crew.role} · ` : ""}${s.monthCount} ${s.monthCount === 1 ? "booking" : "bookings"} in ${month}`}</Txt>
             </span>
           </div>
           <div className="flex shrink-0 items-center px-compact pt-tight pb-2">

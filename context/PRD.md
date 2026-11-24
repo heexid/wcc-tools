@@ -75,7 +75,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
   - **Location** and **Notes**: text areas, **max 255 characters** each, with live counters. Both are printed on invoices (US-10). Validated server-side too.
 - The **Payment instruction** card is the first item of the *Others* section, above Terms & Conditions (moved from *Package*, 2026-11-21).
 - **Terms & Conditions** (section *Others*): a multi-line text area, **max 255 characters**, with a live counter (`174/255`). It's prefilled from the workspace default terms and can be edited per booking. Typing stops at 255, and pasted text over the limit shows the Error state ("Max 255 characters"). Validated server-side too.
-- **Crew** (section *Crew*): a multi-select of the crew handling the booking. A booking can have **0…n crew**. Selected crew show as removable chips (avatar + name). The dropdown lists active crew with avatar, name and role, has a search, and applies instantly (no footer). The source is the workspace crew list (members flagged as crew, with a role).
+- **Crew** (section *Crew*): a multi-select of the crew handling the booking. A booking can have **0…n crew**. Selected crew show as removable chips (avatar + name). The dropdown lists active crew with avatar, name and role, has a search, and applies instantly (no footer). The source is the workspace crew list: people without a login, plus one linked entry per account (admins and crew), so an admin can assign themself. The signed-in person is listed first as **"Name (You)"** and is never preselected; chips show the plain name. `crew.role` is the job title, not the account type; an empty title is hidden.
 - Additional items: add or remove rows dynamically. Each row has name (required), price (integer ≥ 0) and qty (integer 1–999). Subtotal = price × qty, shown live.
 - The summary card updates on every keystroke (< 50 ms): package price, additional items total, subtotal, **total**. With no package picked the form keeps the package card slot ("No package selected") and the summary reads "Package (not selected) · —".
 - `created_at` is stored automatically. The booking date shows in the calendar right after save.
@@ -159,7 +159,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - Filters: date preset (Today / This week / This month / Next 7 days / Last month / Custom range), status (Draft / Partially paid / Paid / Canceled, multi), **crew (multi-select)**, and package (multi) (as designed in Figma 02 / 26). No invoice-type filter (removed 2026-11-11).
 - Filters combine with AND, values within one filter combine with OR, and the state lives in the URL query (shareable). The same filters apply to both Calendar and Table.
 - Active filters show as removable chips, plus a "Reset all" link, and the Table shows "Showing n of N bookings". The date filter applies to the Table; the Calendar navigates by its own dates.
-- **Crew filter:** a dropdown with search, checkbox + avatar + name + role per crew member, a "n selected" count and Clear / Apply. The trigger shows `All crew` or `n crew`. A booking matches if **any** of its crew is selected (OR within the filter, AND with the other filters). The active chip reads e.g. "Crew: Raka Pratama, Dinda Ayu".
+- **Crew filter:** a dropdown with search, checkbox + avatar + name + role per crew member, a "n selected" count and Clear / Apply. The trigger shows `All crew` or `n crew`. A booking matches if **any** of its crew is selected (OR within the filter, AND with the other filters). The signed-in person is listed first as "Name (You)". The active chip reads e.g. "Crew: Raka Pratama, Dinda Ayu".
 
 #### US-9 Booking detail
 *As an admin, I want one place for everything about a booking.*
@@ -191,7 +191,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-12 Cancel a booking
 *As an admin, I want to cancel a booking when the client calls it off so that it stops counting as active work but stays on record.*
 - **Manual only.** Allowed from **Draft** or **Partially paid**; never from **Paid**. Nothing cancels a booking automatically. There's no delete.
-- **Where:** a **Cancel booking** section at the end of the booking form (Edit booking, or New booking once **Save booking** has created it). It has a short explanation and a **Warning button** "Cancel booking" (DS `Warning button`). The section is hidden for unsaved new bookings, for Paid bookings and for viewers.
+- **Where:** a **Cancel booking** section at the end of the booking form (Edit booking, or New booking once **Save booking** has created it). It has a short explanation and a **Warning button** "Cancel booking" (DS `Warning button`). The section is hidden for unsaved new bookings, for Paid bookings and for crew.
 - **Modal** "Cancel this booking?" (BK ref · name):
   - A Warning alert, "This can't be undone": the booking becomes read-only, no edits, no new invoices. Existing invoices (count and amount paid) stay on record, and refunds are handled outside the app.
   - **Reason (optional):** a text area, max 255 characters, with a counter.
@@ -225,7 +225,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 
 #### US-14 Business information
 *As an admin, I want to keep my business's name, logo and contact details in one place so that every invoice PDF carries the right brand.*
-- **Where:** a third card on **Account settings** (`/account`), under Security: **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only rows: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials."), **Business name**, **Address**, **Email**, **Phone**. **Viewers** see the card without the Edit button.
+- **Where:** a third card on **Account settings** (`/account`), under Security: **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only rows: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials."), **Business name**, **Address**, **Email**, **Phone**. **Crew** see the card without the Edit button.
 - **Prefilled:** the card and the modal always start from the saved values (seed: a sample business name, address, finance email and phone, no logo). The business can never be empty: every field except the logo is required.
 - **Edit modal** "Business information" (DS Modal, 640 wide, same chrome as *Payment instruction*), opened prefilled:
   - **Business logo** — upload field: 56 px preview + **Upload logo** (or **Replace logo** + ghost **Remove** when one is set) and the helper "PNG, JPG or WebP · up to 1 MB · square works best." Anything else shows the inline error "Use a PNG, JPG or WebP image." or "Logo must be 1 MB or smaller." and keeps the previous logo. The prototype re-encodes the file to ≤ 256 px.
@@ -340,9 +340,9 @@ workspace_settings(workspace_id uuid pk, business_name text not null check (char
          default_terms text, default_payment jsonb, updated_by uuid, updated_at timestamptz)
 
 profiles(id uuid pk fk → auth.users, display_name text not null check (char_length(display_name) between 2 and 50),
-         role text check (role in ('admin','viewer')), password_changed_at timestamptz)
+         role text check (role in ('admin','crew')), password_changed_at timestamptz)
 
-crew(id uuid pk, user_id uuid null fk, name text not null, role text, is_active bool default true)
+crew(id uuid pk, user_id uuid null unique fk, name text not null, role text, is_active bool default true)
 
 booking_crew(booking_id uuid fk, crew_id uuid fk, primary key (booking_id, crew_id))   -- 0..n crew per booking
 
@@ -373,7 +373,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 ### 4.3 Integration points
 
 - **Login → Forgot password:** there's no self-service reset. The **Forgot password?** link under the password field shows an Info alert in the login card: "Forgot your password? Passwords are managed by your workspace admin. Ask them to reset it, then log in with the new password." (Login screen E7).
-- **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `viewer` (read-only, for the Owner). Enforced by RLS.
+- **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `crew` (read-only: sees everything, changes nothing). Enforced by RLS. The old `viewer` role was removed on 2026-11-24; migration 014 turns active viewers, including the Owner, into admins. The developer creates, changes and revokes accounts with SQL (`agents/DEPLOY.md`); see `CREW-TYPE-PLAN.md`.
 - **Sessions end at 00:00 WIB every day** (decided 2026-11-16). A session that signed in before today's midnight is refused by the server and the database; an open tab signs out at 00:00. Both show Login **E4** ("Your session expired"), email prefilled. Only accounts an admin provisioned with a role are staff (P4).
 - **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Account settings (US-14) and stored in `workspace_settings`.
 - **Storage:** bucket `invoices/` (private) with signed URLs that expire after 10 min.

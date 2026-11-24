@@ -548,7 +548,7 @@ Standard loop. E2E: Profile lanes A–D, D with a dirty booking form.
 ### F17 — Viewer role, loading states, full-flow regression
 
 **Feature**
-- `viewer` role (6.4): hide New booking, Edit booking, Create invoice, Archive, New package, Cancel booking section.
+- `viewer` role (6.4; renamed `crew` on 2026-11-24, see `CREW-TYPE-PLAN.md`): hide New booking, Edit booking, Create invoice, Archive, New package, Cancel booking section.
 - Loading (6.3): skeleton rows (table), skeleton date cells (calendar), Loader in the detail panel; filters stay interactive.
 - Full regression: every frame in the Figma deliverables list re-run through G1–G4; every hi-fi lane (Bookings A–H, Package A–D, Launchpad A–B, Profile A–E) as one Playwright suite; a11y check (keyboard, focus, `role`s, badge text + icon, WCAG 2.2 AA contrast); reduced-motion pass.
 - Motion consistency pass: one more `find-animation-opportunities` over the whole app to catch gaps between slices, then `animate` for accepted items.

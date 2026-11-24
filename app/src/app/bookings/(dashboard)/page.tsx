@@ -29,7 +29,7 @@ import { useCachedQuery } from "@/lib/data/useCachedQuery";
 import { calendarQuery, dashboardKeys, kpiMonth, weekQuery } from "@/lib/data/dashboard-reads";
 import type { Crew } from "@/lib/data/types";
 import { isoToLocalDate, type ISODate } from "@/lib/format";
-import { useIsViewer } from "@/lib/role";
+import { useIsReadOnly } from "@/lib/role";
 import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { MobileBookings } from "@/components/bookings/mobile/MobileBookings";
 
@@ -58,7 +58,7 @@ function useDashboardData(today: ISODate, mobile: boolean) {
 }
 
 function FirstUse({ onNew, className }: { onNew: () => void; className?: string }) {
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   return (
     <section aria-label="Bookings" className={cn("flex flex-col overflow-hidden rounded-card border border-border-default bg-surface-default", className)}>
       <BookingTableHeader />
@@ -69,9 +69,9 @@ function FirstUse({ onNew, className }: { onNew: () => void; className?: string 
           <Txt>No bookings yet</Txt>
         </h2>
         <p className="flex text-caption text-text-secondary">
-          <Txt>{viewer ? "Bookings created by your team appear on the calendar and in this table." : "Create your first booking. It appears on the calendar and in this table right away."}</Txt>
+          <Txt>{readOnly ? "Bookings created by your team appear on the calendar and in this table." : "Create your first booking. It appears on the calendar and in this table right away."}</Txt>
         </p>
-        {!viewer && (
+        {!readOnly && (
           <Button icon="plus" onClick={onNew}>
             New booking
           </Button>
@@ -86,7 +86,7 @@ function Dashboard() {
   const router = useRouter();
   const path = usePathname();
   const { navigate } = useLeaveGuard();
-  const viewer = useIsViewer();
+  const readOnly = useIsReadOnly();
   // Below 768 the page is the mobile view (R04, Figma M01–M03); it runs its own list / agenda queries.
   const mobile = useIsMobile();
   // Fixed for the visit, so every read (and the calendar's first window) agrees on the day.
@@ -188,7 +188,7 @@ function Dashboard() {
           </h1>
           <span className="flex-1" />
           {/* No Package library button here (removed 2026-11-11) — Packages is reached from the app launcher. */}
-          {!viewer && (
+          {!readOnly && (
             <Button icon="plus" onClick={() => navigate("/bookings/new")}>
               New booking
             </Button>

@@ -50,7 +50,7 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
   }, []);
   const [loggingOut, setLoggingOut] = useState(false);
   const mobile = useIsMobile();
-  const roleLabel = profile?.role === "viewer" ? "Viewer" : "Admin";
+  const roleLabel = profile && profile.role !== "admin" ? "Crew" : "Admin";
   const confirmLogout = async () => {
     await logout();
     router.push("/login?loggedOut=1");

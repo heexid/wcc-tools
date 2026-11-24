@@ -432,11 +432,11 @@ function Trust() {
               visual={
                 <>
                   <Member initials="AD" role="Admin" />
-                  <Member initials="VW" role="Viewer" />
+                  <Member initials="CR" role="Crew" />
                 </>
               }
               title="Built for your team"
-              body="Admins edit, and Viewers see bookings and invoices read only"
+              body="Admins edit, and crew see bookings and invoices read only"
             />
           </ul>
         </div>

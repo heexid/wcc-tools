@@ -42,7 +42,7 @@ Design source of truth: Figma `bs internal tools` (CIR · Design System; screens
    - `FOR UPDATE` on the booking, recompute the server-side total, validate per type and against remaining, `next_invoice_number(year)`, build the snapshot JSON + sha256, insert the invoice linked to `booking_id`. Returns the invoice + new booking status.
 4. RPC `cancel_booking(booking_id, reason?)`: `FOR UPDATE`, allowed only when status ∈ {draft, partially_paid}; sets `canceled_at/by/cancel_reason` (≤ 255) and status `canceled`. `save_booking` and `create_invoice` reject canceled bookings; `save_booking` rejects a newly picked archived package.
 5. RPC `save_booking(payload)`: upsert the booking + replace items + replace `booking_crew` rows in one transaction (new bookings start as `draft`, no invoice). Rejects `total < total_paid`. Returns the booking with its derived fields.
-6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `viewer`.
+6. `profiles` table (PRD §4.2) for display name, role and password-changed date. RLS policies for `admin` and `crew`.
 7. Seed: 8 packages (6 active, 2 archived — as in Figma Package Lib), 6 crew and 40 bookings across Oct–Dec covering every status, including Canceled. *(Built in prototype slice F2 from the Figma data: `app/src/lib/data/seed.ts`.)*
 
 ## 3. Domain logic (Day 3) — `lib/booking/calc.ts` (pure, 100% unit-tested) *(done in prototype slice F2)*
@@ -89,10 +89,10 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - Log out: `<AccountMenu>` → `<ConfirmDialog>` → sign out → redirect to `/login?loggedOut=1` (toast). Goes through `useLeaveGuard` first.
 
 ## 8c. Business information (Day 11)
-- `/account` gets a third `<Card>` "Business information" (read-only rows + admin-only **Edit**), data from `getBusiness()`; viewer role hides the button.
+- `/account` gets a third `<Card>` "Business information" (read-only rows + admin-only **Edit**), data from `getBusiness()`; crew role hides the button.
 - `<BusinessModal>` (DS Modal, like `<PaymentInstructionModal>`): `<LogoField>` (hidden `<input type=file accept="image/png,image/jpeg,image/webp">`, ≤ 1 MB, re-encoded to ≤ 256 px on a canvas), name, address (`<TextArea>` max 150), email, phone. Validation lives in `lib/booking/business.ts` (`validateBusiness`, shared with the service layer); `updateBusiness()` = Supabase update on `workspace_settings` (admin only, RLS) + logo upload to Storage `branding/`.
 - Saving never touches invoices. `downloadInvoicePdf()` merges `getBusiness()` into the snapshot before rendering (PRD US-14).
-- Tests: unit `business.test.ts` (validation), e2e `F18-business.spec.ts` (prefill, validation, logo, save → PDF, failure, viewer).
+- Tests: unit `business.test.ts` (validation), e2e `F18-business.spec.ts` (prefill, validation, logo, save → PDF, failure, crew).
 
 ## 9. QA & launch (Day 11–12)
 - Unit: calc (≥ 30 cases). Integration: RPC concurrency (2 parallel `create_invoice` calls → one fails). E2E (Playwright): every hi-fi flow lane (Bookings A–H, Package Lib A–D, Launchpad A–B, Profile A–E).

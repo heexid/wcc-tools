@@ -91,20 +91,20 @@ test("save fails (network) → inline message, nothing saved; Try again saves", 
   expect(sql("select business_name from workspace_settings")).toBe("Studio Lain");
 });
 
-test("viewer sees the card but no Edit; Storage refuses a viewer's upload", async ({ page, context }) => {
+test("crew sees the card but no Edit; Storage refuses a crew's upload", async ({ page, context }) => {
   await context.clearCookies();
   await page.goto("/login?next=/account");
-  await page.getByLabel("Email").fill("owner@bs-moment.test");
-  await page.getByLabel("Password", { exact: true }).fill("ownerview26");
+  await page.getByLabel("Email").fill("crew@bs-moment.test");
+  await page.getByLabel("Password", { exact: true }).fill("crewview26");
   await page.getByRole("button", { name: "Login" }).click();
   await expect(card(page)).toBeVisible();
   await expect(card(page).getByRole("button", { name: "Edit" })).toHaveCount(0);
   const status = await page.evaluate(async ([url, key, cookieName]) => {
     const raw = document.cookie.split("; ").filter((c) => c.startsWith(cookieName)).map((c) => decodeURIComponent(c.split("=").slice(1).join("="))).join("");
     const session = JSON.parse(atob(raw.replace(/^base64-/, "").replace(/-/g, "+").replace(/_/g, "/")));
-    const r = await fetch(`${url}/storage/v1/object/branding/logo/viewer.png`, { method: "POST", headers: { apikey: key, authorization: `Bearer ${session.access_token}`, "content-type": "image/png" }, body: new Uint8Array([0x89, 0x50, 0x4e, 0x47]) });
+    const r = await fetch(`${url}/storage/v1/object/branding/logo/crew.png`, { method: "POST", headers: { apikey: key, authorization: `Bearer ${session.access_token}`, "content-type": "image/png" }, body: new Uint8Array([0x89, 0x50, 0x4e, 0x47]) });
     return r.status;
   }, [process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, authCookieName(process.env.NEXT_PUBLIC_SUPABASE_URL!)]);
   expect(status).toBeGreaterThanOrEqual(400);
-  expect(sql("select count(*) from storage.objects where name = 'logo/viewer.png'")).toBe("0");
+  expect(sql("select count(*) from storage.objects where name = 'logo/crew.png'")).toBe("0");
 });

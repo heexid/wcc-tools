@@ -3,11 +3,11 @@
 begin;
 select plan(30);
 
--- Fixtures: an admin and a viewer, one package, as the table owner.
+-- Fixtures: an admin and a crew, one package, as the table owner.
 insert into auth.users (id) values ('00000000-0000-4000-8000-0000000000a1'), ('00000000-0000-4000-8000-0000000000a2');
 insert into public.profiles (id, display_name, role) values
   ('00000000-0000-4000-8000-0000000000a1', 'Test Admin', 'admin'),
-  ('00000000-0000-4000-8000-0000000000a2', 'Test Viewer', 'viewer')
+  ('00000000-0000-4000-8000-0000000000a2', 'Test Crew', 'crew')
 on conflict (id) do update set display_name = excluded.display_name, role = excluded.role;
 insert into public.packages (id, name, price, summary) values ('00000000-0000-4000-8000-00000000a001', 'RPC Package', 4000000, '4-hour test');
 
@@ -28,13 +28,13 @@ select ok(not has_function_privilege('authenticated', 'public.save_booking_tx(js
 select ok(not has_function_privilege('authenticated', 'public.create_invoice_tx(uuid, text, text, numeric, numeric)', 'execute'), 'internal create_invoice_tx is not callable');
 select ok(not has_function_privilege('authenticated', 'public.invoice_amount(bigint, bigint, int, boolean, text, text, numeric, numeric)', 'execute'), 'internal invoice_amount is not callable');
 
--- Viewer: every write RPC raises 'forbidden' (INTERACTIONS 6.4 — enforced server-side, not just hidden).
+-- Crew: every write RPC raises 'forbidden' (INTERACTIONS 6.4 — enforced server-side, not just hidden).
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000a2"}', true);
-select throws_ok($$ select public.save_booking(pg_temp.payload()) $$, 'P0001', 'forbidden', 'viewer: save_booking forbidden');
-select throws_ok($$ select public.create_invoice('00000000-0000-4000-8000-00000000b999', 'full') $$, 'P0001', 'forbidden', 'viewer: create_invoice forbidden');
-select throws_ok($$ select public.cancel_booking('00000000-0000-4000-8000-00000000b999') $$, 'P0001', 'forbidden', 'viewer: cancel_booking forbidden');
-select is(public.is_admin(), false, 'is_admin() is false for a viewer');
+select throws_ok($$ select public.save_booking(pg_temp.payload()) $$, 'P0001', 'forbidden', 'crew: save_booking forbidden');
+select throws_ok($$ select public.create_invoice('00000000-0000-4000-8000-00000000b999', 'full') $$, 'P0001', 'forbidden', 'crew: create_invoice forbidden');
+select throws_ok($$ select public.cancel_booking('00000000-0000-4000-8000-00000000b999') $$, 'P0001', 'forbidden', 'crew: cancel_booking forbidden');
+select is(public.is_admin(), false, 'is_admin() is false for a crew');
 
 -- No JWT at all (an authenticated role without a subject) is not an admin either.
 select set_config('request.jwt.claims', '', true);

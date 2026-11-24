@@ -109,7 +109,10 @@ export async function updateDisplayName(name: string) {
   return call("updateProfile", () => {
     const n = name.trim();
     if (n.length < LIMITS.displayNameMin || n.length > LIMITS.displayNameMax) return { ok: false as const, error: "length" as const };
-    transaction((d) => (d.profile.displayName = n));
+    transaction((d) => {
+      d.profile.displayName = n;
+      for (const c of d.crew) if (c.userId === d.profile.id) c.name = n; // the crew entry follows (migration 014)
+    });
     return { ok: true as const, profile: clone(getDb().profile) };
   });
 }

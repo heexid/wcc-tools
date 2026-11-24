@@ -13,8 +13,8 @@ About 15 minutes, all in the browser. Do Supabase first, then Vercel.
    ```sql
    update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}' where email = 'you@example.com';
    ```
-   For a read-only account (e.g. the Owner), add the user the same way and use `'{"role":"viewer"}'`.
-6. **Add your crew** (there is no crew screen yet), one line per person:
+   Your crew entry is added automatically, so you can assign yourself to bookings. For a read-only crew account, add the user the same way and use `'{"role":"crew"}'`.
+6. **Add crew who won't log in** (accounts get their crew entry automatically), one line per person:
    ```sql
    insert into public.crew (name, role) values ('Raka Pratama', 'Lead photographer'), ('Dinda Ayu', 'Videographer');
    ```
@@ -55,6 +55,61 @@ Open the site, log in with the account from step 1.4, and you're live. From now 
 All six work → you're live.
 
 **Before real client data:** make sure your Supabase plan includes backups (the free plan has none; Pro has daily backups) under *Project Settings → Add-ons / Backups*.
+
+## Accounts (admin and crew)
+
+**Create.** Add the user in Supabase → Authentication → Users (Auto Confirm), then:
+
+```sql
+-- Optional: for someone already in the crew list, add "crew_id" to link them and avoid a duplicate.
+-- select id, name, role from public.crew where user_id is null;
+update auth.users
+set raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || '{"display_name":"Raka Pratama"}',
+    raw_app_meta_data  = raw_app_meta_data || '{"role":"crew"}'   -- or "admin"; optionally ,"crew_id":"<uuid>"
+where email = 'raka@example.com';
+```
+
+**Edit**
+
+```sql
+-- Type
+update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}' where email = 'raka@example.com';
+-- Job title
+update public.crew set role = 'Videographer'
+where user_id = (select id from auth.users where email = 'raka@example.com');
+-- Name (the crew entry follows)
+update public.profiles set display_name = 'Raka P.'
+where id = (select id from auth.users where email = 'raka@example.com');
+```
+
+**Delete = revoke access**
+
+```sql
+update auth.users set raw_app_meta_data = raw_app_meta_data - 'role' where email = 'raka@example.com';
+```
+
+Don't delete the auth user as routine. Deleting an admin who issued an invoice **fails**: the FK tries to clear `invoices.created_by`, and the append-only trigger rejects it. Deleting other users loses their name on past bookings. Reserve a hard delete for accounts created by mistake with no history.
+
+**Check there is always an admin**
+
+```sql
+select count(*) from public.profiles where active and role = 'admin';   -- must be ≥ 1
+```
+
+## Upgrade to crew types (databases set up before 2026-11-24)
+
+1. **Back up**, then list the viewers. **Every active one becomes an admin.** Keep the list, and revoke any that should not:
+   ```sql
+   select u.email, p.display_name, p.active from public.profiles p join auth.users u on u.id = p.id where p.role = 'viewer';
+   ```
+2. For each account that is already in the crew list, set the link so the person doesn't appear twice. After the migration it is too late for this step:
+   ```sql
+   update auth.users set raw_app_meta_data = raw_app_meta_data || '{"crew_id":"<crew uuid>"}' where email = 'raka@example.com';
+   ```
+3. **Deploy the app and wait until it is live.** The older app would show edit buttons to crew accounts.
+4. Run [`supabase/migrations/20261124000014_crew_types.sql`](../supabase/migrations/20261124000014_crew_types.sql).
+5. Create the crew logins (see *Accounts* above).
+6. Check: an admin assigns themself and filters by themself; a crew login has no edit buttons and can download a PDF.
 
 ## After launch
 

@@ -7,7 +7,7 @@ test.beforeAll(() => resetDb());
 // P3 done-check (PRODUCTION-PLAN §3 P3): /bookings, /packages, /bookings/new end-to-end on local Supabase with
 // the seed — read and write — with the UI unchanged (same selectors and copy as the mock-source suites).
 const ADMIN = { email: "bs-moment@email.com", password: "bsmoment26" };
-const VIEWER = { email: "owner@bs-moment.test", password: "ownerview26" };
+const CREW = { email: "crew@bs-moment.test", password: "crewview26" };
 
 // The seed is built around Figma's "today" (Tue 10 Nov 2026). The app computes today in the browser, so freeze
 // the browser clock (Playwright) — the server and database keep the real clock, as in staging.
@@ -95,8 +95,8 @@ test("booking write path: save Draft → DP 40 % invoice → persists → cancel
   await expect(page.getByRole("status").filter({ hasText: /Booking canceled · BK-\d{4}-\d{4}/ })).toBeVisible();
 });
 
-test("viewer: reads everything, no write controls", async ({ page }) => {
-  await signIn(page, VIEWER);
+test("crew: reads everything, no write controls", async ({ page }) => {
+  await signIn(page, CREW);
   await expect(page.getByRole("main")).toContainText("Rp 48.750.000");
   await expect(page.getByRole("main").getByRole("button", { name: "New booking", exact: true })).toHaveCount(0);
   await page.goto("/packages");

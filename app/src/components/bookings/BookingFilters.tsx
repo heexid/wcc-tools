@@ -24,6 +24,8 @@ import {
   type Chip,
   type DatePreset,
 } from "@/lib/booking/filters";
+import { crewOptions } from "@/lib/booking/crew";
+import { useMyId } from "@/lib/role";
 import type { Crew, Package } from "@/lib/data/types";
 import { initials, parseISODate, toISODate, type ISODate } from "@/lib/format";
 
@@ -356,6 +358,7 @@ export function BookingToolbar({
 }) {
   const w = view === "calendar" ? W.calendar : W.table;
   const pkgName = (id: string) => packages.find((p) => p.id === id)?.name ?? id;
+  const myId = useMyId();
   return (
     <div className={cn("flex flex-col gap-base", className)}>
       <TabList label="View" className="flex border-b border-border-default">
@@ -384,7 +387,7 @@ export function BookingToolbar({
           menuWidth="w-[calc(var(--spacing-64)*5)]"
           searchable="Search crew"
           value={multiLabel(filters.crew, "All crew", () => "1 crew", "crew")}
-          options={crew.filter((c) => c.isActive || filters.crew.includes(c.id)).map((c) => ({ value: c.id, label: c.name, sub: c.role, avatar: initials(c.name) }))}
+          options={crewOptions(crew, filters.crew, myId).map((c) => ({ value: c.id, label: c.label, sub: c.role, avatar: initials(c.name) }))}
           selected={filters.crew}
           onApply={(v) => update({ crew: v })}
         />

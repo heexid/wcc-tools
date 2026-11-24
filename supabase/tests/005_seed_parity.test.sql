@@ -5,7 +5,7 @@ select plan(8);
 
 select is((select count(*)::int from public.packages), 8, 'seed: packages');
 select is((select count(*)::int from public.packages where is_active), 6, 'seed: active packages');
-select is((select count(*)::int from public.crew), 6, 'seed: crew');
+select is((select count(*)::int from public.crew where user_id is null), 6, 'seed: crew');
 select is((select count(*)::int from public.bookings), 40, 'seed: bookings');
 select is((select count(*)::int from public.invoices), 41, 'seed: invoices');
 

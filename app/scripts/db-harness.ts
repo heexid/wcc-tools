@@ -43,11 +43,12 @@ const SUPABASE_SHIM = `
 
 export const sqlFiles = (dir: string) => readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();
 
-export async function bootDb(opts: { quiet?: boolean } = {}): Promise<PGlite> {
+export async function bootDb(opts: { quiet?: boolean; beforeMigration?: (pg: PGlite, file: string) => Promise<void> } = {}): Promise<PGlite> {
   const log = (m: string) => !opts.quiet && console.log(m);
   const pg = await PGlite.create({ extensions: { pg_trgm, pgtap } });
   await pg.exec(SUPABASE_SHIM);
   for (const m of sqlFiles(join(SUPABASE_DIR, "migrations"))) {
+    await opts.beforeMigration?.(pg, m);
     try {
       await pg.exec(readFileSync(join(SUPABASE_DIR, "migrations", m), "utf8"));
       log(`migrate  ${m}`);

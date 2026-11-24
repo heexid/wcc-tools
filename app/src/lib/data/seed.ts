@@ -19,7 +19,7 @@ export const at = (local: string) => new Date(`${local.replace(" ", "T")}:00+07:
 /** Saved-data schema version: the store reseeds when localStorage holds another one. Bump on any Db shape change.
  *  2: bookings carry a payment instruction (lane I) · 3: invoice snapshots carry the business + package summary (F15)
  *  · 4: bookings + new snapshots carry eventStart / location / notes (2026-11-21). */
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 export const DEFAULT_PAYMENT = { receiptName: "Bank BCA", accountNumber: "1234567890", accountName: "bs.moment Studio" };
 
@@ -162,7 +162,8 @@ export function seedDb(): Db {
     version: DB_VERSION,
     fixture: "seed",
     packages: PACKAGES.map((p) => ({ ...p })),
-    crew: CREW.map((c) => ({ ...c })),
+    // Every account has a linked crew entry (migration 014 adds it in SQL, so gen-seed-sql skips it).
+    crew: [...CREW.map((c) => ({ ...c })), { id: "crew_me", name: "bs.moment", role: "", isActive: true, userId: "user_admin" }],
     bookings: [],
     invoices: [],
     profile: { id: "user_admin", displayName: "bs.moment", email: "bs-moment@email.com", role: "admin", workspace: "bs.moment", passwordChangedAt: "2026-09-12" },

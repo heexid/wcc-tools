@@ -45,7 +45,7 @@ Keep one list of packages and prices. Update a price once, and new bookings use 
 Search by client, booking name or phone. Filter by status, crew, package or date. Share a filtered view by sending the link.
 
 ### Built for your team
-Admins manage everything. Viewers can see bookings and invoices without changing them. Each crew member's schedule is one click away.
+Admins manage everything. Crew can see bookings and invoices without changing them. Each crew member's schedule is one click away.
 
 ---
 
@@ -126,5 +126,5 @@ Still tracking bookings across chats and spreadsheets? Our booking and invoice t
 
 ## Before publishing
 
-- The copy says invoices download as PDFs, that viewers can't edit, and that sessions end at midnight WIB. These match the current app, but confirm them before you publish.
+- The copy says invoices download as PDFs, that crew can't edit, and that sessions end at midnight WIB. These match the current app, but confirm them before you publish.
 - The app is currently desktop-only, so the video and page should not show or promise mobile use.

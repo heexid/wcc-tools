@@ -98,9 +98,9 @@ test("save failure: inline message, nothing saved (?fail=updateBusiness)", async
   await expect(card(page)).toContainText("Studio Baru");
 });
 
-test("viewer: sees the card but no Edit button (6.4)", async ({ page }) => {
+test("crew: sees the card but no Edit button (6.4)", async ({ page }) => {
   await page.goto("/dev/role");
-  await page.getByRole("button", { name: "Viewer" }).click();
+  await page.getByRole("button", { name: "Crew" }).click();
   await page.goto("/account");
   await expect(card(page)).toContainText("bs.moment");
   await expect(card(page).getByRole("button", { name: "Edit" })).toHaveCount(0);

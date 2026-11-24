@@ -104,7 +104,7 @@ async function main() {
   const pg = await bootDb({ quiet: true });
   // Reads run as a signed-in staff member, under RLS.
   await pg.exec(`insert into auth.users (id) values ('00000000-0000-4000-8000-0000000000e1');
-                 insert into public.profiles (id, display_name, role) values ('00000000-0000-4000-8000-0000000000e1', 'Reader', 'viewer') on conflict (id) do nothing;
+                 insert into public.profiles (id, display_name, role) values ('00000000-0000-4000-8000-0000000000e1', 'Reader', 'crew') on conflict (id) do nothing;
                  set role authenticated; select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000e1"}', false);`);
   let pass = 0;
   const fails: string[] = [];
@@ -147,7 +147,7 @@ async function main() {
     const g = { ...strip(got), invoices: (got.invoices as Row[]).map(strip) };
     check(`detail · ${ref}`, want, g);
   }
-  for (const c of db.crew) {
+  for (const c of db.crew.filter((x) => !x.userId)) { // linked entries are added by SQL
     const mine = filterBookings(db, { view: "calendar", crewIds: [c.id] });
     const want = { crew: { ...c, id: uuid(c.id) }, monthCount: mine.filter((b) => b.bookingDate.slice(0, 7) === TODAY.slice(0, 7)).length, upcoming: mine.filter((b) => b.bookingDate >= TODAY).map((r) => mapRow(r as unknown as Row)) };
     const got = await q<Row>(pg, "select public.get_crew_schedule($1::uuid, $2::date) as r", [uuid(c.id), TODAY]);

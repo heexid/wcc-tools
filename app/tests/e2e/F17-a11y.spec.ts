@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { signIn } from "../helpers/session";
 
-// F17 — a11y sweep (WCAG 2.2 AA via axe-core): every screen, admin and viewer.
+// F17 — a11y sweep (WCAG 2.2 AA via axe-core): every screen, admin and crew.
 const AXE = require.resolve("axe-core/axe.min.js");
 
 async function audit(page: Page) {
@@ -24,13 +24,13 @@ const SCREENS: [string, string][] = [
   ["Account", "/account"],
 ];
 
-for (const viewer of [false, true]) {
+for (const crew of [false, true]) {
   for (const [name, url] of SCREENS) {
-    test(`a11y · ${viewer ? "viewer" : "admin"} · ${name}`, async ({ page }) => {
+    test(`a11y · ${crew ? "crew" : "admin"} · ${name}`, async ({ page }) => {
       await signIn(page);
-      if (viewer) {
+      if (crew) {
         await page.goto("/dev/role");
-        await page.getByRole("button", { name: "Viewer" }).click();
+        await page.getByRole("button", { name: "Crew" }).click();
       }
       await page.goto(url);
       await page.waitForTimeout(1200); // entrance cascade settles

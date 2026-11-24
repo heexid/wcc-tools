@@ -1,15 +1,16 @@
 -- LOCAL / CI ONLY — never run on staging or production (known passwords). Loaded after seed.sql by
 -- supabase/config.toml [db.seed]. Hosted environments create users through the admin path (PRODUCTION-PLAN P14).
--- Admin = the prototype's demo account (app/src/lib/data/seed.ts); viewer = the Owner role (INTERACTIONS 6.4).
+-- Admin = the prototype's demo account (app/src/lib/data/seed.ts); crew = the read-only type (INTERACTIONS 6.4).
 do $$
 declare
   u record;
 begin
   for u in select * from (values
     ('00000000-0000-4000-8000-00000000aa01'::uuid, 'bs-moment@email.com', 'bsmoment26', 'bs.moment', 'admin', '2026-09-12 10:00+07'::timestamptz),
-    ('00000000-0000-4000-8000-00000000aa02'::uuid, 'owner@bs-moment.test', 'ownerview26', 'Owner', 'viewer', '2026-09-12 10:00+07'::timestamptz),
+    ('00000000-0000-4000-8000-00000000aa02'::uuid, 'owner@bs-moment.test', 'ownerview26', 'Owner', 'admin', '2026-09-12 10:00+07'::timestamptz),
+    ('00000000-0000-4000-8000-00000000aa04'::uuid, 'crew@bs-moment.test', 'crewview26', 'Crew Test', 'crew', '2026-09-12 10:00+07'::timestamptz),
     -- Used only by tests/e2e-supabase/auth.spec.ts, which changes its name and password.
-    ('00000000-0000-4000-8000-00000000aa03'::uuid, 'account-test@bs-moment.test', 'accounttest26', 'Account Test', 'viewer', '2026-09-12 10:00+07'::timestamptz)
+    ('00000000-0000-4000-8000-00000000aa03'::uuid, 'account-test@bs-moment.test', 'accounttest26', 'Account Test', 'crew', '2026-09-12 10:00+07'::timestamptz)
   ) as t(id, email, password, display_name, role, changed_at)
   loop
     insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -22,7 +23,7 @@ begin
     insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
     values (u.id::text, u.id, jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true), 'email', now(), now(), now())
     on conflict do nothing;
-    -- The auth.users trigger (migration 005) already made a viewer profile: set the seeded name and role.
+    -- The auth.users trigger (migration 005) already made a profile: set the seeded name and role.
     insert into public.profiles (id, display_name, role, password_changed_at)
     values (u.id, u.display_name, u.role, u.changed_at)
     on conflict (id) do update set display_name = excluded.display_name, role = excluded.role, password_changed_at = excluded.password_changed_at;

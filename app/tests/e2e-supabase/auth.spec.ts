@@ -79,7 +79,7 @@ test("Account: change name, then change password — this device stays in, the o
   await nameDlg.getByLabel("Name").fill("  Owner Test  ");
   await nameDlg.getByRole("button", { name: "Save name" }).click();
   await expect(pa.getByRole("status").filter({ hasText: "Name updated" })).toBeVisible();
-  await expect(pa.getByRole("button", { name: /^Owner Test, Viewer/ })).toBeVisible(); // header follows (6.8)
+  await expect(pa.getByRole("button", { name: /^Owner Test, Crew/ })).toBeVisible(); // header follows (6.8)
   await pa.reload();
   await expect(pa.getByRole("region", { name: "Profile" })).toContainText("Owner Test"); // stored, not just local state
 

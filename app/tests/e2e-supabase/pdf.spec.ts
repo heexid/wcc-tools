@@ -82,13 +82,13 @@ test("a new invoice's PDF is generated on confirm (quietly) and downloads", asyn
   await expect.poll(() => sql(`select coalesce(pdf_path, '') from invoices where number = '${number}'`), { timeout: 20_000 }).toMatch(new RegExp(`^${number}/`));
 });
 
-test("who: a viewer can download; no session → 401; a signed URL stops working when it expires", async ({ page, request }) => {
+test("who: a crew can download; no session → 401; a signed URL stops working when it expires", async ({ page, request }) => {
   const anon = await request.get("/api/invoices/INV-2026-0187/pdf", { maxRedirects: 0 });
   expect(anon.status()).toBe(401);
 
-  await signIn(page, "owner@bs-moment.test", "ownerview26");
-  const viewer = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
-  expect(viewer.text).toContain("INV-2026-0187");
+  await signIn(page, "crew@bs-moment.test", "crewview26");
+  const crew = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
+  expect(crew.text).toContain("INV-2026-0187");
 
   // The route's OWN link: valid for exactly 10 minutes (PRD §4.3) and downloads under the invoice's file name.
   const issued = await page.evaluate(async () => (await (await fetch("/api/invoices/INV-2026-0187/pdf")).json()) as { url: string; fileName: string });

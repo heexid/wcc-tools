@@ -11,7 +11,9 @@ import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { useDismiss } from "@/components/shell/useDismiss";
+import { crewOptions } from "@/lib/booking/crew";
 import type { Crew, Package } from "@/lib/data/types";
+import { useMyId } from "@/lib/role";
 import { addDays, formatDate, formatIDR, initials, parseISODate, toISODate, type ISODate } from "@/lib/format";
 
 // Popover fields of the booking form (Figma Bookings 13 / 39 / 40 package, 14 date, 03b crew). Each popover
@@ -292,8 +294,8 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
   const { open, setOpen, box, panel, mounted, presence } = usePopover();
   const id = useId();
   const [q, setQ] = useState("");
-  const options = crew.filter((c) => c.isActive || value.includes(c.id));
-  const shown = options.filter((c) => `${c.name} ${c.role}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const options = crewOptions(crew, value, useMyId());
+  const shown = options.filter((c) => `${c.label} ${c.role}`.toLowerCase().includes(q.trim().toLowerCase()));
   const toggle = (cid: string) => onChange(value.includes(cid) ? value.filter((x) => x !== cid) : [...value, cid]);
   const picked = value.map((v) => crew.find((c) => c.id === v)).filter((c): c is Crew => !!c);
   const [initial] = useState(() => new Set(value)); // chips present on load don't animate in
@@ -346,8 +348,8 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
                       <Checkbox checked={on} onChange={() => toggle(c.id)} />
                       <Avatar initials={initials(c.name)} />
                       <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-caption-strong text-text-primary">{c.name}</span>
-                        <span className="truncate text-timestamp text-text-secondary">{c.role}</span>
+                        <span className="truncate text-caption-strong text-text-primary">{c.label}</span>
+                        {c.role && <span className="truncate text-timestamp text-text-secondary">{c.role}</span>}
                       </span>
                     </label>
                   </li>
