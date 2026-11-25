@@ -18,14 +18,14 @@ begin
                             confirmation_token, recovery_token, email_change_token_new, email_change)
     values ('00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email,
             extensions.crypt(u.password, extensions.gen_salt('bf')), now(),
-            jsonb_build_object('provider', 'email', 'providers', jsonb_build_array('email'), 'role', u.role), '{}', now(), now(), '', '', '', '')
+            jsonb_build_object('provider', 'email', 'providers', jsonb_build_array('email'), 'role', u.role, 'workspace_id', (select id from public.workspaces)), '{}', now(), now(), '', '', '', '')
     on conflict (id) do nothing;
     insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
     values (u.id::text, u.id, jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true), 'email', now(), now(), now())
     on conflict do nothing;
     -- The auth.users trigger (migration 005) already made a profile: set the seeded name and role.
-    insert into public.profiles (id, display_name, role, password_changed_at)
-    values (u.id, u.display_name, u.role, u.changed_at)
+    insert into public.profiles (id, workspace_id, display_name, role, password_changed_at)
+    values (u.id, (select id from public.workspaces), u.display_name, u.role, u.changed_at)
     on conflict (id) do update set display_name = excluded.display_name, role = excluded.role, password_changed_at = excluded.password_changed_at;
   end loop;
 end $$;

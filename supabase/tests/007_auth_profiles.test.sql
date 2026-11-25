@@ -3,11 +3,11 @@ begin;
 select plan(12);
 
 insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values
-  ('00000000-0000-4000-8000-0000000000b1', 'rina.kartika@bs-moment.test', '{}', '{"role":"crew"}'),
-  ('00000000-0000-4000-8000-0000000000b2', 'x@bs-moment.test', '{"display_name":"  Dimas Pratama  "}', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-0000000000b3', 'q@bs-moment.test', '{}', '{"role":"crew"}'),
+  ('00000000-0000-4000-8000-0000000000b1', 'rina.kartika@bs-moment.test', '{}', test_only.meta('{"role":"crew"}')),
+  ('00000000-0000-4000-8000-0000000000b2', 'x@bs-moment.test', '{"display_name":"  Dimas Pratama  "}', test_only.meta('{"role":"admin"}')),
+  ('00000000-0000-4000-8000-0000000000b3', 'q@bs-moment.test', '{}', test_only.meta('{"role":"crew"}')),
   -- self-registered: a role in *user* metadata (user-editable) must not count
-  ('00000000-0000-4000-8000-0000000000b4', 'stranger@evil.test', '{"role":"admin"}', '{"provider":"email"}');
+  ('00000000-0000-4000-8000-0000000000b4', 'stranger@evil.test', test_only.meta('{"role":"admin"}'), '{"provider":"email"}');
 
 select is((select display_name from public.profiles where id = '00000000-0000-4000-8000-0000000000b1'), 'rina.kartika', 'name from the email local part');
 select is((select display_name from public.profiles where id = '00000000-0000-4000-8000-0000000000b2'), 'Dimas Pratama', 'name from user metadata, trimmed');

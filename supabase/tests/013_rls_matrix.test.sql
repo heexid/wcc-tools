@@ -6,8 +6,8 @@ begin;
 select plan(3);
 
 insert into auth.users (id, email, raw_app_meta_data) values
-  ('00000000-0000-4000-8000-0000000000a5', 'rls-admin@bs-moment.test', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-0000000000a6', 'rls-crew@bs-moment.test', '{"role":"crew"}');
+  ('00000000-0000-4000-8000-0000000000a5', 'rls-admin@bs-moment.test', test_only.meta('{"role":"admin"}')),
+  ('00000000-0000-4000-8000-0000000000a6', 'rls-crew@bs-moment.test', test_only.meta('{"role":"crew"}'));
 
 create temp table got (who text, obj text, op text, result text);
 grant all on got to anon, authenticated;
@@ -73,7 +73,7 @@ begin
     perform pg_temp.try(who, 'list_people', 'select', $q$select jsonb_array_elements(public.list_people('2026-11-10'))$q$);
     perform pg_temp.try(who, 'get_settings', 'select', $q$select 1 where public.get_settings() is not null$q$);
     perform pg_temp.try(who, 'my_profile', 'select', $q$select 1 where public.my_profile() is not null$q$);
-    perform pg_temp.try(who, 'next_invoice_number', 'rpc', $q$select public.next_invoice_number(2099)$q$);
+    perform pg_temp.try(who, 'next_invoice_number', 'rpc', $q$select public.next_invoice_number(gen_random_uuid(), 2099)$q$);
     perform pg_temp.try(who, 'save_booking_tx', 'rpc', $q$select public.save_booking_tx('{}')$q$);
     execute 'reset role';
   end loop;

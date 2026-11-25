@@ -62,7 +62,7 @@ select results_eq(
 );
 
 select is(
-  (select next_invoice_number(2026)),
+  (select next_invoice_number((select id from public.workspaces), 2026)),
   'INV-2026-0202',
   'seed: invoice numbering continues above the highest seeded number'
 );

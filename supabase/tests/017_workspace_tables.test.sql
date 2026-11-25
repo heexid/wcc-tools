@@ -30,10 +30,10 @@ select throws_ok($$ insert into public.workspaces (slug, name, status) values ('
 select ok(not has_table_privilege('authenticated', 'public.workspaces', 'select'), 'workspaces are not readable through the API');
 
 -- No silent default once there are two
-select is(public.only_workspace(), null, 'two workspaces → no default');
+select is((select count(*)::int from information_schema.columns where table_schema = 'public' and column_name = 'workspace_id' and column_default is not null and column_default not like 'test_only%'), 0, 'no table has a default workspace');
 select throws_ok($$ insert into public.crew (name) values ('Lost') $$, '23502', null, 'crew must name its workspace');
 select throws_ok($$ insert into public.packages (name, price) values ('Lost', 1) $$, '23502', null, 'package must name its workspace');
-select throws_ok($$ select public.next_invoice_number(2026) $$, '23502', null, 'numbering must name its workspace');
+select throws_ok($$ select public.next_invoice_number(null, 2026) $$, '23502', null, 'numbering must name its workspace');
 select throws_ok($$ insert into public.crew (workspace_id, name) values (gen_random_uuid(), 'Nowhere') $$, '23503', null, 'the workspace must exist');
 
 select is((select workspace_id from public.crew where user_id = '00000000-0000-4000-8000-0000000017b1'), pg_temp.b(), 'an account''s crew entry is in its workspace');

@@ -42,7 +42,7 @@ export type Database = {
         }
         Insert: {
           last_value?: number
-          workspace_id?: string
+          workspace_id: string
           year: number
         }
         Update: {
@@ -71,7 +71,7 @@ export type Database = {
           booking_id: string
           crew_id: string
           position?: number
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           booking_id?: string
@@ -120,7 +120,7 @@ export type Database = {
           position?: number
           price: number
           qty: number
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           booking_id?: string
@@ -199,7 +199,7 @@ export type Database = {
           total?: number
           total_paid?: number
           updated_at?: string
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           booking_date?: string
@@ -275,7 +275,7 @@ export type Database = {
           name: string
           role?: string
           user_id?: string | null
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           created_at?: string
@@ -311,7 +311,7 @@ export type Database = {
         }
         Insert: {
           last_value?: number
-          workspace_id?: string
+          workspace_id: string
           year: number
         }
         Update: {
@@ -364,7 +364,7 @@ export type Database = {
           type: string
           void_reason?: string | null
           voided_at?: string | null
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           amount?: number
@@ -431,7 +431,7 @@ export type Database = {
           price: number
           summary?: string
           updated_at?: string
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           archived_at?: string | null
@@ -474,7 +474,7 @@ export type Database = {
           password_changed_at?: string | null
           role?: string
           updated_at?: string
-          workspace_id?: string
+          workspace_id: string
         }
         Update: {
           active?: boolean
@@ -582,6 +582,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_workspace: { Args: { p_meta: Json }; Returns: string }
       archive_package: { Args: { p_id: string }; Returns: undefined }
       below_paid_error: { Args: { p_booking_id: string }; Returns: undefined }
       booking_errors: { Args: { p: Json }; Returns: Json }
@@ -615,6 +616,7 @@ export type Database = {
         }
         Returns: string
       }
+      current_workspace_id: { Args: never; Returns: string }
       ensure_crew_entry: { Args: { p_user: string }; Returns: undefined }
       filter_bookings: { Args: { q: Json }; Returns: Json[] }
       get_booking: { Args: { p_id: string }; Returns: Json }
@@ -658,14 +660,15 @@ export type Database = {
       list_people: { Args: { p_today: string }; Returns: Json }
       mark_password_changed: { Args: never; Returns: undefined }
       my_profile: { Args: never; Returns: Json }
-      next_booking_ref:
-        | { Args: { p_workspace: string; p_year: number }; Returns: string }
-        | { Args: { p_year: number }; Returns: string }
-      next_invoice_number:
-        | { Args: { p_workspace: string; p_year: number }; Returns: string }
-        | { Args: { p_year: number }; Returns: string }
+      next_booking_ref: {
+        Args: { p_workspace: string; p_year: number }
+        Returns: string
+      }
+      next_invoice_number: {
+        Args: { p_workspace: string; p_year: number }
+        Returns: string
+      }
       normalize_phone: { Args: { p_input: string }; Returns: string }
-      only_workspace: { Args: never; Returns: string }
       ordered_booking_ids: {
         Args: { q: Json }
         Returns: {

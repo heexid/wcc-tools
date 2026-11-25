@@ -41,6 +41,22 @@ const SUPABASE_SHIM = `
   set search_path = "$user", public, extensions;
 `;
 
+// Test only, never part of a migration: rows in single-workspace tests land in the seeded workspace, and
+// test_only.meta() adds it to an account's metadata. With a second workspace the default is null, so a function that
+// forgets its workspace still fails (018_workspace_isolation drops the defaults altogether).
+const TEST_HELPERS = `
+  create schema test_only;
+  create function test_only.ws() returns uuid language sql stable security definer set search_path = '' as $$
+    select case when count(*) = 1 then (array_agg(w.id))[1] end from public.workspaces w $$;
+  create function test_only.meta(m jsonb) returns jsonb language sql stable security definer set search_path = '' as $$
+    select m || jsonb_build_object('workspace_id', test_only.ws()) $$;
+  do $$ declare t text; begin
+    foreach t in array array['profiles','crew','packages','bookings','booking_items','booking_crew','invoices','booking_counters','invoice_counters'] loop
+      execute format('alter table public.%I alter column workspace_id set default test_only.ws()', t);
+    end loop;
+  end $$;
+`;
+
 export const sqlFiles = (dir: string) => readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();
 
 export async function bootDb(opts: { quiet?: boolean; seed?: boolean; beforeMigration?: (pg: PGlite, file: string) => Promise<void> } = {}): Promise<PGlite> {
@@ -56,6 +72,7 @@ export async function bootDb(opts: { quiet?: boolean; seed?: boolean; beforeMigr
       throw new Error(`migrate  ${m} FAILED\n${(e as Error).message}`);
     }
   }
+  await pg.exec(TEST_HELPERS);
   if (opts.seed === false) return pg;
   await pg.exec(readFileSync(join(SUPABASE_DIR, "seed.sql"), "utf8"));
   log("seed     seed.sql");
@@ -65,7 +82,13 @@ export async function bootDb(opts: { quiet?: boolean; seed?: boolean; beforeMigr
 /** seed.sql as it was before migration 016 (no workspaces table), for the upgrade tests. */
 export const seedBefore016 = () => {
   const s = readFileSync(join(SUPABASE_DIR, "seed.sql"), "utf8");
-  const out = s.replace(/insert into public\.workspaces [^;]*;\n/, "");
-  if (out === s) throw new Error("seed.sql: workspaces insert not found");
+  const ws = /insert into public\.workspaces [^(]*\([^)]*\) values \('([0-9a-f-]{36})'/.exec(s)?.[1];
+  if (!ws) throw new Error("seed.sql: workspaces insert not found");
+  // Statement by statement: drop the workspaces insert, and the workspace column from every other table.
+  const out = s
+    .split(/(?=^insert into )/m)
+    .filter((x) => !x.startsWith("insert into public.workspaces "))
+    .map((x) => (x.startsWith("insert into public.workspace_settings ") || !x.startsWith("insert into ") ? x : x.replace("(workspace_id, ", "(").replaceAll(`('${ws}', `, "(")))
+    .join("");
   return out;
 };

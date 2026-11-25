@@ -2,7 +2,7 @@
 begin;
 select plan(7);
 
-insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000f7', 'p7@bs-moment.test', '{"role":"admin"}');
+insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000f7', 'p7@bs-moment.test', test_only.meta('{"role":"admin"}'));
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-4000-8000-0000000000f7"}', true);
 

@@ -1,8 +1,8 @@
 name: CI
 
-# One quick check (~2 min) on every push. It does not block deploys: Vercel builds from GitHub on its own.
-# The deeper suites (database tests, Supabase end-to-end) stay in the repo and run locally when needed —
-# see app/package.json (db:test, test:parity, test:rls, e2e:supabase).
+# Quick checks on every push: the app, and the database (pgTAP incl. workspace isolation, SQL ⇄ mock parity, upgrade
+# tests; Postgres in WASM, no Docker). Vercel builds from GitHub on its own, so a red check blocks a deploy only when
+# both jobs are required on `main` (branch protection). Supabase end-to-end stays local: npm run e2e:supabase.
 on:
   push:
   pull_request:
@@ -44,3 +44,22 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
           SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+
+  database:
+    name: database · isolation · parity · upgrades
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run db:test
+      - run: npm run test:parity
+      - run: npm run test:migrate-014
+      - run: npm run test:migrate-016

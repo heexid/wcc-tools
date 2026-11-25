@@ -6,9 +6,9 @@ insert into public.crew (id, name, role, is_active) values
   ('00000000-0000-4000-8000-00000000c161', 'Free Lance', 'Assistant', true),
   ('00000000-0000-4000-8000-00000000c162', 'Gone Person', '', false);
 insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values
-  ('00000000-0000-4000-8000-000000000161', 'admin16@bs-moment.test', '{"display_name":"Admin Sixteen"}', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-000000000162', 'crew16@bs-moment.test', '{"display_name":"Crew Sixteen"}', '{"role":"crew"}'),
-  ('00000000-0000-4000-8000-000000000163', 'gone16@bs-moment.test', '{"display_name":"Revoked Sixteen"}', '{"role":"crew"}');
+  ('00000000-0000-4000-8000-000000000161', 'admin16@bs-moment.test', '{"display_name":"Admin Sixteen"}', test_only.meta('{"role":"admin"}')),
+  ('00000000-0000-4000-8000-000000000162', 'crew16@bs-moment.test', '{"display_name":"Crew Sixteen"}', test_only.meta('{"role":"crew"}')),
+  ('00000000-0000-4000-8000-000000000163', 'gone16@bs-moment.test', '{"display_name":"Revoked Sixteen"}', test_only.meta('{"role":"crew"}'));
 update auth.users set raw_app_meta_data = '{}' where id = '00000000-0000-4000-8000-000000000163';
 
 -- Free Lance: yesterday (past), today and later (2 upcoming), one Canceled.

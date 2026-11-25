@@ -2,7 +2,7 @@
 begin;
 select plan(6);
 
-insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000e9', 'p8@bs-moment.test', '{"role":"admin"}');
+insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000e9', 'p8@bs-moment.test', test_only.meta('{"role":"admin"}'));
 create temp table before as select id, snapshot, snapshot_hash from public.invoices;
 
 update public.workspace_settings set
