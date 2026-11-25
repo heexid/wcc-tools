@@ -4,6 +4,9 @@
 
 begin;
 
+-- One workspace: every row below gets it from the column default (migration 016).
+insert into public.workspaces (id, slug, name) values ('dad0c61f-10d3-4e28-10b2-0f2e257fdfb1', 'main', 'bs.moment');
+
 insert into public.workspace_settings (workspace_id, business_name, business_address, business_email, business_phone, default_terms, default_payment) values
 ('dad0c61f-10d3-4e28-10b2-0f2e257fdfb1', 'bs.moment', 'Jl. Rawa Mangun No. 12, Jakarta Timur', 'finance@bs-moment.com', '+62 21-555-0100', 'Remaining balance is due H-3 before the booking date. DP is non-refundable once the date is locked. Reschedule requests must be made at least 14 days before the booking date.', '{"receiptName":"Bank BCA","accountNumber":"1234567890","accountName":"bs.moment Studio"}'::jsonb);
 

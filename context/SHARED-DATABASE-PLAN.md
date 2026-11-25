@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1 is built locally (see §4.1). SD2–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -104,7 +104,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
 | ✅ Backup and restore tested; automatic backups postponed (dummy data) | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
-| ⬜ | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
+| ✅ Built and tested locally (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
 | ⬜ | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ⬜ | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
 | ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
@@ -115,6 +115,22 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
 | ✅ Built | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
 | 🟡 Released ✅, live hand checks ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
+
+### 4.1 SD1 checklist (2026-11-25)
+
+| | Step |
+|---|---|
+| ✅ | Migration `20261126000016_workspaces.sql`: `workspaces`, `workspace_id` on every business table, keys and uniqueness per workspace, numbering per workspace, `workspace_id` in existing accounts |
+| ✅ | It refuses to run when it can't tell which workspace the data belongs to (several settings rows, or data without one) |
+| ✅ | No silent mix-up meanwhile: with a second workspace, a write that doesn't name its workspace fails. SD2 removes this temporary default (`only_workspace()`) |
+| ✅ | A new account's crew entry is in the account's workspace, and `crew_id` can only link an entry there (moved forward from SD2) |
+| ✅ | Run: all 16 earlier database files, plus `017_workspace_tables` (38 checks with two workspaces) |
+| ✅ | Run: upgrade test from data before the migration (29 checks, `npm run test:migrate-016`) |
+| ✅ | Run: SQL and mock parity, 308 unit tests, types, lint |
+| ✅ | Run: on a restored copy of live: every row, invoice hash and account unchanged |
+| ✅ | Run: Supabase browser tests on a copy: 51 of 52; only "calendar loads only the visible range" fails, as before |
+| ✅ | `setup-production.sql`, seed and generated types updated |
+| ⬜ | Live: with SD2 and SD3, in SD4. **Don't run 016 on live before SD4** |
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
 **Total: about 14–20 days for SD0–SD6, plus 7–9 for W1–W5.** You can sell after SD5 (10–14 days) if you don't promise custom fields or invoices yet.

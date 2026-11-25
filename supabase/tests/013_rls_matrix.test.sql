@@ -48,7 +48,7 @@ do $$
 declare
   who text;
   t text;
-  tables text[] := array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings'];
+  tables text[] := array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces'];
   bk text := (select id::text from public.bookings where ref = 'BK-2026-0144');
   pk text := (select package_id::text from public.bookings where ref = 'BK-2026-0144'); -- read as the owner, up front
 begin
@@ -85,13 +85,13 @@ create temp table want (who text, obj text, op text, result text);
 insert into want
 select w.who, t.t, o.op,
   case
-    when o.op = 'select' and t.t in ('invoice_counters', 'booking_counters', 'workspace_settings') then '42501'
+    when o.op = 'select' and t.t in ('invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces') then '42501'
     when o.op = 'select' and w.who = 'anon' then '42501'
     when o.op = 'select' then 'rows'
     else '42501' -- no direct writes for anyone through the API
   end
 from (values ('anon'), ('crew'), ('admin')) w(who),
-     unnest(array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings']) t(t),
+     unnest(array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces']) t(t),
      (values ('select'), ('update'), ('delete')) o(op)
 union all
 select w.who, 'profiles', 'select_private', '42501' from (values ('anon'), ('crew'), ('admin')) w(who) -- private column: only via my_profile()

@@ -1,8 +1,14 @@
 -- P1 · schema shape: tables, the columns the prototype added beyond the PRD, indexes, RLS on.
 begin;
-select plan(26);
+select plan(37);
 
 select has_table('public', t, 'table ' || t) from unnest(array[
+  'packages', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'invoice_counters',
+  'booking_counters', 'profiles', 'crew', 'workspace_settings', 'workspaces'
+]) t;
+
+-- SD1: every business table belongs to a workspace.
+select col_not_null('public', t, 'workspace_id', t || '.workspace_id is required') from unnest(array[
   'packages', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'invoice_counters',
   'booking_counters', 'profiles', 'crew', 'workspace_settings'
 ]) t;

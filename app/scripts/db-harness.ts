@@ -43,7 +43,7 @@ const SUPABASE_SHIM = `
 
 export const sqlFiles = (dir: string) => readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();
 
-export async function bootDb(opts: { quiet?: boolean; beforeMigration?: (pg: PGlite, file: string) => Promise<void> } = {}): Promise<PGlite> {
+export async function bootDb(opts: { quiet?: boolean; seed?: boolean; beforeMigration?: (pg: PGlite, file: string) => Promise<void> } = {}): Promise<PGlite> {
   const log = (m: string) => !opts.quiet && console.log(m);
   const pg = await PGlite.create({ extensions: { pg_trgm, pgtap } });
   await pg.exec(SUPABASE_SHIM);
@@ -56,7 +56,16 @@ export async function bootDb(opts: { quiet?: boolean; beforeMigration?: (pg: PGl
       throw new Error(`migrate  ${m} FAILED\n${(e as Error).message}`);
     }
   }
+  if (opts.seed === false) return pg;
   await pg.exec(readFileSync(join(SUPABASE_DIR, "seed.sql"), "utf8"));
   log("seed     seed.sql");
   return pg;
 }
+
+/** seed.sql as it was before migration 016 (no workspaces table), for the upgrade tests. */
+export const seedBefore016 = () => {
+  const s = readFileSync(join(SUPABASE_DIR, "seed.sql"), "utf8");
+  const out = s.replace(/insert into public\.workspaces [^;]*;\n/, "");
+  if (out === s) throw new Error("seed.sql: workspaces insert not found");
+  return out;
+};
