@@ -29,7 +29,7 @@ A customer's business is called a **workspace**. This is the only name used for 
 | L | One page: Business information on top, people table below, no tabs. |
 | M | The panel leaves out Canceled bookings. |
 | N | Desktop and mobile ship together. |
-| O | The launcher tile ships without an illustration until the user provides one, after the screens and journey are done. |
+| O | The launcher tile uses the illustration the user provided (`Asset/Crew`). |
 | P | The Figma page is named "Workspace & Crew" (renamed 2026-11-25). |
 
 ### Permissions
@@ -99,11 +99,11 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. ✅ means done in Figma or locally; W1–W5 are committed on branch `workspace-crew`; nothing is pushed or live yet.
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. ✅ means done in Figma or locally; W1–W5 are committed on branch `workspace-crew`; migration 015 is live, the app is not deployed yet.
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
-| 🟡 Backup and restore tested ✅, automatic backups ⬜ | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
+| ✅ Backup and restore tested; automatic backups postponed (dummy data) | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
 | ⬜ | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
 | ⬜ | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ⬜ | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
@@ -112,7 +112,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ⬜ | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6 |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
-| ✅ Built and approved; migration 015 not on live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
+| ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
 | ✅ Built | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
 | 🟡 Docs ✅, tests ✅, release ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
 
@@ -204,13 +204,14 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ⬜ | Re-export the Figma images: launcher (desktop and MS1), Account settings | W5 |
 | ✅ | Tests for the load errors of the people list, Business information, person panel and Show more (Supabase suite) | W5 |
 | ✅ | Run: speed on local Supabase through the API with 100 people and 10,041 bookings: list 20 ms, panel 54 ms at p95 (targets 300 and 500 ms) | W5 |
-| ⬜ | Launcher illustration and header icon (from the user) | W5 |
+| ✅ | Launcher illustration and header icon (`Asset/Crew`, from the user), in Figma and the app | W5 |
 | ✅ | SD0: live database and Storage files backed up (2026-11-25) and restored into a separate local stack. Row counts, every table hash, invoice hashes, accounts, rules and 18 of 18 files match live. The standard dump leaves out the account triggers, Storage rules and buckets; the backup has an `extra.sql` for them | SD0 |
 | ✅ | SD0: live has exactly one settings row | SD0 |
 | ✅ | Run: migration 015 on the restored copy of live: every row unchanged, the list returns everyone active | W5 |
-| ⬜ | SD0: automatic backups (live has none; point-in-time recovery is off) | SD0 |
+| — | SD0: automatic backups: not needed for now, live holds dummy data only (user, 2026-11-25). **Needed before the first real customer** | SD0 |
 | ✅ | Commit (branch `workspace-crew`) | W5 |
-| ⬜ | Fresh backup, migration 015 on live, deploy, live hand checks (in this order) | W5 |
+| ✅ | Fresh backup, then migration 015 on live (2026-11-25): every row unchanged, callable only when signed in | W5 |
+| ⬜ | Merge the pull request (deploys), then live hand checks | W5 |
 
 ### 9.1 Summary
 
@@ -259,7 +260,7 @@ App launcher → Workspace & Crew
 *As any user, I want Workspace & Crew in the App launcher so that I can reach it from anywhere.*
 
 - The launcher's Management group gains the tile **Workspace & Crew**, after Package Lib and before Coming Soon. Four tiles wrap to a second row.
-- The tile has no illustration yet: an empty 56 px art slot keeps its size. The header shows the module name only; its icon comes with the illustration.
+- The tile and header use the illustration `Asset/Crew`; the label takes two lines.
 - The current tile, keyboard behaviour and leave guard follow US-11.
 - A signed-out visit goes to Login and returns to `/workspace` after sign-in.
 
@@ -370,7 +371,7 @@ Existing stack: Next.js app in `app/`, Supabase in `supabase/`, and a mock repo 
 - **Database:** one migration adding the read function (`SECURITY INVOKER`), mirrored in `setup-production.sql`. No new tables or columns. Live rollout runs the single file inside `begin` / `commit`; never `db push`. It waits for SD0.
 - **Auth:** the existing session check, extended to `/workspace`.
 - **App:** `ModuleId` and `TILES` in `AppLauncher.tsx`, header, mobile launcher, Account settings.
-- **Asset:** none yet. The user provides the launcher illustration after the screens and journey are done.
+- **Asset:** `Asset/Crew` → `tile-crew` (56) and `module-crew` (18), @1x and @2x.
 
 #### Security and privacy
 

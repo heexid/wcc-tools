@@ -18,11 +18,10 @@ import { useLeaveGuard } from "./LeaveGuard";
 
 export type ModuleId = "booking" | "packages" | "workspace";
 
-/** `art: null` = no illustration yet: the 56 slot stays empty. */
-const TILES: readonly { id: ModuleId | "bookmark"; label: string; href: string | null; art: string | null; name?: string }[] = [
+const TILES: readonly { id: ModuleId | "bookmark"; label: string; href: string | null; art: string; name?: string }[] = [
   { id: "booking" as const, label: "Booking", href: "/bookings", art: "bookings" },
   { id: "packages" as const, label: "Package Lib", href: "/packages", art: "package-lib" },
-  { id: "workspace" as const, label: "Workspace & Crew", href: "/workspace", art: null },
+  { id: "workspace" as const, label: "Workspace & Crew", href: "/workspace", art: "crew" },
   { id: "bookmark" as const, label: "Coming Soon", href: null, art: "lock", name: "Bookmark — coming soon" },
 ];
 
@@ -152,16 +151,12 @@ export function LauncherTiles({
                   : "cursor-pointer border border-border-default bg-surface-default shadow-card hover:border-accent-primary hover:bg-surface-subtle",
             )}
           >
-            {t.art ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
-            ) : (
-              <span aria-hidden className="block size-[calc(var(--spacing-48)+var(--spacing-8))] shrink-0" />
-            )}
-            {t.art ? (
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))] shrink-0" />
+            {t.id !== "workspace" ? (
               <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
             ) : (
-              <span className="text-center text-body text-text-primary">{t.label}</span>
+              <span className="text-center text-body text-text-primary">{t.label}</span> // two lines
             )}
           </button>
         );

@@ -186,7 +186,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - Clicking the current module's tile only closes the launcher. Esc, × and clicking outside also close it, and focus returns to the ⋮⋮ button.
 - If a New or Edit booking has unsaved changes, the leave guard (US-1 / screen 12) shows before switching. **Discard** continues to the chosen module; **Keep editing** stays.
 - Keyboard: Tab / arrow keys move between tiles and Enter opens one. The popover has `role="dialog"` and the label "App launcher".
-- The header shows the active module's icon and name: `Asset/bookings` "Booking" or `Asset/package-lib` "Packages". Workspace & Crew shows its name only and an empty art slot until its illustration is provided.
+- The header shows the active module's icon and name: `Asset/bookings` "Booking" or `Asset/package-lib` "Packages". Workspace & Crew uses `Asset/Crew`.
 
 #### US-12 Cancel a booking
 *As an admin, I want to cancel a booking when the client calls it off so that it stops counting as active work but stays on record.*

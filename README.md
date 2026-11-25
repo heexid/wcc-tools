@@ -125,7 +125,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 |---|---|---|
 | W1 | Figma: screens, mobile, Hi-fi flow | ✅ 2026-11-25 |
 | W2 | `/workspace`, launcher tile, Business information moved from Account settings | ✅ built, not deployed |
-| W3 | People list, search, type filter, migration 015 | ✅ built, not deployed; migration not on live |
+| W3 | People list, search, type filter, migration 015 | ✅ built, not deployed; migration 015 live |
 | W4 | Person panel, links into Booking, mobile sheet | ✅ built, not deployed |
 | W5 | Docs, release | 🟡 docs ✅, tests ✅, release ⬜ |
 

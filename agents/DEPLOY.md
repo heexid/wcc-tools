@@ -120,7 +120,7 @@ select count(*) from public.profiles where active and role = 'admin';   -- must 
 
 ## Upgrade to Workspace & Crew (databases set up before migration 015)
 
-**Not run on the live database yet.** New databases get it from `setup-production.sql`.
+**Run on the live database on 2026-11-25.** Keep these steps for any other database. New databases get it from `setup-production.sql`.
 
 1. **Back up.** `supabase db dump` leaves out the triggers on `auth.users`, the Storage policies and the buckets, so save those too (tested 2026-11-25, SD0 in [`SHARED-DATABASE-PLAN.md`](../context/SHARED-DATABASE-PLAN.md)).
 2. Run [`supabase/migrations/20261125000015_list_people.sql`](../supabase/migrations/20261125000015_list_people.sql) inside `begin; … commit;`. It only adds one read-only function, so the running app is not affected.
