@@ -99,13 +99,13 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. For W2–W5 also means live since 2026-11-25 (pull request #8).
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1 and SD2 are in draft pull request #10 and must not be merged or run on live before SD4.
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
 | ✅ Backup and restore tested; automatic backups postponed (dummy data) | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
-| ✅ Built and tested locally (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
-| 🟡 Built and tested locally (migration 017); CI added, not yet required on `main` | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
+| ✅ Built and tested (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
+| ✅ Built and tested (migration 017); CI required on `main`; not on live | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ⬜ | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
 | ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
 | 🟡 Template drafted | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
@@ -113,8 +113,8 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
 | ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
-| ✅ Built | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
-| 🟡 Released ✅, live hand checks ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
+| ✅ Live | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
+| ✅ Live | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
 
 ### 4.1 SD1 checklist (2026-11-25)
 
@@ -146,7 +146,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ | Run: 60 invoices at the same moment by three admins in two workspaces: no duplicate, no gap, no error |
 | ✅ | Run: 50 workspaces, about 108,000 bookings (in memory): every read under 55 ms |
 | ✅ | CI: a "database" job (isolation, parity, upgrades) in `ci.yml` |
-| ⬜ | CI: seen passing on GitHub, and both jobs required on `main` (user's setting), so a failing test blocks a deploy |
+| ✅ | CI: both jobs pass on GitHub and are required on `main` (pull requests only, admins included), so a failing test blocks a deploy |
 | ⬜ | Live: with SD3, in SD4 |
 
 A saved booking that lists another workspace's crew drops that person, like any unknown id; another workspace's package is rejected.
@@ -250,7 +250,7 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Live hand checks, signed in (user, 2026-11-25): all pass, two changes asked: no lag, and stay in Workspace & Crew | W5 |
 | ✅ | Booking detail opens in place, without a page change | W5 |
 | ✅ | Booking: its own detail panel also opens without a page request | W5 |
-| ⬜ | Deploy these changes | W5 |
+| ✅ | Deployed (pull request #9, 2026-11-26); checked by the user on the preview | W5 |
 | ✅ | `PRICING.md` and `supabase/templates/` are no longer tracked: kept on the owner's machine only | — |
 
 ### 9.1 Summary
