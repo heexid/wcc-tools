@@ -21,6 +21,7 @@ export function ScheduleItem({
   current,
   forceState,
   onOpen,
+  onIntent,
 }: {
   weekday: string;
   day: string;
@@ -30,6 +31,8 @@ export function ScheduleItem({
   current?: boolean;
   forceState?: "hover";
   onOpen?: () => void;
+  /** Pointer or focus reached it: start loading what a click opens. */
+  onIntent?: () => void;
 }) {
   const body = (
     <>
@@ -64,6 +67,8 @@ export function ScheduleItem({
       type="button"
       data-force={forceState}
       onClick={onOpen}
+      onPointerEnter={onIntent}
+      onFocus={onIntent}
       className={cn(
         cls,
         "cursor-pointer bg-surface-default outline-none transition-[background-color] duration-(--dur-hover) ease-(--ease-hover) hover:bg-surface-subtle focus-visible:shadow-focus-ring data-[force=hover]:bg-surface-subtle",

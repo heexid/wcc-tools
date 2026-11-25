@@ -241,7 +241,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 *As any user, I want one list of the team so that I can see who works on what.* Full requirements: `SHARED-DATABASE-PLAN.md` §9.
 - **Page** (`/workspace`): Business information (US-14) on top, **Admin & crew** below. Crew see everything and edit nothing.
 - **List:** every active person, including people without a login: name ("(You)" on yourself), account type (Admin / Crew / No login), job title, upcoming bookings (from today, Canceled excluded). Order: you, admins, crew, no login; A–Z. Search by name or job title plus a type filter. View only.
-- **Person panel** (`?person=<crew id>`): side sheet (bottom sheet on mobile) with **Upcoming** and **Past** (newest first, 20 at a time), grouped by month, Canceled left out. A booking opens its detail in Booking; **See in Booking** opens the Table filtered by that person. An unknown or inactive person shows "This person is no longer in the list."
+- **Person panel** (`?person=<crew id>`): side sheet (bottom sheet on mobile) with **Upcoming** and **Past** (newest first, 20 at a time), grouped by month, Canceled left out. A booking opens its detail over the panel, in place; **See in Booking** opens the Table filtered by that person. An unknown or inactive person shows "This person is no longer in the list."
 
 ### 2.4 Business rules (enforced in the DB and service layer)
 
