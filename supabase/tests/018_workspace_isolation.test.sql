@@ -248,7 +248,7 @@ select is((select coalesce(string_agg(c.relname, ', '), '') from pg_class c wher
   '', 'no direct writes on any table');
 select is((select coalesce(string_agg(c.relname, ', '), '') from pg_class c where c.relnamespace = 'public'::regnamespace and c.relkind = 'r' and c.relname <> 'workspaces'
             and not exists (select 1 from pg_attribute a where a.attrelid = c.oid and a.attname = 'workspace_id' and a.attnotnull)), '', 'every table has a required workspace_id');
--- Reviewed 2026-11-26. A SECURITY DEFINER function bypasses row level security: add one here only after checking that
+-- Reviewed 2026-11-25. A SECURITY DEFINER function bypasses row level security: add one here only after checking that
 -- every id it receives is limited to current_workspace_id().
 select is((select array_agg(p.oid::regprocedure::text order by 1) from (select p.oid from pg_proc p where p.pronamespace = 'public'::regnamespace and p.prosecdef order by p.oid::regprocedure::text) p),
   (select array_agg(x order by x) from unnest(array[

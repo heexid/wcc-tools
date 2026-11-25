@@ -132,7 +132,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ | `setup-production.sql`, seed and generated types updated |
 | ⬜ | Live: with SD2 and SD3, in SD4. **Don't run 016 on live before SD4** |
 
-### 4.2 SD2 checklist (2026-11-26)
+### 4.2 SD2 checklist (2026-11-25)
 
 | | Step |
 |---|---|
@@ -181,7 +181,7 @@ Use workspaces A and B, each with an admin and a crew account.
 | 🟡 settings ✅, PDFs in SD3 | 17 | A's admin edits business information | Only A's settings and PDFs change |
 | 🟡 database ✅, button in SD3 | 18 | Business information in a read-only workspace | Visible, no Edit button; a direct save is rejected |
 
-**CI (part of SD2, added 2026-11-26):** before SD2, `.github/workflows/ci.yml` ran only typecheck, lint, unit tests and build. Original note: add `npm run db:test`, `npm run test:parity` and `npm run test:rls` as required checks. Vercel builds from GitHub on its own, so also block production deploys until the checks pass. Tests that need real Storage or a browser (4–6, 11) stay in `e2e:supabase`, run before each release on a separate stack because it resets its database.
+**CI (part of SD2, added 2026-11-25):** before SD2, `.github/workflows/ci.yml` ran only typecheck, lint, unit tests and build. Original note: add `npm run db:test`, `npm run test:parity` and `npm run test:rls` as required checks. Vercel builds from GitHub on its own, so also block production deploys until the checks pass. Tests that need real Storage or a browser (4–6, 11) stay in `e2e:supabase`, run before each release on a separate stack because it resets its database.
 
 ## 6. Moving the live data
 
@@ -250,7 +250,7 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Live hand checks, signed in (user, 2026-11-25): all pass, two changes asked: no lag, and stay in Workspace & Crew | W5 |
 | ✅ | Booking detail opens in place, without a page change | W5 |
 | ✅ | Booking: its own detail panel also opens without a page request | W5 |
-| ✅ | Deployed (pull request #9, 2026-11-26); checked by the user on the preview | W5 |
+| ✅ | Deployed (pull request #9, 2026-11-25); the user reported the checks pass, before it was merged | W5 |
 | ✅ | `PRICING.md` and `supabase/templates/` are no longer tracked: kept on the owner's machine only | — |
 
 ### 9.1 Summary
