@@ -119,17 +119,16 @@ function Dashboard() {
   };
   // Detail panel (F12, INTERACTIONS 1.13 / 1.18 / 1.19 / 4.4): ?booking=<id> over the list; closing keeps the
   // list's scroll and filters (only the param goes).
-  const openBooking = (id: string) => {
-    const p = new URLSearchParams(params);
-    p.set("booking", id);
-    router.replace(`${path}?${p}`, { scroll: false });
-  };
+  // Through the History API (useSearchParams follows it): only the booking itself is read, with no page request.
+  const setBooking = useCallback((id: string | null) => {
+    const p = new URLSearchParams(window.location.search);
+    if (id) p.set("booking", id);
+    else p.delete("booking");
+    window.history.replaceState(null, "", `${window.location.pathname}${p.size ? `?${p}` : ""}`);
+  }, []);
+  const openBooking = setBooking;
   const bookingId = params.get("booking");
-  const closeBooking = useCallback(() => {
-    const p = new URLSearchParams(params);
-    p.delete("booking");
-    router.replace(`${path}${p.size ? `?${p}` : ""}`, { scroll: false });
-  }, [params, path, router]);
+  const closeBooking = useCallback(() => setBooking(null), [setBooking]);
   const seeInCalendar = (crewId: string) => router.replace(`${path}?crew=${crewId}`, { scroll: false }); // 4.10
   const [avatarPop, setAvatarPop] = useState<(CrewPopoverAnchor & { bookingId: string }) | null>(null);
   const crewCtx = useMemo(() => ({ open: setAvatarPop, active: avatarPop }), [avatarPop]);
