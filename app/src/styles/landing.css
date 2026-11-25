@@ -114,6 +114,40 @@
   transform: translateY(var(--list-from-y));
 }
 
+/* 2b · Final CTA + footer — a staged entrance, once per visit (better-motion): mascot → headings → button, then
+   Product → Company → bottom bar. 100 ms apart (--reveal-base puts
+   the footer after the CTA when both arrive at once), each 300 ms of opacity + 12px rise + 4px blur → sharp. The mascot
+   skips the blur: filtering a live WebGL canvas repaints it every frame. Reduced motion: opacity only, together. */
+.lp-js [data-reveal="stage"],
+.lp-js [data-reveal-item] {
+  transition-property: opacity, transform, filter;
+  transition-duration: calc(var(--dur-swap) * 2);
+  transition-timing-function: var(--ease-out);
+  transition-delay: calc((var(--reveal-base, 0) + var(--reveal-i, 0)) * var(--stagger-step) * 2);
+}
+.lp-js [data-reveal="stage"][data-reveal-sharp] {
+  transition-property: opacity, transform;
+}
+.lp-js [data-reveal="group"]:not([data-shown]) {
+  opacity: 1;
+  transform: none;
+}
+.lp-js [data-reveal="stage"]:not([data-shown]),
+.lp-js [data-reveal="group"]:not([data-shown]) [data-reveal-item] {
+  opacity: 0;
+  transform: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lp-js [data-reveal="stage"]:not([data-shown]),
+  .lp-js [data-reveal="group"]:not([data-shown]) [data-reveal-item] {
+    transform: translateY(var(--spacing-12));
+    filter: blur(var(--spacing-4));
+  }
+  .lp-js [data-reveal="stage"][data-reveal-sharp]:not([data-shown]) {
+    filter: none;
+  }
+}
+
 /* 3 · FAQ — the answer row opens (0fr → 1fr, the accordion exception) and fades; the plus's bar rotates flat. */
 .lp-faq-panel {
   transition-property: grid-template-rows, margin-top;

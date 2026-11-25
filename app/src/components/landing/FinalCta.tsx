@@ -42,16 +42,18 @@ export function FinalCta() {
   const cheer = { onPointerEnter: () => setMood("happy"), onPointerLeave: () => setMood("idle"), onFocus: () => setMood("happy"), onBlur: () => setMood("idle") };
 
   return (
-    <div ref={block} data-reveal className="flex flex-col items-center text-center">
-      <Mascot size="hero" state={mood} apiRef={mascot} />
+    <div ref={block} className="flex flex-col items-center text-center">
+      <div data-reveal="stage" data-reveal-sharp>
+        <Mascot size="hero" state={mood} apiRef={mascot} />
+      </div>
       {/* z-1: the mascot's canvas overflows its box and would cover the text */}
-      <h2 className="relative z-1 mt-16 text-marketing-heading text-balance">
+      <h2 data-reveal="stage" className="relative z-1 mt-16 text-marketing-heading text-balance">
         <span className="block text-text-primary">Stop adding it up by hand</span>
         <span className="mx-auto mt-8 block text-text-secondary max-desktop:max-w-[calc(var(--spacing-64)*7+var(--spacing-32))]">
           Move every booking and payment into one place
         </span>
       </h2>
-      <div className="relative z-1 mt-24 flex items-center max-tablet:w-full max-tablet:flex-col max-tablet:items-stretch">
+      <div data-reveal="stage" className="relative z-1 mt-24 flex items-center max-tablet:w-full max-tablet:flex-col max-tablet:items-stretch">
         <ButtonLink href={GET_STARTED_HREF} size="lg" {...cheer}>
           Start your first booking
         </ButtonLink>

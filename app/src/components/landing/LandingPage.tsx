@@ -471,13 +471,13 @@ function FinalCtaAndFooter() {
       <Container className="relative z-1 pt-(--lp-section-y)">
         <FinalCta />
       </Container>
-      <footer className="relative z-1 flex flex-col gap-64 pt-64">
+      <footer data-reveal="group" className="relative z-1 flex flex-col gap-64 pt-64">
         <nav aria-label="Footer" className="flex flex-col items-center gap-32">
           <FooterColumn title="Product" links={SECTION_LINKS.map((l) => [l.label, l.href])} />
           <FooterColumn title="Company" links={[["Log in", LOGIN_HREF]]} />
         </nav>
         {/* Figma "Bottom bar": page margin 32 · 24 · 16; stacked and centred on phones */}
-        <div className="flex items-center justify-between gap-12 px-32 pb-32 max-desktop:px-(--lp-gutter) max-desktop:pb-24 max-tablet:flex-col max-tablet:gap-8 max-tablet:pb-32 max-tablet:text-center">
+        <div data-reveal-item className="flex items-center justify-between gap-12 px-32 pb-32 max-desktop:px-(--lp-gutter) max-desktop:pb-24 max-tablet:flex-col max-tablet:gap-8 max-tablet:pb-32 max-tablet:text-center">
           <p className="text-heading-panel text-text-primary max-tablet:text-mobile-heading-module">Clarity for every invoice</p>
           <p className="text-caption text-text-primary">© 2026 CIR · WCC &amp; ECC</p>
         </div>
@@ -488,7 +488,7 @@ function FinalCtaAndFooter() {
 
 function FooterColumn({ title, links }: { title: string; links: Array<[string, string]> }) {
   return (
-    <div className="flex flex-col items-center gap-12 text-center">
+    <div data-reveal-item className="flex flex-col items-center gap-12 text-center">
       <p className="text-body-strong text-text-primary">{title}</p>
       <ul className="flex flex-col items-center gap-12">
         {links.map(([label, href]) => (
