@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is built locally (W1–W4 ✅, see §9.0). SD0–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is built locally (W1–W4 ✅, see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -99,11 +99,11 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. ✅ means done in Figma or locally; nothing from W2–W5 is committed or live yet.
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. ✅ means done in Figma or locally; W1–W5 are committed on branch `workspace-crew`; nothing is pushed or live yet.
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
-| ⬜ | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
+| 🟡 Backup and restore tested ✅, automatic backups ⬜ | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
 | ⬜ | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
 | ⬜ | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ⬜ | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
@@ -205,8 +205,12 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Tests for the load errors of the people list, Business information, person panel and Show more (Supabase suite) | W5 |
 | ✅ | Run: speed on local Supabase through the API with 100 people and 10,041 bookings: list 20 ms, panel 54 ms at p95 (targets 300 and 500 ms) | W5 |
 | ⬜ | Launcher illustration and header icon (from the user) | W5 |
-| ⬜ | SD0: tested backup of the live database | SD0 |
-| ⬜ | Commit, run migration 015 on live, deploy, live hand checks (in this order) | W5 |
+| ✅ | SD0: live database and Storage files backed up (2026-11-25) and restored into a separate local stack. Row counts, every table hash, invoice hashes, accounts, rules and 18 of 18 files match live. The standard dump leaves out the account triggers, Storage rules and buckets; the backup has an `extra.sql` for them | SD0 |
+| ✅ | SD0: live has exactly one settings row | SD0 |
+| ✅ | Run: migration 015 on the restored copy of live: every row unchanged, the list returns everyone active | W5 |
+| ⬜ | SD0: automatic backups (live has none; point-in-time recovery is off) | SD0 |
+| ✅ | Commit (branch `workspace-crew`) | W5 |
+| ⬜ | Fresh backup, migration 015 on live, deploy, live hand checks (in this order) | W5 |
 
 ### 9.1 Summary
 

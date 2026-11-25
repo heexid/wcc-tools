@@ -127,7 +127,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | W2 | `/workspace`, launcher tile, Business information moved from Account settings | ✅ built, not deployed |
 | W3 | People list, search, type filter, migration 015 | ✅ built, not deployed; migration not on live |
 | W4 | Person panel, links into Booking, mobile sheet | ✅ built, not deployed |
-| W5 | Docs, release | 🟡 docs ✅, tests ✅, release waits for SD0 |
+| W5 | Docs, release | 🟡 docs ✅, tests ✅, release ⬜ |
 
 ### Mobile layouts
 
@@ -185,7 +185,7 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 | D3: does the module use the existing internal-tools Supabase auth project? | P0 / P4 | Your decision |
 | Figma note for the stale-save notice (INTERACTIONS 2.19) | P7 | Figma update |
 | Re-export the Figma PNGs after the 2026-11-14 design sync and the 2026-11-21 form / detail / invoice changes (clears the 53 inherited visual failures) | P12 | `npm run figma:receiver` |
-| **No backups on the live database** (checked 2026-11-24: none listed). One manual dump was taken before migration 014; it has not been test-restored | P13 | A Supabase plan with backups, or scheduled dumps |
+| **No backups on the live database** (checked 2026-11-24: none listed). A manual backup of 2026-11-25 (database and Storage) was restored and matched live; the one before migration 014 was not test-restored | P13 | A Supabase plan with backups, or scheduled dumps |
 | Re-export the Figma PNGs for 02b / 03b, and add LO1b / MS3b to the visual gates | Crew types, log out | `npm run figma:receiver` (only when asked) |
 | Failing before crew types too: 14 a11y checks (contrast), `mobile-ms3` screenshot, booking detail overflow at 320 px, and the Supabase e2e "calendar loads only the visible range" (asks for one week, not the month) | P12 | Investigation |
 | Contrast tokens and 2 ARIA fixes | P12 | A design decision on the contrast tokens |
