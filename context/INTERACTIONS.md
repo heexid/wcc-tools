@@ -131,7 +131,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | # | Element | Status | Note |
 |---|---|---|---|
 | 6.1 | Language, workspace selector | ✅ | Existing CIR shell |
-| 6.1a | **App launcher** ⋮⋮ → popover; current module tile highlighted; tile → switch module (Booking ⇄ Package Lib); current tile / Esc / × / outside click → close; unsaved booking → leave guard first | ✅ | Launchpad page · flow lanes A (L1 → L3) and B (M1 → M3) · PRD US-11 |
+| 6.1a | **App launcher** ⋮⋮ → popover; current module tile highlighted; tile → switch module (Booking, Package Lib, Workspace & Crew); current tile / Esc / × / outside click → close; unsaved booking → leave guard first | ✅ | Launchpad page · flow lanes A (L1 → L3) and B (M1 → M3) · PRD US-11 |
 | 6.2 | Success toasts | ✅ | 05, 05c, B5 |
 | 6.3 | Loading | ✅ | Skeleton rows (table, 8 + footer), skeleton date cells (calendar; week / day 3–4 blocks), KPI value + rail skeletons, DS `Loader` (5×5 orchid dots) in the detail panel — appears only after 250 ms so fast loads never flash it. Filters, search and view switch stay interactive. Figma: CIR · Design System → Pattern · Data & content (`Skeleton`, `Loader`). Package library has no skeleton yet |
 | 6.4 | `crew` account type (read-only; was `viewer` until 2026-11-24) | ✅ | Hide New booking (header, empty states, quick-add targets), Edit booking, Create invoice, the Cancel booking section, Archive / Restore, New package and Edit package. `/bookings/new` → `/bookings`; `/bookings/[id]/edit` → read-only view. Everything else stays visible. Prototype switch: `/dev/role` |
@@ -141,8 +141,12 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 6.8 | **Edit name** → modal → Save | 2–50 chars; error "Enter 2–50 characters."; toast "Name updated", header updates | ✅ | **AC3**, **AC3b**, **AC4** · flow B |
 | 6.9 | **Change password** → modal → Update | Current / new / confirm, live rules; errors inline; others logged out; toast | ✅ | **AC5**, **AC6**, **AC7** · flow C |
 | 6.10 | **Log out** → centred confirm → Login | Cancel / Esc stays. On confirm the button is disabled and shows a spinner with "Logging out…", and the dialog can't be closed until Login opens (2026-11-24). Unsaved booking → leave guard first (wired; not reachable today — New / Edit booking use the Editor header without the account menu); toast "You’ve logged out" (top-centre, 32 from the top on Login) | ✅ | **LO1**, **LO1b** (in progress), **LO2** · flow D · mobile **MS3**, **MS3b** |
-| 6.11 | **Edit** (Business information card) → modal | Admin only (crew: no button). Modal opens **prefilled**: logo upload (Upload / Replace + Remove), Business name, Address (text area, ≤ 150), Email, Phone number. Cancel / Esc / × discard the draft | ✅ | **AC8**, **AC9** · flow E |
-| 6.12 | **Save changes** (Business information) | Validates all fields at once: "Enter 2–60 characters." · "Enter the business address." · "Enter a valid email address." · "Enter a valid phone number." · logo "Use a PNG, JPG or WebP image." / "Logo must be 1 MB or smaller."; errors stay inline and clear as fixed. Success → close + toast "Business information updated"; the next invoice PDF's Brand row (logo/initials, name, address, phone · email) and From block show it. Failure → "Couldn't save…" inline | ✅ | **AC9b**, **AC10** · flow E · PDF 11 / 11b / 11c |
+| 6.11 | **Edit** (Business information card) → modal | Admin only (crew: no button). Modal opens **prefilled**: logo upload (Upload / Replace + Remove), Business name, Address (text area, ≤ 150), Email, Phone number. Cancel / Esc / × discard the draft | ✅ | Workspace & Crew **WC1**, **WC14** · flow B · mobile **WM5** |
+| 6.12 | **Save changes** (Business information) | Validates all fields at once: "Enter 2–60 characters." · "Enter the business address." · "Enter a valid email address." · "Enter a valid phone number." · logo "Use a PNG, JPG or WebP image." / "Logo must be 1 MB or smaller."; errors stay inline and clear as fixed. Success → close + toast "Business information updated"; the next invoice PDF's Brand row (logo/initials, name, address, phone · email) and From block show it. Failure → "Couldn't save" alert at the top of the form | ✅ | **WC15**, **WC16**, **WC17** · flow B · mobile **WM6** · PDF 11 / 11b / 11c |
+| 6.13 | **Workspace & Crew** tile → `/workspace` | Business information, then Admin & crew. Loading skeletons; each part has its own load error with Try again | ✅ | **WC1**–**WC3**, **WC5**, **WC5b** · flow A |
+| 6.14 | Search + **Account type** filter (people) | Combine; "Showing n of N people"; no match → "No people match your search." + Reset. Mobile: chips | ✅ | **WC4**, **WC6** · mobile **WM1**, **WM2** |
+| 6.15 | **Person row** → person panel | Whole row, Enter. Upcoming / Past, month headings, Show more; × / Esc / scrim close, focus back to the row; stale link → toast | ✅ | **WC8**–**WC13**, **WC19** · flow A · mobile **WM3**, **WM4** |
+| 6.16 | Panel booking / **See in Booking** | Booking detail in Booking (Back reopens the panel) / Table with only this crew filter | ✅ | flow A |
 
 ---
 
@@ -150,6 +154,6 @@ All 96 interactions are now defined. There are no ❌ items left.
 
 | Status | Count |
 |---|---|
-| ✅ Designed | 80 |
+| ✅ Designed | 84 |
 | 📝 Spec (behaviour defined, reuses existing visuals) | 16 |
 | ❌ Undefined | 0 |

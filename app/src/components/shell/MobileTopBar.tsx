@@ -21,6 +21,7 @@ import { useLeaveGuard } from "./LeaveGuard";
 const MODULES: Record<ModuleId, { name: string; href: string; art: string }> = {
   booking: { name: "Booking", href: "/bookings", art: "bookings" },
   packages: { name: "Packages", href: "/packages", art: "package-lib" },
+  workspace: { name: "Workspace & Crew", href: "/workspace", art: "crew" },
 };
 
 export function MobileTopBar({

@@ -22,6 +22,8 @@ const SCREENS: [string, string][] = [
   ["Edit booking", "/bookings/BK-2026-0142/edit"],
   ["Package library", "/packages"],
   ["Account", "/account"],
+  ["Workspace & Crew", "/workspace"],
+  ["Workspace & Crew · person panel", "/workspace?person=crew_rp"],
 ];
 
 for (const crew of [false, true]) {

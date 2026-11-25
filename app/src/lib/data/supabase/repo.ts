@@ -10,7 +10,7 @@ import type { BookingErrors, BookingInput, BookingQuery, BookingRow, BookingDeta
 import type * as Mock from "../repo";
 import { invalidateAll } from "../cache";
 import { NetworkError, PROFILE_CHANGED, type Catalog } from "../shared";
-import type { Business, Crew, Invoice, InvoiceSnapshot, PaymentInstruction, Profile } from "../types";
+import type { Business, Crew, Invoice, InvoiceSnapshot, PaymentInstruction, Person, Profile } from "../types";
 import * as act from "./actions";
 import { countBookingsWith, filterCatalogWith, getKpisWith, listAllBookingsWith, listPackagesWith, rpc } from "./reads";
 
@@ -163,6 +163,8 @@ export const listCrew: typeof Mock.listCrew = async () => {
   if (res.error) throw new NetworkError("listCrew");
   return res.data.map((c): Crew => ({ id: c.id, name: c.name, role: c.role, isActive: c.is_active, userId: c.user_id }));
 };
+
+export const listPeople: typeof Mock.listPeople = () => read<Person[]>("listPeople", "list_people", { p_today: today() });
 
 // ── Bookings: read ──────────────────────────────────────────────────────────────────────────────
 export const listBookings: typeof Mock.listBookings = (q: BookingQuery = {}) =>

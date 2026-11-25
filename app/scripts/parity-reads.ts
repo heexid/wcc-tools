@@ -153,6 +153,16 @@ async function main() {
     const got = await q<Row>(pg, "select public.get_crew_schedule($1::uuid, $2::date) as r", [uuid(c.id), TODAY]);
     check(`crew schedule · ${c.name}`, want, { ...got, upcoming: (got.upcoming as Row[]).map(strip) });
   }
+  // list_people: names, titles and counts (account types come from logins, which the seed doesn't have).
+  {
+    const slim = (p: Row) => ({ crewId: p.crewId, name: p.name, jobTitle: p.jobTitle, upcomingCount: p.upcomingCount });
+    const ids = new Set(db.crew.filter((c) => !c.userId).map((c) => uuid(c.id)));
+    const sort = (a: Row, b: Row) => String(a.crewId).localeCompare(String(b.crewId));
+    const up = filterBookings(db, { view: "calendar", from: TODAY });
+    const want = db.crew.filter((c) => !c.userId && c.isActive).map((c): Row => ({ crewId: uuid(c.id), name: c.name, jobTitle: c.role, upcomingCount: up.filter((b) => b.crewIds.includes(c.id)).length })).sort(sort);
+    const got = (await q<Row[]>(pg, "select public.list_people($1::date) as r", [TODAY])).filter((p) => ids.has(p.crewId as string)).map((p): Row => slim(p)).sort(sort);
+    check("people", want, got);
+  }
   // The mock's own listPackages (its search trimming, its filters). `bookings`: the mock adds Figma's legacy counts,
   // so compare the SQL count with the real number of seeded bookings per package instead.
   for (const tab of [undefined, "active", "archived"] as const) {

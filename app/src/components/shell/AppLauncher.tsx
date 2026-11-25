@@ -16,11 +16,12 @@ import { useLeaveGuard } from "./LeaveGuard";
 // radius card. Current: surface/accent + 2px border/accent + Shadow/Card · Available: surface/default + 1px
 // border/default + Shadow/Card · Hover: surface/subtle + 1px accent/primary · Locked: surface/header, no stroke.
 
-export type ModuleId = "booking" | "packages";
+export type ModuleId = "booking" | "packages" | "workspace";
 
-const TILES = [
+const TILES: readonly { id: ModuleId | "bookmark"; label: string; href: string | null; art: string; name?: string }[] = [
   { id: "booking" as const, label: "Booking", href: "/bookings", art: "bookings" },
   { id: "packages" as const, label: "Package Lib", href: "/packages", art: "package-lib" },
+  { id: "workspace" as const, label: "Workspace & Crew", href: "/workspace", art: "crew" },
   { id: "bookmark" as const, label: "Coming Soon", href: null, art: "lock", name: "Bookmark — coming soon" },
 ];
 
@@ -122,7 +123,7 @@ export function LauncherTiles({
   fluid?: boolean;
 }) {
   return (
-    <div className="flex gap-compact">
+    <div className={cn("grid gap-compact", fluid ? "grid-cols-3" : "w-max grid-cols-[repeat(3,max-content)]")}>
       {TILES.map((t, i) => {
         const isCurrent = t.id === current;
         const locked = !t.href;
@@ -139,8 +140,8 @@ export function LauncherTiles({
             aria-label={t.name ?? t.label}
             onClick={() => onChoose(t)}
             className={cn(
-              "flex shrink-0 flex-col items-center justify-center gap-compact rounded-card p-inset outline-none",
-              fluid ? "h-launcher-tile min-w-0 flex-1" : "size-launcher-tile",
+              "flex shrink-0 flex-col items-center justify-center gap-compact rounded-card p-compact outline-none",
+              fluid ? "h-launcher-tile min-w-0" : "size-launcher-tile",
               "transition-[background-color,border-color,transform] duration-(--dur-hover) ease-(--ease-hover) focus-visible:shadow-focus-ring",
               "active:scale-(--press-scale) active:duration-(--dur-press) active:ease-(--ease-out) disabled:active:scale-100",
               locked
@@ -151,8 +152,12 @@ export function LauncherTiles({
             )}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))]" />
-            <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
+            <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))] shrink-0" />
+            {t.id !== "workspace" ? (
+              <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
+            ) : (
+              <span className="text-center text-body text-text-primary">{t.label}</span> // two lines
+            )}
           </button>
         );
       })}

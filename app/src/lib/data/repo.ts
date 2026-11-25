@@ -11,7 +11,8 @@ import { buildInvoice, invoicesOf, nextNumber, recompute } from "./ledger";
 import { NetworkError, passwordRules, type Catalog } from "./shared";
 import { getDb, transaction } from "./store";
 import { invalidateAll } from "./cache";
-import type { Booking, BookingStatus, Business, Crew, Db, Invoice, Package, PaymentInstruction, Profile } from "./types";
+import type { Booking, BookingStatus, Business, Crew, Db, Invoice, Package, PaymentInstruction, Person, Profile } from "./types";
+import { CREW_LOGINS } from "./seed";
 
 // ── Dev controls ───────────────────────────────────────────────────────────────────
 // Compile-time flag (next.config.ts sets it). Kept as a per-module const on purpose: Next inlines the
@@ -209,6 +210,21 @@ export async function listCrew(): Promise<Crew[]> {
   return call(null, () => clone(getDb().crew.filter((c) => c.isActive)));
 }
 
+/** Workspace & Crew → Admin & crew: every active person with the number of upcoming bookings (from today, Canceled excluded). */
+export async function listPeople(): Promise<Person[]> {
+  return call(null, () => {
+    const d = getDb();
+    const upcoming = filterBookings(d, { view: "calendar", from: today() });
+    return d.crew
+      .filter((c) => c.isActive)
+      .map((c) => {
+        const isYou = c.userId === d.profile.id;
+        const type = isYou ? d.profile.role : CREW_LOGINS.includes(c.id) ? ("crew" as const) : ("none" as const);
+        return { crewId: c.id, name: c.name, jobTitle: c.role, type, isYou, upcomingCount: upcoming.filter((b) => b.crewIds.includes(c.id)).length };
+      });
+  });
+}
+
 // ── Bookings: read ──────────────────────────────────────────────────────────────────
 export type BookingRow = Booking & { remaining: number; latestInvoiceType: InvoiceType | null; invoiceTypes: InvoiceType[]; invoiceCount: number };
 const toRow = (d: Db, b: Booking): BookingRow => {
@@ -230,7 +246,7 @@ export type BookingQuery = {
    *  (PRD US-7 "booking date asc from today"; Figma 02 opens on 10 Nov). */
   today?: ISODate;
   page?: number;
-  pageSize?: 10 | 25 | 50;
+  pageSize?: 10 | 20 | 25 | 50;
 };
 
 const STATUS_ORDER: Record<BookingStatus, number> = { draft: 0, partially_paid: 1, paid: 2, canceled: 3 };
@@ -289,7 +305,7 @@ export async function listBookings(q: BookingQuery = {}) {
       if (Number.isNaN(n)) return d;
       return Number.isFinite(n) ? Math.floor(n) : n > 0 ? Number.MAX_SAFE_INTEGER : -Number.MAX_SAFE_INTEGER;
     };
-    const size = Math.max(1, Math.min(100, num(q.pageSize, 10))) as 10 | 25 | 50;
+    const size = Math.max(1, Math.min(100, num(q.pageSize, 10))) as 10 | 20 | 25 | 50;
     const pages = Math.max(1, Math.ceil(all.length / size));
     const page = Math.min(Math.max(1, num(q.page, 1)), pages);
     return { rows: all.slice((page - 1) * size, page * size), total: all.length, page, pages, pageSize: size };
@@ -587,7 +603,7 @@ export async function getSettings() {
   return call(null, () => clone(getDb().settings));
 }
 
-/** Business information shown in Account settings and printed in the invoice PDF's Brand row (PRD US-14). */
+/** Business information shown in Workspace & Crew and printed in the invoice PDF's Brand row (PRD US-14). */
 export async function getBusiness(): Promise<Business> {
   return call(null, () => clone(getDb().settings.business));
 }

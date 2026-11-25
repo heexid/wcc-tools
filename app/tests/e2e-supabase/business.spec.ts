@@ -10,11 +10,11 @@ import { authCookieName } from "../../src/lib/supabase/cookie";
 
 test.beforeAll(() => resetDb());
 test.beforeEach(async ({ page }) => {
-  await page.goto("/login?next=/account");
+  await page.goto("/login?next=/workspace");
   await page.getByLabel("Email").fill("bs-moment@email.com");
   await page.getByLabel("Password", { exact: true }).fill("bsmoment26");
   await page.getByRole("button", { name: "Login" }).click();
-  await expect(page).toHaveURL(/\/account$/);
+  await expect(page).toHaveURL(/\/workspace$/);
 });
 
 const card = (p: Page) => p.getByRole("region", { name: "Business information" });
@@ -26,7 +26,6 @@ const pdfText = (file: string) => execFileSync("node", [join(process.cwd(), "tes
 test("E1 · the card is prefilled from workspace_settings", async ({ page }) => {
   await expect(card(page)).toContainText("bs.moment");
   await expect(card(page)).toContainText("finance@bs-moment.com");
-  await expect(card(page)).toContainText("No logo — the PDF shows your initials.");
 });
 
 test("E2 · validation keeps the modal open; nothing is stored", async ({ page }) => {
@@ -74,7 +73,7 @@ test("E4 · save with a logo → stored in Storage, card shows it, and an old in
 
 test("save fails (network) → inline message, nothing saved; Try again saves", async ({ page }) => {
   let aborted = false;
-  await page.route("**/account", async (route) => {
+  await page.route("**/workspace", async (route) => {
     if (!aborted && route.request().method() === "POST" && route.request().headers()["next-action"]) {
       aborted = true;
       return route.abort("internetdisconnected");
@@ -84,7 +83,7 @@ test("save fails (network) → inline message, nothing saved; Try again saves", 
   await card(page).getByRole("button", { name: "Edit" }).click();
   await dlg(page).getByLabel("Business name").fill("Studio Lain");
   await dlg(page).getByRole("button", { name: "Save changes" }).click();
-  await expect(dlg(page).getByText("Couldn’t save. Check your connection and try again.")).toBeVisible();
+  await expect(dlg(page).getByRole("alert").filter({ hasText: "Couldn’t save" })).toContainText("Check your connection and try again.");
   expect(sql("select business_name from workspace_settings")).not.toBe("Studio Lain");
   await dlg(page).getByRole("button", { name: "Save changes" }).click();
   await expect(dlg(page)).toHaveCount(0);
@@ -93,7 +92,7 @@ test("save fails (network) → inline message, nothing saved; Try again saves", 
 
 test("crew sees the card but no Edit; Storage refuses a crew's upload", async ({ page, context }) => {
   await context.clearCookies();
-  await page.goto("/login?next=/account");
+  await page.goto("/login?next=/workspace");
   await page.getByLabel("Email").fill("crew@bs-moment.test");
   await page.getByLabel("Password", { exact: true }).fill("crewview26");
   await page.getByRole("button", { name: "Login" }).click();

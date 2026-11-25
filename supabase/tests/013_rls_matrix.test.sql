@@ -70,6 +70,7 @@ begin
     perform pg_temp.try(who, 'save_package', 'rpc', $q$select public.save_package('{"name":"RLS pkg","price":1,"description":""}')$q$);
     perform pg_temp.try(who, 'update_business', 'rpc', $q$select public.update_business('{"name":"bs.moment","address":"Jl. Rawa Mangun No. 12, Jakarta Timur","email":"finance@bs-moment.com","phone":"+62 21-555-0100"}')$q$);
     perform pg_temp.try(who, 'list_bookings', 'select', $q$select jsonb_array_elements(public.list_bookings('{}') -> 'rows')$q$);
+    perform pg_temp.try(who, 'list_people', 'select', $q$select jsonb_array_elements(public.list_people('2026-11-10'))$q$);
     perform pg_temp.try(who, 'get_settings', 'select', $q$select 1 where public.get_settings() is not null$q$);
     perform pg_temp.try(who, 'my_profile', 'select', $q$select 1 where public.my_profile() is not null$q$);
     perform pg_temp.try(who, 'next_invoice_number', 'rpc', $q$select public.next_invoice_number(2099)$q$);
@@ -107,7 +108,7 @@ select w.who, r.obj, r.op,
   end
 from (values ('anon'), ('crew'), ('admin')) w(who),
      (values ('save_booking', 'rpc'), ('create_invoice', 'rpc'), ('cancel_booking', 'rpc'), ('save_package', 'rpc'), ('update_business', 'rpc'),
-             ('list_bookings', 'select'), ('get_settings', 'select'), ('my_profile', 'select'), ('next_invoice_number', 'rpc'), ('save_booking_tx', 'rpc')) r(obj, op);
+             ('list_bookings', 'select'), ('list_people', 'select'), ('get_settings', 'select'), ('my_profile', 'select'), ('next_invoice_number', 'rpc'), ('save_booking_tx', 'rpc')) r(obj, op);
 
 select is((select count(*)::int from got), (select count(*)::int from want), 'every matrix cell was exercised');
 select set_eq($$ select who, obj, op, result from got $$, $$ select who, obj, op, result from want $$, 'RLS / grant matrix matches the P10 table exactly');

@@ -54,6 +54,9 @@ export const CREW: Crew[] = [
   { id: "crew_sd", name: "Sinta Dewi", role: "Make-up artist", isActive: true },
 ];
 
+/** Mock only: crew who have their own login (the store has no other accounts). Everyone else shows "No login". */
+export const CREW_LOGINS: readonly string[] = ["crew_rp", "crew_da", "crew_bs", "crew_np"];
+
 type InvDef = { type: InvoiceType; amount: number; at: string; number?: string; dp?: [DpMethod, number] };
 type BookingDef = {
   ref: string;

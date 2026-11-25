@@ -2647,8 +2647,39 @@ begin
   end loop;
 end $$;
 
+-- ═══ 20261125000015_list_people.sql ═══
+-- 015 · Workspace & Crew people list (context/SHARED-DATABASE-PLAN.md §9.5): every active crew entry with its account
+-- type and its number of upcoming bookings (booking date from p_today, Canceled excluded).
+-- SECURITY INVOKER: the caller's RLS applies. No email or user id is returned. The app sorts and filters.
+create function public.list_people(p_today date)
+returns jsonb
+language sql
+stable
+set search_path = ''
+as $$
+  with upcoming as (
+    select bc.crew_id, count(*)::int as n
+      from public.booking_crew bc
+      join public.bookings b on b.id = bc.booking_id
+     where b.booking_date >= p_today and b.status <> 'canceled'
+     group by bc.crew_id
+  )
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'crewId', c.id, 'name', c.name, 'jobTitle', c.role,
+           'type', coalesce(p.role, 'none'),
+           'isYou', coalesce(c.user_id = (select auth.uid()), false),
+           'upcomingCount', coalesce(u.n, 0)) order by c.name, c.id), '[]')
+    from public.crew c
+    left join public.profiles p on p.id = c.user_id
+    left join upcoming u on u.crew_id = c.id
+   where c.is_active;
+$$;
+
+revoke execute on function public.list_people(date) from public, anon;
+grant execute on function public.list_people(date) to authenticated;
+
 -- ═══ Workspace defaults (the app needs this one row) ═══
--- Change these later: business info on Account settings in the app; bank details / terms here or in the SQL Editor.
+-- Change these later: business info on Workspace & Crew in the app; bank details / terms here or in the SQL Editor.
 insert into public.workspace_settings (workspace_id, business_name, business_address, business_email, business_phone, default_terms, default_payment)
 select gen_random_uuid(), 'bs.moment', 'Jl. Rawa Mangun No. 12, Jakarta Timur', 'finance@bs-moment.com', '+62 21-555-0100',
        'Remaining balance is due H-3 before the booking date. DP is non-refundable once the date is locked.',
