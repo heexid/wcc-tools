@@ -26,9 +26,10 @@ The app has two modules, **Booking** and **Package Library**, plus a login page 
 | 14 | [Crew schedule](#14-crew-schedule) | Popover from crew chips | Everyone |
 | 15 | [Invoice PDF](#15-invoice-pdf) | Invoice cards and dialogs | Everyone |
 | 16 | [Account settings](#16-account-settings) | `/account` | Everyone (own profile) |
-| 17 | [Business information](#17-business-information) | `/account` | Admin edits, Crew reads |
+| 17 | [Business information](#17-business-information) | `/workspace` | Admin edits, Crew reads |
 | 18 | [Roles and permissions](#18-roles-and-permissions) | Whole app | — |
 | 19 | [Leave guard (unsaved changes)](#19-leave-guard-unsaved-changes) | New and Edit booking | Admin |
+| 20 | [Workspace & Crew](#20-workspace--crew) | `/workspace` | Everyone (Admin edits business information) |
 
 ---
 
@@ -41,7 +42,7 @@ The app has two modules, **Booking** and **Package Library**, plus a login page 
 
 ## 2. App launcher
 
-- The **⋮⋮ button** in the Global header opens an "App launcher" popover with two live tiles: **Booking** and **Package Lib**. A third tile, **Bookmark**, is shown as "Coming soon" and can't be opened.
+- The **⋮⋮ button** in the Global header opens an "App launcher" popover with three live tiles: **Booking**, **Package Lib** and **Workspace & Crew**. A fourth tile, **Bookmark**, is shown as "Coming soon" and can't be opened.
 - The current module's tile is highlighted.
 - Keyboard: Tab and arrow keys move between tiles, Enter opens one, and Esc closes the popover and returns focus to the ⋮⋮ button.
 - If a New or Edit booking has unsaved changes, the leave guard appears before switching modules (see [19](#19-leave-guard-unsaved-changes)).
@@ -201,7 +202,7 @@ Route: `/account`. Opened from the profile menu (avatar, name and role at the to
 
 ## 17. Business information
 
-Shown as a card on `/account`, titled **Business information**. It holds the details that appear on every invoice PDF.
+Shown as the first card on **Workspace & Crew** (`/workspace`). It holds the details that appear on every invoice PDF.
 
 - **Fields:** logo, business name (2–60 characters), address (up to 150 characters), email, and phone (8–15 digits).
 - **Logo:** PNG, JPG or WebP, up to 1 MB. Square works best. The app resizes it to 256 px or smaller. Without a logo, the PDF shows initials.
@@ -244,3 +245,12 @@ Tablet-specific layouts (phones are supported; tablets use the desktop layout); 
 ---
 
 *Based on `context/PRD.md`, `context/INTERACTIONS.md` and `README.md`. The app is under active development: the progress table in `README.md` lists which parts are done.*
+
+## 20. Workspace & Crew
+
+Route: `/workspace`, from the app launcher.
+
+- **Business information** is the first card (see [17](#17-business-information)).
+- **Admin & crew** lists every active person: name, account type (Admin, Crew or No login), job title and number of upcoming bookings. You come first. Search by name or job title, and filter by type.
+- **Click a person** to see their **Upcoming** and **Past** bookings. Canceled bookings are left out. Click a booking to open it in Booking, or **See in Booking** for the table filtered by that person.
+- The list is view only. The developer manages accounts (see [`DEPLOY.md`](DEPLOY.md)).

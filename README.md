@@ -60,7 +60,8 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | Area | What it does | PRD |
 |---|---|---|
 | Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. A live mascot reacts to the form: its eyes follow the cursor, it watches the caret while you type the email, closes its eyes for the password (peeks when you show it), and looks worried on errors. | §4.3 |
-| App launcher | ⋮⋮ popover to switch between Booking and Package Lib (Bookmark is "Coming soon"). | US-11 |
+| App launcher | ⋮⋮ popover to switch between Booking, Package Lib and Workspace & Crew (Bookmark is "Coming soon"). | US-11 |
+| Workspace & Crew | Business information, plus every active admin and crew member with their upcoming bookings. Click a person for Upcoming and Past. View only. | US-14, US-15 |
 | Package Library | Create, edit, archive and restore packages. Duplicate active names are blocked. Description up to 1000 characters. | US-0 |
 | New / Edit booking | One form. **Client & schedule** first: client, phone (`+62…`), booking name, booking date, optional **event start** (30-minute time select), **location** and **notes** (up to 255 characters each). Then package, items, crew, and **Others**: payment instruction and T&C (up to 255 characters). Live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
 | Invoices | The first invoice is **DP** (% or fixed) or **Full**. Later ones are **Partial** or **Paid**. Each invoice is a frozen snapshot, counts as paid straight away, and is numbered `INV-YYYY-NNNN`. | US-2, US-3, US-5 |
@@ -117,6 +118,16 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | F17 | Viewer role, loading states, full regression | 🟡 2026-11-14: 53 inherited visual failures waiting on a PNG re-export; a11y open |
 | F18 | Business information → PDF brand row | ⚠ 2026-11-14: PNG re-export pending |
 | F19 | Booking event details (event start, location, notes): form, detail sheet, invoice PDF, plus Supabase migration 013 | ⚠ 2026-11-21: PNG re-export pending ([log](app/docs/slices/F19.md)) |
+
+### Workspace & Crew
+
+| Slice | Scope | Status |
+|---|---|---|
+| W1 | Figma: screens, mobile, Hi-fi flow | ✅ 2026-11-25 |
+| W2 | `/workspace`, launcher tile, Business information moved from Account settings | ✅ built, not deployed |
+| W3 | People list, search, type filter, migration 015 | ✅ built, not deployed; migration not on live |
+| W4 | Person panel, links into Booking, mobile sheet | ✅ built, not deployed |
+| W5 | Docs, release | 🟡 docs ✅, tests ✅, release waits for SD0 |
 
 ### Mobile layouts
 
@@ -198,12 +209,13 @@ Every test result below is from a **local** Supabase. Staging hasn't been set up
 
 | Doc | Read it for |
 |---|---|
-| [`context/PRD.md`](context/PRD.md) | What and why: user stories US-0 to US-14, business rules 1–14, data model, security and performance requirements, roadmap |
+| [`context/PRD.md`](context/PRD.md) | What and why: user stories US-0 to US-15, business rules 1–14, data model, security and performance requirements, roadmap |
 | [`context/PLAN.md`](context/PLAN.md) | How: mapping from design to code, database and RPC design, domain logic, the list of Figma deliverables |
-| [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (96 rows, 1.1–6.12) with its Figma frame |
+| [`context/INTERACTIONS.md`](context/INTERACTIONS.md) | Every interaction (100 rows, 1.1–6.16) with its Figma frame |
 | [`context/PROTOTYPE-PLAN.md`](context/PROTOTYPE-PLAN.md) | Prototype slices F0–F19, pixel gates G1–G4, motion rules, the prototype tracker |
 | [`context/PRODUCTION-PLAN.md`](context/PRODUCTION-PLAN.md) | Production slices P0–P14, gates PG1–PG7, the RLS matrix, the production tracker, a paste-ready prompt for each slice |
 | [`context/CREW-TYPE-PLAN.md`](context/CREW-TYPE-PLAN.md) | Crew types (admin, crew): decisions, migration 014, slices C1–C5, release steps |
+| [`context/SHARED-DATABASE-PLAN.md`](context/SHARED-DATABASE-PLAN.md) | Workspaces plan (SD0–SD6) and the Workspace & Crew module (W1–W5), with progress |
 | [`agents/DEPLOY.md`](agents/DEPLOY.md) | Going live on Supabase and Vercel |
 | [`agents/FEATURES.md`](agents/FEATURES.md) | Plain-language guide to every feature |
 | `app/docs/slices/`, `production/docs/slices/` | Per-slice logs: what changed, decisions, test results |

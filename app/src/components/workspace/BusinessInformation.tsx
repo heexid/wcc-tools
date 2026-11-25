@@ -5,8 +5,10 @@ import { Button } from "@/components/ds/Button";
 import { Dialog } from "@/components/ds/Dialog";
 import { BottomSheet } from "@/components/ds/BottomSheet";
 import { useIsMobile } from "@/components/ds/useBreakpoint";
+import { Alert } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
 import { InputField } from "@/components/ds/InputField";
+import { Skeleton } from "@/components/ds/Loading";
 import { TextArea } from "@/components/ds/TextArea";
 import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
@@ -16,7 +18,7 @@ import { updateBusiness } from "@/lib/data/repo";
 import type { Business } from "@/lib/data/types";
 import { initials } from "@/lib/format";
 
-// Account settings → "Business information" (PRD US-14, INTERACTIONS 6.11–6.12; Figma Launchpad & Profile → AC8–AC10, lane E).
+// Workspace & Crew → "Business information" (PRD US-14, INTERACTIONS 6.11–6.12; Figma Workspace & Crew → WC1, WC14–WC17, flow lane B).
 
 /** Logo tile [Size=56 | 38]: the uploaded image (contained, hairline border, radius control) or, with no logo, the
  *  business-name initials on the brand avatar fill. */
@@ -32,7 +34,32 @@ export function BusinessLogo({ business, size = 56 }: { business: Business; size
   );
 }
 
-/** Card body rows (label 160 · value · nothing at the end — the Edit button sits in the card head). */
+/** Desktop card body (Figma WC1 › Details): 56 logo · Business name 180 · Address (fills) · Email 230 · Phone 170, gap
+ *  group; label Caption over value Body Strong (gap 2). No business yet = the loading row (WC3). */
+export function BusinessDetails({ business }: { business: Business | null }) {
+  return (
+    <div className="flex items-center gap-group border-t border-border-default pt-base">
+      {business ? <BusinessLogo business={business} /> : <Skeleton className="size-[calc(var(--spacing-64)-var(--spacing-8))] shrink-0 rounded-control" />}
+      <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-group gap-y-base desktop:grid-cols-[calc(var(--spacing-64)*3-var(--spacing-12))_minmax(0,1fr)_calc(var(--spacing-64)*4-var(--spacing-24)-var(--spacing-2))_calc(var(--spacing-64)*3-var(--spacing-24)+var(--spacing-2))]">
+        <Detail label="Business name" value={business?.name} />
+        <Detail label="Address" value={business?.address} />
+        <Detail label="Email" value={business?.email} />
+        <Detail label="Phone" value={business?.phone} />
+      </dl>
+    </div>
+  );
+}
+
+function Detail({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      <dt className="text-caption text-text-secondary">{label}</dt>
+      <dd className="text-body-strong wrap-anywhere whitespace-pre-line text-text-primary">{value ?? <Skeleton className="h-16 w-full max-w-[calc(var(--spacing-64)*2)]" />}</dd>
+    </div>
+  );
+}
+
+/** Mobile card body rows (Figma WM1): label over value, hairline between rows. */
 export function BusinessRows({ business }: { business: Business }) {
   return (
     <>
@@ -121,6 +148,7 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
   const mobile = useIsMobile();
   const [draft, setDraft] = useState<Business>(value);
   const [errors, setErrors] = useState<BusinessErrors>({});
+  const [failed, setFailed] = useState(false);
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const [wasOpen, setWasOpen] = useState(open);
@@ -129,6 +157,7 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
     if (open) {
       setDraft(value);
       setErrors({});
+      setFailed(false);
       setTried(false);
     }
   }
@@ -141,16 +170,22 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
     const e = validateBusiness(draft);
     setTried(true);
     setErrors(e);
+    setFailed(false);
     if (Object.keys(e).length) return;
     setBusy(true);
     const r = await updateBusiness(draft).catch(() => null);
     setBusy(false);
-    if (!r) return setErrors({ name: "Couldn’t save. Check your connection and try again." });
+    if (!r) return setFailed(true);
     if (!r.ok) return setErrors(r.errors);
     onSaved(r.business);
   };
   const fields = (
     <>
+      {failed && (
+        <Alert tone="danger" title="Couldn’t save" className="motion-notice">
+          Check your connection and try again.
+        </Alert>
+      )}
       <LogoField draft={draft} error={errors.logo} onChange={(l) => set("logo", l)} onError={(m) => setErrors((e) => ({ ...e, logo: m }))} />
       <InputField label="Business name" required type="text" value={draft.name} onChange={(e) => set("name", e.target.value)} error={errors.name} helper={BUSINESS_HELPER.name} />
       <TextArea label={<>Address<span aria-hidden className="ml-micro text-text-danger">*</span></>} maxLength={LIMITS.businessAddressMax} value={draft.address} onValueChange={(v) => set("address", v)} error={errors.address} placeholder="Street, city" />
@@ -169,7 +204,7 @@ export function BusinessModal({ open, value, onClose, onSaved }: { open: boolean
     </>
   );
   if (mobile)
-    // Mobile (Figma MA4): sheet "Business information" · logo + 4 fields · Cancel / Save changes (44, equal).
+    // Mobile (Figma WM5): sheet "Business information" · logo + 4 fields · Cancel / Save changes (44, equal).
     return (
       <BottomSheet open={open} onClose={onClose} locked={busy} title="Business information" initialFocus="[data-business-modal] input[type=text]">
         <form data-business-modal noValidate onSubmit={(e) => (e.preventDefault(), void save())} className="flex flex-col gap-base">

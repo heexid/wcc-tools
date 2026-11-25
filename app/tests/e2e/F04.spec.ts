@@ -32,6 +32,8 @@ test.describe("signed in", () => {
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("button", { name: "Package Lib", exact: true })).toBeFocused();
     await page.keyboard.press("ArrowRight");
+    await expect(page.getByRole("button", { name: "Workspace & Crew" })).toBeFocused();
+    await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("button", { name: "Booking", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Bookmark — coming soon" })).toBeDisabled();
   });

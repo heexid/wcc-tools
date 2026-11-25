@@ -46,7 +46,7 @@ export function ScheduleItem({
             </span>
           )}
         </span>
-        <Txt className="text-timestamp text-text-secondary">{meta}</Txt>
+        <Txt className="max-w-full truncate text-timestamp text-text-secondary">{meta}</Txt>
         <PaymentStatusBadge status={status} className="self-start" />
       </span>
       <Icon name="chevron-right" className={cn("size-icon-sm shrink-0 text-text-secondary", current && "opacity-0")} />

@@ -18,9 +18,10 @@ import { useLeaveGuard } from "./LeaveGuard";
 // Grid → App launcher sheet (MS1) · avatar → Account sheet (MS2) → Log out sheet (MS3). No language row: the app is
 // English-only (desktop shows a static label).
 
-const MODULES: Record<ModuleId, { name: string; href: string; art: string }> = {
+const MODULES: Record<ModuleId, { name: string; href: string; art: string | null }> = {
   booking: { name: "Booking", href: "/bookings", art: "bookings" },
   packages: { name: "Packages", href: "/packages", art: "package-lib" },
+  workspace: { name: "Workspace & Crew", href: "/workspace", art: null }, // icon comes with the illustration
 };
 
 export function MobileTopBar({
@@ -58,7 +59,7 @@ export function MobileTopBar({
       >
         <Icon name="grid" className="size-icon-md" />
       </button>
-      {m && !title && (
+      {m?.art && !title && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={`/assets/module-${m.art}.png`} srcSet={`/assets/module-${m.art}.png 1x, /assets/module-${m.art}@2x.png 2x`} alt="" className="block size-icon-md shrink-0" />
       )}

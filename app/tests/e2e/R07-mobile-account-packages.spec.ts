@@ -36,17 +36,6 @@ test.describe("account settings", () => {
     await page.getByRole("button", { name: "Change password" }).click();
     await expect(page.getByRole("dialog", { name: "Change password" })).toBeVisible();
   });
-
-  test("MA4 · Business information sheet: fields + Cancel / Save changes", async ({ page }) => {
-    await page.getByRole("region", { name: "Business information" }).getByRole("button", { name: "Edit" }).click();
-    const sheet = page.getByRole("dialog", { name: "Business information" });
-    await expect(sheet).toBeVisible();
-    expect((await sheet.boundingBox())!.width).toBe(390);
-    await expect(sheet.getByLabel("Business name")).toBeVisible();
-    expect((await sheet.getByRole("button", { name: "Save changes" }).boundingBox())!.height).toBe(44);
-    await sheet.getByRole("button", { name: "Cancel" }).click();
-    await expect(sheet).toBeHidden();
-  });
 });
 
 test.describe("package library", () => {

@@ -14,6 +14,7 @@ const SCREENS: { name: string; url: string; ready: (p: Page) => Promise<unknown>
   { name: "new booking", url: "/bookings/new", ready: (p) => p.getByLabel("Client name", { exact: true }).waitFor() },
   { name: "edit booking (saved items)", url: "/bookings/BK-2026-0142/edit", ready: (p) => p.getByLabel("Item 1 name").waitFor() },
   { name: "booking detail", url: "/bookings?tab=table&booking=BK-2026-0142", ready: (p) => p.getByRole("button", { name: "Edit booking" }).waitFor() },
+  { name: "workspace & crew", url: "/workspace", ready: (p) => p.getByRole("button", { name: "Edit" }).waitFor() },
   { name: "account settings", url: "/account", ready: (p) => p.getByRole("button", { name: "Edit name" }).waitFor() },
   { name: "package library", url: "/packages", ready: (p) => p.getByRole("button", { name: "New package" }).waitFor() },
 ];

@@ -170,7 +170,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 #### US-10 PDF invoice
 *As an admin, I want a professional PDF so that I can send it directly to the client.*
 - A4 portrait, following the existing *Invoice editor → A4 preview* style.
-- **Brand row** (top of the header): the business **logo** (or the name's initials when there is none), **business name**, **address**, and one line with **phone · email**, then the status tag at the far right. All of it comes from **Business information** (US-14) and always shows the *current* values: change them in Account settings and the next PDF you download has them, for old invoices too. Only the business block is live. Money, items, booking details, payment instructions and terms stay exactly as issued (snapshot). (The *From* block was removed 2026-11-21: it repeated the Brand row.)
+- **Brand row** (top of the header): the business **logo** (or the name's initials when there is none), **business name**, **address**, and one line with **phone · email**, then the status tag at the far right. All of it comes from **Business information** (US-14) and always shows the *current* values: change them in Workspace & Crew and the next PDF you download has them, for old invoices too. Only the business block is live. Money, items, booking details, payment instructions and terms stay exactly as issued (snapshot). (The *From* block was removed 2026-11-21: it repeated the Brand row.)
 - **Header layout (2026-11-21):** the meta block shows *Invoice date* and *Booking ref* only. Below the dashed line, two columns: **Bill to** (client name, phone) and **Event** (booking name — 1 line max; booking date · event start; location — 2 lines max; "Notes: …" in secondary text — 2 lines max). Longer text ends in "…", so the header never grows past a fixed height and the invoice stays on one A4 page. Invoices issued before 2026-11-21 have no event details in their snapshot and show the booking name and date only.
 - Contents: business name, logo and contact (from Business information, US-14), invoice number `INV-2026-0001`, invoice date, client name and phone, booking ref, booking name, booking date and event start, location, notes, package line, item breakdown (name, price, qty, subtotal), booking total, invoice type, **this payment**, total paid (including this invoice), remaining balance, payment instructions (bank, account no., account name from Settings), and the booking's Terms & Conditions (≤ 255 chars, copied into the invoice snapshot at issue time).
 - Generated from the **invoice snapshot only**, never from the live booking. Regenerating an old invoice always produces identical figures.
@@ -179,14 +179,14 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 - **First use:** with no bookings at all, the dashboard shows KPIs at 0 ("No data yet"), "Nothing scheduled in the next 7 days" in the rail, and an empty state "No bookings yet" with **New booking** (36).
 
 #### US-11 Switch modules with the App launcher
-*As an admin, I want to jump between Booking and Package Library from anywhere so that I don't have to go back to a home page.*
-- The ⋮⋮ **App launcher** in the Global header opens a popover anchored below it, titled "App launcher". It's grouped by section ("Management": **Booking**, **Package Lib**, Bookmark) and uses the DS *Launcher tile*.
+*As an admin, I want to jump between Booking, Package Library and Workspace & Crew from anywhere so that I don't have to go back to a home page.*
+- The ⋮⋮ **App launcher** in the Global header opens a popover anchored below it, titled "App launcher". It's grouped by section ("Management": **Booking**, **Package Lib**, **Workspace & Crew**, Bookmark; three per row) and uses the DS *Launcher tile*.
 - The current module's tile is highlighted (accent fill and border). Hovering a tile shows its Hover state. Locked modules show "Coming soon" and can't be clicked.
-- Clicking a tile closes the launcher and opens that module: **Booking** → `/bookings` (the last view, Calendar or Table, and its filters come back from the URL); **Package Lib** → `/packages` (the Active tab).
+- Clicking a tile closes the launcher and opens that module: **Booking** → `/bookings` (the last view, Calendar or Table, and its filters come back from the URL); **Package Lib** → `/packages` (the Active tab); **Workspace & Crew** → `/workspace` (US-15).
 - Clicking the current module's tile only closes the launcher. Esc, × and clicking outside also close it, and focus returns to the ⋮⋮ button.
 - If a New or Edit booking has unsaved changes, the leave guard (US-1 / screen 12) shows before switching. **Discard** continues to the chosen module; **Keep editing** stays.
 - Keyboard: Tab / arrow keys move between tiles and Enter opens one. The popover has `role="dialog"` and the label "App launcher".
-- The header shows the active module's icon and name: `Asset/bookings` "Booking" or `Asset/package-lib` "Packages".
+- The header shows the active module's icon and name: `Asset/bookings` "Booking" or `Asset/package-lib` "Packages". Workspace & Crew shows its name only and an empty art slot until its illustration is provided.
 
 #### US-12 Cancel a booking
 *As an admin, I want to cancel a booking when the client calls it off so that it stops counting as active work but stays on record.*
@@ -225,7 +225,7 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
 
 #### US-14 Business information
 *As an admin, I want to keep my business's name, logo and contact details in one place so that every invoice PDF carries the right brand.*
-- **Where:** a third card on **Account settings** (`/account`), under Security: **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only rows: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials."), **Business name**, **Address**, **Email**, **Phone**. **Crew** see the card without the Edit button.
+- **Where (moved 2026-11-25):** the first card on **Workspace & Crew** (`/workspace`, US-15): **Business information** — "Printed in the header of every invoice PDF." A **Secondary "Edit"** button (pencil) sits at the right of the card head. Read-only values, one row on desktop, two columns on tablet and stacked rows on mobile: **Logo** (56 px tile — the image, or the name's initials on the brand avatar fill with "No logo — the PDF shows your initials." on mobile), **Business name**, **Address**, **Email**, **Phone**. **Crew** see the card without the Edit button.
 - **Prefilled:** the card and the modal always start from the saved values (seed: a sample business name, address, finance email and phone, no logo). The business can never be empty: every field except the logo is required.
 - **Edit modal** "Business information" (DS Modal, 640 wide, same chrome as *Payment instruction*), opened prefilled:
   - **Business logo** — upload field: 56 px preview + **Upload logo** (or **Replace logo** + ghost **Remove** when one is set) and the helper "PNG, JPG or WebP · up to 1 MB · square works best." Anything else shows the inline error "Use a PNG, JPG or WebP image." or "Logo must be 1 MB or smaller." and keeps the previous logo. The prototype re-encodes the file to ≤ 256 px.
@@ -233,9 +233,15 @@ Invoice type and booking status are separate fields. A DP invoice never makes a 
   - **Address** (text area, required, max 150 with counter — "Enter the business address.").
   - **Email** (input, required, valid format — "Enter a valid email address.").
   - **Phone number** (input, required, 8–15 digits, only `+ space - ( )` accepted — "Enter a valid phone number.").
-  - Footer **Cancel** · **Save changes**. Save validates every field at once; errors show inline, the modal stays open and each error clears as the field is fixed. Cancel, Esc and × discard the draft (the next open starts from the saved values). A failed save shows "Couldn't save. Check your connection and try again." and keeps the draft.
+  - Footer **Cancel** · **Save changes**. Save validates every field at once; errors show inline, the modal stays open and each error clears as the field is fixed. Cancel, Esc and × discard the draft (the next open starts from the saved values). A failed save shows the alert "Couldn't save · Check your connection and try again." at the top of the form and keeps the draft.
 - **After saving:** the modal closes, the card shows the new values and the toast "Business information updated" appears. Nothing else changes: existing invoices keep their figures.
 - **Effect on the PDF:** see US-10. The Brand row (logo/initials, name, address, phone · email) uses the current business information every time a PDF is generated.
+
+#### US-15 Workspace & Crew
+*As any user, I want one list of the team so that I can see who works on what.* Full requirements: `SHARED-DATABASE-PLAN.md` §9.
+- **Page** (`/workspace`): Business information (US-14) on top, **Admin & crew** below. Crew see everything and edit nothing.
+- **List:** every active person, including people without a login: name ("(You)" on yourself), account type (Admin / Crew / No login), job title, upcoming bookings (from today, Canceled excluded). Order: you, admins, crew, no login; A–Z. Search by name or job title plus a type filter. View only.
+- **Person panel** (`?person=<crew id>`): side sheet (bottom sheet on mobile) with **Upcoming** and **Past** (newest first, 20 at a time), grouped by month, Canceled left out. A booking opens its detail in Booking; **See in Booking** opens the Table filtered by that person. An unknown or inactive person shows "This person is no longer in the list."
 
 ### 2.4 Business rules (enforced in the DB and service layer)
 
@@ -293,7 +299,8 @@ Next.js App Router (RSC + Server Actions)
  ├─ /bookings/[id]/edit  Same editor as /new: updated totals + Invoices (n) + New invoice #n modal
  ├─ /packages            Package Library (List layout)
  ├─ /login               Login (no self-service reset, see §4.3)
- ├─ /account             Account settings (name, password, business information) — US-13, US-14
+ ├─ /workspace           Workspace & Crew (business information, people, person panel) — US-14, US-15
+ ├─ /account             Account settings (name, password) — US-13
  └─ /api/invoices/[id]/pdf  → renders @react-pdf from snapshot, caches in Supabase Storage
         │
         ▼
@@ -375,7 +382,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 - **Login → Forgot password:** there's no self-service reset. The **Forgot password?** link under the password field shows an Info alert in the login card: "Forgot your password? Passwords are managed by your workspace admin. Ask them to reset it, then log in with the new password." (Login screen E7).
 - **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `crew` (read-only: sees everything, changes nothing). Enforced by RLS. The old `viewer` role was removed on 2026-11-24; migration 014 turns active viewers, including the Owner, into admins. The developer creates, changes and revokes accounts with SQL (`agents/DEPLOY.md`); see `CREW-TYPE-PLAN.md`.
 - **Sessions end at 00:00 WIB every day** (decided 2026-11-16). A session that signed in before today's midnight is refused by the server and the database; an open tab signs out at 00:00. Both show Login **E4** ("Your session expired"), email prefilled. Only accounts an admin provisioned with a role are staff (P4).
-- **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Account settings (US-14) and stored in `workspace_settings`.
+- **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Workspace & Crew (US-14) and stored in `workspace_settings`.
 - **Storage:** bucket `invoices/` (private) with signed URLs that expire after 10 min.
 - **Design tokens:** export CIR variables → Tailwind 4 `@theme` in `src/styles/tokens.css` (`surface/*`, `text/*`, `accent/*`, `status/*`, `space/*`, `radius/*`), generated from the Figma export (prototype F0).
 
@@ -401,7 +408,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 | Phase | Scope |
 |---|---|
-| **MVP** | Login, App launcher, Account settings (+ Business information) + Log out, Package Library, Create booking (crew, T&C, leave guard), Cancel booking (manual, with optional reason), DP/Full invoice, Edit booking, Partial/Paid, total-below-paid guard, Calendar (month/week/day), Table, search + filters, Detail panel + Crew schedule, PDF. Built first as a front-end prototype (`context/PROTOTYPE-PLAN.md`). |
+| **MVP** | Login, App launcher, Account settings + Log out, Workspace & Crew (Business information, people), Package Library, Create booking (crew, T&C, leave guard), Cancel booking (manual, with optional reason), DP/Full invoice, Edit booking, Partial/Paid, total-below-paid guard, Calendar (month/week/day), Table, search + filters, Detail panel + Crew schedule, PDF. Built first as a front-end prototype (`context/PROTOTYPE-PLAN.md`). |
 | **v1.1** | Refund records, discounts/VAT lines, send via WhatsApp/email, CSV export, **void invoice dialog**, **tablet layouts** (mobile shipped 2026-11-22) |
 | **v2.0** | Payment gateway and auto-reconciliation, client portal, resource/conflict scheduling, reminders for unpaid balances before the booking date |
 

@@ -5,7 +5,7 @@ import type * as Supabase from "./repo";
 
 type Contract =
   | "login" | "logout" | "hasSession" | "lastEmail" | "getProfile" | "peekProfile" | "peekCatalog" | "loadCatalog" | "loadFilterCatalog" | "updateDisplayName" | "changePassword" | "passwordRules"
-  | "listPackages" | "savePackage" | "archivePackage" | "restorePackage" | "listCrew"
+  | "listPackages" | "savePackage" | "archivePackage" | "restorePackage" | "listCrew" | "listPeople"
   | "listBookings" | "listAllBookings" | "countBookings" | "getBooking" | "getKpis" | "getUpcoming" | "getCrewSchedule" | "getInvoiceSnapshot"
   | "saveBooking" | "createInvoice" | "saveBookingAndCreateInvoice" | "cancelBooking" | "nextInvoiceTypes"
   | "getSettings" | "getBusiness" | "updateBusiness" | "NetworkError";

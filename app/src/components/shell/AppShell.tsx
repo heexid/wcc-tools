@@ -26,9 +26,10 @@ import { LeaveGuardProvider, useLeaveGuard } from "./LeaveGuard";
 // workspace/account pill. Workspace: surface/default, 1px border, radius card on top corners.
 // Sticky at the top (z 35: above page popovers z-30, under dialogs z-40) so it stays put while the page scrolls.
 
-const MODULES: Record<ModuleId, { name: string; href: string; art: string }> = {
+const MODULES: Record<ModuleId, { name: string; href: string; art: string | null }> = {
   booking: { name: "Booking", href: "/bookings", art: "bookings" },
   packages: { name: "Packages", href: "/packages", art: "package-lib" },
+  workspace: { name: "Workspace & Crew", href: "/workspace", art: null }, // icon comes with the illustration
 };
 
 function Divider() {
@@ -85,15 +86,17 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
               aria-current={page ? undefined : "page"}
               className="flex items-center gap-micro rounded-small outline-none focus-visible:shadow-focus-ring"
             >
-              <span className="flex size-24 items-center justify-center rounded-control bg-surface-default">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/assets/module-${m.art}.png`}
-                  srcSet={`/assets/module-${m.art}.png 1x, /assets/module-${m.art}@2x.png 2x`}
-                  alt=""
-                  className="block size-[calc(var(--spacing-16)+var(--spacing-2))]"
-                />
-              </span>
+              {m.art && (
+                <span className="flex size-24 items-center justify-center rounded-control bg-surface-default">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/assets/module-${m.art}.png`}
+                    srcSet={`/assets/module-${m.art}.png 1x, /assets/module-${m.art}@2x.png 2x`}
+                    alt=""
+                    className="block size-[calc(var(--spacing-16)+var(--spacing-2))]"
+                  />
+                </span>
+              )}
               <Txt className="text-heading-module text-text-primary">{m.name}</Txt>
             </a>
           )}

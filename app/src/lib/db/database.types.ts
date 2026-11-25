@@ -517,6 +517,7 @@ export type Database = {
         Args: { p_search?: string; p_tab?: string }
         Returns: Json
       }
+      list_people: { Args: { p_today: string }; Returns: Json }
       mark_password_changed: { Args: never; Returns: undefined }
       my_profile: { Args: never; Returns: Json }
       next_booking_ref: { Args: { p_year: number }; Returns: string }

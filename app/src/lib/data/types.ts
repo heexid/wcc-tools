@@ -19,13 +19,16 @@ export type Package = {
   legacyBookings: number;
 };
 
+/** One row of Workspace & Crew → Admin & crew. `type` is the account type; "none" = no login. */
+export type Person = { crewId: string; name: string; jobTitle: string; type: "admin" | "crew" | "none"; isYou: boolean; upcomingCount: number };
+
 /** `role` is the job title; `userId` links the entry to a login (only the crew lists carry it, not booking detail). */
 export type Crew = { id: string; name: string; role: string; isActive: boolean; userId?: string | null };
 
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
 
-/** Business information (Account settings → Business information, PRD US-14). Printed in the invoice PDF's Brand row. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
+/** Business information (Workspace & Crew → Business information, PRD US-14). Printed in the invoice PDF's Brand row. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
 export type Business = { name: string; address: string; phone: string; email: string; logo?: string | null };
 
 export type BookingItem = { id: string; name: string; price: number; qty: number };

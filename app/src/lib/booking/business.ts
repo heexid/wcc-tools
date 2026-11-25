@@ -1,5 +1,5 @@
 // Business information (Figma Launchpad & Profile → lane E, PRD US-14): the studio's identity printed in the invoice
-// PDF's Brand row and "From" block. Edited in the "Business information" modal on Account settings.
+// PDF's Brand row and "From" block. Edited in the "Business information" modal on Workspace & Crew.
 //   Logo — optional PNG / JPEG / WebP, ≤ 1 MB, re-encoded to ≤ 256 px (PNG / JPEG data URL).
 //   Name 2–60 · Address (text area) 1–150 · Email (valid format) · Phone (8–15 digits; + space - ( ) allowed).
 import { LIMITS } from "@/lib/booking/calc";

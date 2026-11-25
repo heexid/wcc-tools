@@ -11,7 +11,7 @@ const dlg = (p: Page) => p.getByRole("dialog", { name: "Business information" })
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGD4DwABBAEAX+XDSwAAAABJRU5ErkJggg==", "base64");
 
 test("E1 · the card is prefilled from the saved business information", async ({ page }) => {
-  await page.goto("/account");
+  await page.goto("/workspace");
   await expect(card(page)).toContainText("bs.moment");
   await expect(card(page)).toContainText("Jl. Rawa Mangun No. 12, Jakarta Timur");
   await expect(card(page)).toContainText("finance@bs-moment.com");
@@ -25,7 +25,7 @@ test("E1 · the card is prefilled from the saved business information", async ({
 });
 
 test("E2 · validation keeps the modal open; Cancel / Esc / × discard the draft", async ({ page }) => {
-  await page.goto("/account");
+  await page.goto("/workspace");
   for (const discard of [() => dlg(page).getByRole("button", { name: "Cancel" }).click(), () => page.keyboard.press("Escape"), () => dlg(page).getByRole("button", { name: "Close" }).click()]) {
     await card(page).getByRole("button", { name: "Edit" }).click();
     await dlg(page).getByLabel("Business name").fill("Temp");
@@ -50,7 +50,7 @@ test("E2 · validation keeps the modal open; Cancel / Esc / × discard the draft
 });
 
 test("E3 · logo: wrong type and > 1 MB are refused; a PNG is accepted, replaced and removed", async ({ page }) => {
-  await page.goto("/account");
+  await page.goto("/workspace");
   await card(page).getByRole("button", { name: "Edit" }).click();
   const file = dlg(page).getByLabel("Logo file");
   await file.setInputFiles({ name: "logo.gif", mimeType: "image/gif", buffer: Buffer.from("GIF89a") });
@@ -65,7 +65,7 @@ test("E3 · logo: wrong type and > 1 MB are refused; a PNG is accepted, replaced
 });
 
 test("E4 · save → toast, card updates, and the next PDF shows the new business (Brand row incl. email)", async ({ page }) => {
-  await page.goto("/account");
+  await page.goto("/workspace");
   await card(page).getByRole("button", { name: "Edit" }).click();
   await dlg(page).getByLabel("Logo file").setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: PNG });
   await dlg(page).getByLabel("Business name").fill("  Studio Baru  ");
@@ -88,11 +88,11 @@ test("E4 · save → toast, card updates, and the next PDF shows the new busines
 });
 
 test("save failure: inline message, nothing saved (?fail=updateBusiness)", async ({ page }) => {
-  await page.goto("/account?fail=updateBusiness");
+  await page.goto("/workspace?fail=updateBusiness");
   await card(page).getByRole("button", { name: "Edit" }).click();
   await dlg(page).getByLabel("Business name").fill("Studio Baru");
   await dlg(page).getByRole("button", { name: "Save changes" }).click();
-  await expect(dlg(page).getByText("Couldn’t save. Check your connection and try again.")).toBeVisible();
+  await expect(dlg(page).getByRole("alert").filter({ hasText: "Couldn’t save" })).toContainText("Check your connection and try again.");
   await dlg(page).getByRole("button", { name: "Save changes" }).click();
   await expect(dlg(page)).toHaveCount(0);
   await expect(card(page)).toContainText("Studio Baru");
@@ -101,7 +101,36 @@ test("save failure: inline message, nothing saved (?fail=updateBusiness)", async
 test("crew: sees the card but no Edit button (6.4)", async ({ page }) => {
   await page.goto("/dev/role");
   await page.getByRole("button", { name: "Crew" }).click();
-  await page.goto("/account");
+  await page.goto("/workspace");
   await expect(card(page)).toContainText("bs.moment");
   await expect(card(page).getByRole("button", { name: "Edit" })).toHaveCount(0);
+});
+
+test("Account settings keeps only Profile and Security", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page.getByRole("region", { name: "Security" })).toBeVisible();
+  await expect(page.getByRole("region")).toHaveCount(2);
+  await expect(page.getByText("Business information")).toHaveCount(0);
+});
+
+test("App launcher → Workspace & Crew, its tile is current there", async ({ page }) => {
+  await page.goto("/bookings");
+  await page.getByRole("button", { name: "Menu", exact: true }).click();
+  await page.getByRole("button", { name: "Workspace & Crew" }).click();
+  await expect(page).toHaveURL(/\/workspace$/);
+  await expect(page.getByRole("heading", { name: "Workspace & Crew", level: 1 })).toBeVisible();
+  await page.getByRole("button", { name: "Menu", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Workspace & Crew" })).toHaveAttribute("aria-current", "page");
+});
+
+test("390 · card, edit sheet and no horizontal overflow", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/workspace");
+  await expect(card(page)).toContainText("finance@bs-moment.com");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+  await card(page).getByRole("button", { name: "Edit" }).click();
+  expect((await dlg(page).boundingBox())!.width).toBe(390);
+  expect((await dlg(page).getByRole("button", { name: "Save changes" }).boundingBox())!.height).toBe(44);
+  await dlg(page).getByRole("button", { name: "Cancel" }).click();
+  await expect(dlg(page)).toBeHidden();
 });
