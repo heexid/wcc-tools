@@ -19,6 +19,9 @@ async function signIn(page: Page, email = ADMIN.email, password = ADMIN.password
 const pdfText = (file: string) => execFileSync("node", [join(process.cwd(), "tests/e2e-supabase/pdf-text.mjs"), file], { encoding: "utf8" });
 const objects = (prefix: string) => Number(sql(`select count(*) from storage.objects where bucket_id = 'invoices' and name like '${prefix}%'`));
 
+/** <workspace id>/<invoice id>/ (migration 018). */
+const folder = (number = "INV-2026-0187") => sql(`select workspace_id || '/' || id || '/' from invoices where number = '${number}'`);
+
 async function downloadFromSheet(page: Page, ref: string, number: string) {
   await page.goto(`/bookings?booking=${ref}`);
   const [d] = await Promise.all([
@@ -34,12 +37,13 @@ test("download: server render from the snapshot, stored, then reused; a business
   expect(first.name).toBe("INV-2026-0187_sari-wulandari.pdf");
   for (const s of ["INV-2026-0187", "Sari Wulandari", "BK-2026-0142", "Rp 3.000.000", "Bank BCA", "bs.moment"]) expect(first.text).toContain(s);
   const path1 = sql("select pdf_path from invoices where number = 'INV-2026-0187'");
-  expect(path1).toMatch(/^INV-2026-0187\/[0-9a-f]{16}\.pdf$/);
-  expect(objects("INV-2026-0187/")).toBe(1);
+  expect(path1).toBe(`${folder()}${path1.slice(-20)}`);
+  expect(path1).toMatch(/\/[0-9a-f]{16}\.pdf$/);
+  expect(objects(folder())).toBe(1);
 
   await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187"); // same business → reused, nothing new stored
   expect(sql("select pdf_path from invoices where number = 'INV-2026-0187'")).toBe(path1);
-  expect(objects("INV-2026-0187/")).toBe(1);
+  expect(objects(folder())).toBe(1);
 
   sql("update workspace_settings set business_name = 'Studio Baru'");
   const changed = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
@@ -47,7 +51,7 @@ test("download: server render from the snapshot, stored, then reused; a business
   expect(changed.text).toContain("Rp 3.000.000"); // figures are the snapshot's
   const path2 = sql("select pdf_path from invoices where number = 'INV-2026-0187'");
   expect(path2).not.toBe(path1);
-  expect(objects("INV-2026-0187/")).toBe(1); // the superseded file is removed once the new one is stored (P9 review #10)
+  expect(objects(folder())).toBe(1); // the superseded file is removed once the new one is stored (P9 review #10)
 
   // Back to the original business: re-rendered (its old file is gone) with text identical to the first render.
   sql("update workspace_settings set business_name = 'bs.moment'");
@@ -60,7 +64,7 @@ test("download: server render from the snapshot, stored, then reused; a business
   expect((await admin.storage.from("invoices").remove([path1])).error).toBeNull(); // Storage API (direct SQL deletes are blocked)
   const again = await downloadFromSheet(page, "BK-2026-0142", "INV-2026-0187");
   expect(again.text).toBe(first.text);
-  expect(objects("INV-2026-0187/")).toBe(1);
+  expect(objects(folder())).toBe(1);
 });
 
 test("F19 · the PDF header carries the snapshot's event details (Bill to | Event)", async ({ page }) => {
@@ -79,7 +83,7 @@ test("a new invoice's PDF is generated on confirm (quietly) and downloads", asyn
   await m.getByRole("button", { name: /Confirm & generate invoice/ }).click();
   await expect(page.getByRole("region", { name: "Invoices" }).getByRole("article")).toHaveCount(1);
   const number = sql("select i.number from invoices i join bookings b on b.id = i.booking_id where b.ref = 'BK-2026-0144'");
-  await expect.poll(() => sql(`select coalesce(pdf_path, '') from invoices where number = '${number}'`), { timeout: 20_000 }).toMatch(new RegExp(`^${number}/`));
+  await expect.poll(() => sql(`select coalesce(pdf_path, '') from invoices where number = '${number}'`), { timeout: 20_000 }).toMatch(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\//);
 });
 
 test("who: a crew can download; no session → 401; a signed URL stops working when it expires", async ({ page, request }) => {

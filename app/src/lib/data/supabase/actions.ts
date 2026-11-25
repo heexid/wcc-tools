@@ -104,8 +104,12 @@ export async function updateBusinessAction(input: Business): Promise<Done<Busine
   const clean = cleanBusiness(input);
   try {
     const sb = await supabaseServer();
-    const current = await sb.rpc("get_settings");
+    const [current, me] = await Promise.all([sb.rpc("get_settings"), sb.rpc("my_profile")]);
     if (current.error) return fail(current.error);
+    if (me.error) return fail(me.error);
+    // Storage and the settings row accept a logo only under the caller's own workspace (migration 018).
+    const workspaceId = (me.data as { workspaceId?: string } | null)?.workspaceId;
+    if (!workspaceId) return { ok: false, code: "forbidden" };
     const currentPath = (current.data as { business?: { logo?: string | null } } | null)?.business?.logo ?? null;
 
     // The logo (P8): a new one arrives as the form's data URL → validated here and stored in Storage `branding/`;
@@ -117,7 +121,7 @@ export async function updateBusinessAction(input: Business): Promise<Done<Busine
     else if (clean.logo.startsWith("data:")) {
       const logo = decodeLogo(clean.logo);
       if ("error" in logo) return { ok: false, code: "invalid", errors: { logo: logo.error } };
-      const path = `logo/${createHash("sha256").update(logo.bytes).digest("hex")}.${logo.ext}`;
+      const path = `${workspaceId}/logo/${createHash("sha256").update(logo.bytes).digest("hex")}.${logo.ext}`;
       const up = await sb.storage.from("branding").upload(path, logo.bytes, { contentType: logo.type, upsert: true });
       if (up.error) return (up.error as { statusCode?: string }).statusCode?.startsWith("4") ? { ok: false, code: "forbidden" } : { ok: false, network: true };
       logoPath = path;

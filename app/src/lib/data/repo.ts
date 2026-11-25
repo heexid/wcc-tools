@@ -2,6 +2,7 @@
 // create_invoice, cancel_booking, plus reads. Every PRD §2.4 business rule is enforced here,
 // independently of the UI. All functions are async (simulated latency) and can be made to fail
 // once via failNext() to drive the error screens (Package 06, Bookings 23, 37).
+import { announceAccountChange, expectAccountChange } from "./account-watch";
 import { EVENT_START_RE, LIMITS, bookingTotal, validateInvoice, validateTotalAgainstPaid, type DpMethod, type InvoiceError, type InvoiceType } from "@/lib/booking/calc";
 import { cleanBusiness, validateBusiness, type BusinessErrors } from "@/lib/booking/business";
 import { cleanPayment, validatePayment } from "@/lib/booking/payment";
@@ -71,12 +72,18 @@ export async function login(email: string, password: string) {
     return { ok: true as const };
   });
 }
+/** The signed-in account in this browser, whichever tab signed in (null = signed out). */
+export function accountId(): string | null {
+  return hasSession() ? getDb().profile.id : null;
+}
 export async function logout() {
+  expectAccountChange();
   invalidateAll();
   return call(null, () => {
     try {
       localStorage.removeItem(SESSION);
     } catch {}
+    announceAccountChange();
   });
 }
 export function hasSession(): boolean {

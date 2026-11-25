@@ -122,7 +122,11 @@ export type Profile = {
   displayName: string;
   email: string;
   role: Role;
+  /** Business name of the account's workspace. */
   workspace: string;
+  workspaceId: string;
+  /** Anything but "active" is read-only for everyone (a closed workspace gets no profile at all). */
+  workspaceStatus: "active" | "read_only";
   passwordChangedAt: ISODate;
 };
 

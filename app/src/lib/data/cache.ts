@@ -12,13 +12,20 @@ type Entry = { value?: { v: unknown }; at: number; pending?: Promise<unknown> };
 
 const MAX_ENTRIES = 100;
 const entries = new Map<string, Entry>();
+// Every entry belongs to the account it was read for (one account = one workspace): another account never sees it.
+let scope: () => string = () => "";
+/** Set once by the data source: the signed-in account. */
+export function setCacheScope(f: () => string) {
+  scope = f;
+}
+const scoped = (key: string) => `${scope()}|${key}`;
 let generation = 0;
 const inBrowser = () => typeof window !== "undefined";
 
 /** What the server streams: per key, its result ({ v }) or null when that read failed there. */
 export type Seed = Promise<Record<string, Promise<{ v: unknown } | null>> | null>;
 const SEED_TTL_MS = 30_000;
-let seed: { values: Seed; taken: Set<string>; at: number; gen: number } | null = null;
+let seed: { values: Seed; taken: Set<string>; at: number; gen: number; scope: string } | null = null;
 const seen = new WeakSet<object>();
 
 /** Register the server's streamed reads (call while rendering, before the screen's effects run). Idempotent per
@@ -26,13 +33,13 @@ const seen = new WeakSet<object>();
 export function seedCache(values: Seed | null | undefined) {
   if (!values || !inBrowser() || seen.has(values)) return;
   seen.add(values);
-  seed = { values, taken: new Set(), at: Date.now(), gen: generation };
+  seed = { values, taken: new Set(), at: Date.now(), gen: generation, scope: scope() };
 }
 
 /** The server's answer for `key` if it streamed one (each key is used once), else `run()`. */
 async function fromSeed<T>(key: string, run: () => Promise<T>): Promise<T> {
   const s = seed;
-  if (!s || s.gen !== generation || s.taken.has(key) || Date.now() - s.at > SEED_TTL_MS) return run();
+  if (!s || s.gen !== generation || s.scope !== scope() || s.taken.has(key) || Date.now() - s.at > SEED_TTL_MS) return run();
   s.taken.add(key);
   try {
     const values = await s.values;
@@ -45,7 +52,7 @@ async function fromSeed<T>(key: string, run: () => Promise<T>): Promise<T> {
 
 /** The cached result for `key`, or undefined when there is none. */
 export function peek<T>(key: string): { value: T; at: number } | undefined {
-  const e = entries.get(key);
+  const e = entries.get(scoped(key));
   return e?.value ? { value: e.value.v as T, at: e.at } : undefined;
 }
 
@@ -53,31 +60,32 @@ export function peek<T>(key: string): { value: T; at: number } | undefined {
  *  prefetch and the click that follows make one request). A result that lands after a write is not stored. */
 export function fetchCached<T>(key: string, run: () => Promise<T>): Promise<T> {
   if (!inBrowser()) return run();
-  const existing = entries.get(key);
+  const id = scoped(key); // the account at the start: its result is stored for it, whoever is signed in when it lands
+  const existing = entries.get(id);
   if (existing?.pending) return existing.pending as Promise<T>;
   const gen = generation;
   const pending = fromSeed(key, run).then(
     (v) => {
-      if (gen === generation) store(key, { value: { v }, at: Date.now() });
+      if (gen === generation) store(id, { value: { v }, at: Date.now() });
       return v;
     },
     (e) => {
-      const cur = entries.get(key);
+      const cur = entries.get(id);
       if (gen === generation && cur?.pending === pending) {
-        if (cur.value) store(key, { value: cur.value, at: cur.at });
-        else entries.delete(key);
+        if (cur.value) store(id, { value: cur.value, at: cur.at });
+        else entries.delete(id);
       }
       throw e;
     },
   );
-  store(key, { ...existing, at: existing?.at ?? 0, pending });
+  store(id, { ...existing, at: existing?.at ?? 0, pending });
   return pending;
 }
 
 /** Warm the cache for `key` unless it already holds a result younger than `freshMs` (or a read is in flight). */
 export function prefetch<T>(key: string, run: () => Promise<T>, freshMs = 30_000) {
   if (!inBrowser()) return;
-  const e = entries.get(key);
+  const e = entries.get(scoped(key));
   if (e?.pending || (e?.value && Date.now() - e.at < freshMs)) return;
   fetchCached(key, run).catch(() => {});
 }

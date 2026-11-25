@@ -14,13 +14,14 @@ const subscribe = (cb: () => void) => {
   return () => window.removeEventListener(PROFILE_CHANGED, cb);
 };
 
-/** True for the read-only type (crew). Server render and first paint assume admin, so hydration matches. */
+/** True when nothing can be changed: crew, or a read-only workspace (SHARED-DATABASE-PLAN §1 G). Server render and first paint assume admin, so hydration matches. */
 export function useIsReadOnly(): boolean {
   return useSyncExternalStore(
     subscribe,
     () => {
       const p = peekProfile();
-      return !!p && p.role !== "admin"; // any other role, including a pre-migration "viewer", is read-only
+      // Any other role, including a pre-migration "viewer", is read-only. A database before migration 018 sends no status.
+      return !!p && (p.role !== "admin" || (p.workspaceStatus ?? "active") !== "active");
     },
     () => false,
   );
@@ -28,7 +29,10 @@ export function useIsReadOnly(): boolean {
 
 /** True once an admin profile is known (gates admin-only sections such as Cancel booking). */
 export function useIsAdmin(): boolean {
-  const read = () => peekProfile()?.role === "admin";
+  const read = () => {
+    const p = peekProfile();
+    return p?.role === "admin" && (p.workspaceStatus ?? "active") === "active";
+  };
   return useSyncExternalStore(subscribe, read, read);
 }
 
