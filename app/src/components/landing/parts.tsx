@@ -9,6 +9,15 @@ export const LOGIN_HREF = "/login";
 /** Placeholder until the Get started flow (Figma "Get started · Desktop 1440") is built. */
 export const GET_STARTED_HREF = "/get-started";
 
+/** Section links, in page order (navbar, fullscreen menu, footer). Labels match each section's chip. */
+export const SECTION_LINKS = [
+  { href: "#why-cir", label: "Why CIR" },
+  { href: "#bookings", label: "Bookings" },
+  { href: "#invoices", label: "Invoices" },
+  { href: "#trust", label: "Trust" },
+  { href: "#faq", label: "FAQ" },
+];
+
 /** A section's content column: 1280 max, on the landing gutter (80 · 24 · 16). */
 export function Container({ className, children }: { className?: string; children: ReactNode }) {
   return <div className={cn("mx-auto w-full max-w-[calc(var(--lp-content)+var(--lp-gutter)*2)] px-(--lp-gutter)", className)}>{children}</div>;

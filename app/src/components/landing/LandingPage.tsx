@@ -8,7 +8,7 @@ import { FinalCta } from "./FinalCta";
 import { LiquidBackground } from "@/components/login/LiquidBackground";
 import { LandingMotion } from "./LandingMotion";
 import { LandingNav } from "./LandingNav";
-import { Chip, Container, GET_STARTED_HREF, Glow, IconTile, LOGIN_HREF, SectionIntro, Shot } from "./parts";
+import { Chip, Container, GET_STARTED_HREF, Glow, IconTile, LOGIN_HREF, SECTION_LINKS, SectionIntro, Shot } from "./parts";
 
 // CIR marketing landing page — Figma "bs internal tools" › Landing Page:
 //   LP-D · Desktop 1440 (231:80481) · LP-T · Tablet 768 (231:83416) · LP-M · Mobile 390 (231:82968).
@@ -154,7 +154,7 @@ const WHY: Array<{ icon: IconName; title: string; body: string }> = [
 
 function WhyCir() {
   return (
-    <section id="features" aria-labelledby="why-title" className="pt-(--lp-section-y)">
+    <section id="why-cir" aria-labelledby="why-title" className="pt-(--lp-section-y)">
       <Container>
         <SectionIntro id="why-title" chip="Why CIR" icon="circle-help" title="Know where every rupiah is">
           CIR brings bookings, prices and invoices out of scattered chats and into one place
@@ -203,7 +203,7 @@ function WhyCir() {
 
 function BookingForm() {
   return (
-    <section aria-labelledby="form-title" className="py-(--lp-section-y)">
+    <section id="bookings" aria-labelledby="form-title" className="py-(--lp-section-y)">
       <Container className="flex items-center gap-64 max-desktop:flex-col max-desktop:items-stretch max-desktop:gap-[calc(var(--spacing-32)+var(--spacing-8))] max-tablet:gap-32">
         <div className="flex w-[calc(var(--spacing-64)*8-var(--spacing-12))] shrink-0 flex-col items-start gap-16 max-desktop:w-full">
           <div data-reveal>
@@ -273,7 +273,7 @@ function FeatureColumn({ chip, icon, title, body, children, className }: { chip:
 
 function Invoices() {
   return (
-    <section aria-label="Invoices and PDFs" className="pb-(--lp-section-y)">
+    <section id="invoices" aria-label="Invoices and PDFs" className="pb-(--lp-section-y)">
       <Container className="grid grid-cols-2 max-desktop:grid-cols-1">
         <FeatureColumn
           chip="Invoices"
@@ -358,7 +358,7 @@ function Member({ initials, role }: { initials: string; role: string }) {
 
 function Trust() {
   return (
-    <section aria-labelledby="trust-title" className="bg-surface-subtle py-(--lp-section-y)">
+    <section id="trust" aria-labelledby="trust-title" className="bg-surface-subtle py-(--lp-section-y)">
       <Container>
         <div className="flex flex-col items-center text-center">
           <div data-reveal>
@@ -473,7 +473,7 @@ function FinalCtaAndFooter() {
       </Container>
       <footer className="relative z-1 flex flex-col gap-64 pt-64">
         <nav aria-label="Footer" className="flex flex-col items-center gap-32">
-          <FooterColumn title="Product" links={[["Features", "#features"], ["FAQ", "#faq"]]} />
+          <FooterColumn title="Product" links={SECTION_LINKS.map((l) => [l.label, l.href])} />
           <FooterColumn title="Company" links={[["Log in", LOGIN_HREF]]} />
         </nav>
         {/* Figma "Bottom bar": page margin 32 · 24 · 16; stacked and centred on phones */}

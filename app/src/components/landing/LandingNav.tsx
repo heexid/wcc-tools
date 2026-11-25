@@ -9,7 +9,7 @@ import { Icon } from "@/components/ds/Icon";
 import { usePresence } from "@/components/ds/usePresence";
 import { useScrollLock } from "@/components/ds/useScrollLock";
 import { NavMascot } from "./NavMascot";
-import { GET_STARTED_HREF, LOGIN_HREF } from "./parts";
+import { GET_STARTED_HREF, LOGIN_HREF, SECTION_LINKS } from "./parts";
 
 // Figma LP-D › Navbar (231:80486): 1368 × 58 floating bar, 16 from the top / 36 from the sides, radius 16,
 // surface/default, pad 0/8/0/20. Left: logo (Asset/mascot 32 + "CIR" Heading/Panel) · 48 · links (Text/Body, gap 32).
@@ -18,11 +18,6 @@ import { GET_STARTED_HREF, LOGIN_HREF } from "./parts";
 // full-screen surface/default panel that slides down from the top — logo + ghost Icon/x bar, link rows, then the
 // two CTAs pinned to the bottom (safe area).
 // No language selector in this build (English only).
-
-const LINKS = [
-  { href: "#features", label: "Features" },
-  { href: "#faq", label: "FAQ" },
-];
 
 export function LandingNav() {
   const [open, setOpen] = useState(false);
@@ -59,7 +54,7 @@ export function LandingNav() {
             <span className="text-heading-panel text-text-primary">CIR</span>
           </Link>
           <ul className="flex items-center gap-32 max-desktop:hidden">
-            {LINKS.map((l) => (
+            {SECTION_LINKS.map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="lp-link text-body text-text-primary">
                   {l.label}
@@ -141,7 +136,7 @@ function FullscreenMenu({
       </div>
 
       <ul className="flex flex-col pt-24">
-        {LINKS.map((l) => (
+        {SECTION_LINKS.map((l) => (
           <li key={l.href} className="border-b border-border-default">
             <a
               href={l.href}
