@@ -146,7 +146,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 6.13 | **Workspace & Crew** tile → `/workspace` | Business information, then Admin & crew. Loading skeletons; each part has its own load error with Try again | ✅ | **WC1**–**WC3**, **WC5**, **WC5b** · flow A |
 | 6.14 | Search + **Account type** filter (people) | Combine; "Showing n of N people"; no match → "No people match your search." + Reset. Mobile: chips | ✅ | **WC4**, **WC6** · mobile **WM1**, **WM2** |
 | 6.15 | **Person row** → person panel | Whole row, Enter. Upcoming / Past, month headings, Show more; × / Esc / scrim close, focus back to the row; stale link → toast | ✅ | **WC8**–**WC13**, **WC19** · flow A · mobile **WM3**, **WM4** |
-| 6.16 | Panel booking / **See in Booking** | Booking detail in Booking (Back reopens the panel) / Table with only this crew filter | ✅ | flow A |
+| 6.16 | Panel booking / **See in Booking** | Booking detail over the panel, page unchanged (×, Esc, Back return to the person) / Table with only this crew filter | ✅ | flow A |
 
 ---
 

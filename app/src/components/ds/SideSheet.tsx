@@ -12,7 +12,8 @@ import { usePresence } from "./usePresence";
 // Shadow/Floating, clips; the header stays put and the body scrolls. × / scrim / Esc close; focus is trapped
 // and returns to the opener. Motion: .motion-sheet (in from the right edge, out the same way).
 
-export function SideSheet({ open, onClose, label, children, className }: { open: boolean; onClose: () => void; label: string; children: ReactNode; className?: string }) {
+/** `stacked`: opens over another sheet, which already dims the page, so its own scrim stays clear. */
+export function SideSheet({ open, onClose, label, children, className, stacked }: { open: boolean; onClose: () => void; label: string; children: ReactNode; className?: string; stacked?: boolean }) {
   const { mounted, presence } = usePresence(open);
   const panel = useRef<HTMLDivElement>(null);
   const close = useCallback(() => onClose(), [onClose]);
@@ -20,8 +21,8 @@ export function SideSheet({ open, onClose, label, children, className }: { open:
   useScrollLock(mounted); // only the layer scrolls while it's open — the screen behind stays put
   if (!mounted || typeof document === "undefined") return null;
   return createPortal(
-    <div className="fixed inset-0 z-40">
-      <div aria-hidden data-state={presence["data-state"]} onClick={close} className="motion-scrim fixed inset-0 bg-surface-scrim opacity-35" />
+    <div className={cn("fixed inset-0", stacked ? "z-41" : "z-40")}>
+      <div aria-hidden data-state={presence["data-state"]} onClick={close} className={cn("fixed inset-0", !stacked && "motion-scrim bg-surface-scrim opacity-35")} />
       <div
         ref={panel}
         role="dialog"

@@ -14,6 +14,7 @@ import { groupByMonth } from "@/lib/booking/people";
 import { now } from "@/lib/clock";
 import { getCrewSchedule, listBookings, type BookingRow } from "@/lib/data/repo";
 import type { Person } from "@/lib/data/types";
+import { prefetchBooking } from "@/lib/data/prefetch";
 import { addDays, formatDowUpper, initials, isoToLocalDate, parseISODate } from "@/lib/format";
 import { AccountTypeTag, Message } from "./PeopleSection";
 
@@ -169,6 +170,7 @@ function PanelContent({ person: p, mobile, onClose, onOpenBooking, onSeeInBookin
                 meta={`${b.packageNameSnapshot} · ${b.clientName}${b.bookingDate === today ? " · Today" : ""}`}
                 status={b.status}
                 onOpen={() => onOpenBooking(b.id)}
+                onIntent={() => prefetchBooking(b.id)}
               />
             ))}
           </section>

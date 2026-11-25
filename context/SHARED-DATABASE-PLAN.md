@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is built locally (W1–W4 ✅, see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -99,7 +99,7 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. ✅ means done in Figma or locally; W1–W5 are committed on branch `workspace-crew`; migration 015 is live, the app is not deployed yet.
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. For W2–W5 also means live since 2026-11-25 (pull request #8).
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
@@ -114,7 +114,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
 | ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
 | ✅ Built | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
-| 🟡 Docs ✅, tests ✅, release ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
+| 🟡 Released ✅, live hand checks ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
 **Total: about 14–20 days for SD0–SD6, plus 7–9 for W1–W5.** You can sell after SD5 (10–14 days) if you don't promise custom fields or invoices yet.
@@ -189,7 +189,7 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 
 | | Step | Phase |
 |---|---|---|
-| ✅ | Figma: screens WC1–WC19, mobile WM1–WM7, Hi-fi flow lanes A and B, components | W1 |
+| ✅ | Figma: screens WC1–WC20, mobile WM1–WM7, Hi-fi flow lanes A and B, components | W1 |
 | ✅ | Figma: Business information removed from Account settings; launcher tile added | W1 |
 | ✅ | App: `/workspace`, launcher tile, Business information moved, Account settings cleaned up | W2 |
 | ✅ | Database: migration 015 `list_people` written, in `setup-production.sql`, run in the in-memory test database | W3 |
@@ -211,7 +211,10 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | — | SD0: automatic backups: not needed for now, live holds dummy data only (user, 2026-11-25). **Needed before the first real customer** | SD0 |
 | ✅ | Commit (branch `workspace-crew`) | W5 |
 | ✅ | Fresh backup, then migration 015 on live (2026-11-25): every row unchanged, callable only when signed in | W5 |
-| ⬜ | Merge the pull request (deploys), then live hand checks | W5 |
+| ✅ | Pull request #8 merged and deployed (2026-11-25). Checked without logging in: `/workspace` asks for login and returns, the new illustration is served, live rows unchanged | W5 |
+| ✅ | Live hand checks, signed in (user, 2026-11-25): all pass, two changes asked: no lag, and stay in Workspace & Crew | W5 |
+| ✅ | Booking detail opens in place, without a page change | W5 |
+| ⬜ | Deploy that change | W5 |
 
 ### 9.1 Summary
 
@@ -249,9 +252,9 @@ App launcher → Workspace & Crew
   ├─ Business information → Edit (admin) → modal → Save → toast; next PDF uses it
   └─ Admin & crew table → search / filter → click a person
        → side panel: Upcoming | Past
-           ├─ click a booking → Booking, with that booking's detail open
+           ├─ click a booking → booking detail over the panel (same page)
            └─ See in Booking → Booking table filtered by that person
-       → browser Back returns to the page with the panel open
+       → browser Back returns to the person panel
 ```
 
 #### User stories and acceptance criteria
@@ -307,7 +310,7 @@ App launcher → Workspace & Crew
 
 - "Today" uses the app's session day. Draft, Partially paid and Paid are included.
 - Each item reuses the DS *Schedule item*: date, booking name, package · client, status. Items are grouped under a month heading with the year.
-- **Click a booking:** opens `/bookings` with that booking's detail panel (`?booking=<id>`).
+- **Click a booking:** its detail opens over the panel, in place: the page stays Workspace & Crew (`?person=<id>&booking=<id>`; user, 2026-11-25). ×, Esc, the dimmed area and Back return to the person, with the tab kept. **Edit booking** and *Open full page* leave for Booking. Details start loading on hover or focus.
 - **See in Booking:** opens the Table tab with `crew=<id>` as the only filter. That table also includes Canceled bookings, so its total can be higher than the panel's.
 - The open panel is in the URL (`/workspace?person=<crew id>`). An unknown, inactive or other-workspace id shows the page without the panel and the toast "This person is no longer in the list."
 - Esc, × and an outside click close it; focus returns to the row. The list behind the panel is covered, so a click there closes the panel; click again to open another person.
@@ -346,7 +349,7 @@ App launcher → Workspace & Crew
 | Every other Account settings frame showing the card (AC2–AC7, MA1 and their flow copies) | Card removed; stays in place |
 | Launcher frames (desktop L2, mobile MS1 and other open-launcher frames) | New tile added |
 
-- Drawn 2026-11-25 on page **Workspace & Crew**: Screens WC1–WC19, Mobile WM1–WM7, Hi-fi flow lanes A (people) and B (business information). Components: *Account type tag*, *People table/Header* and */Row*, *Mobile/Person card* (DS section "Workspace & Crew components"). AC8 was replaced by WC1; AC9, AC9b, AC10, MA4, MA5 and lane E were moved.
+- Drawn 2026-11-25 on page **Workspace & Crew**: Screens WC1–WC20, Mobile WM1–WM7, Hi-fi flow lanes A (people) and B (business information). Components: *Account type tag*, *People table/Header* and */Row*, *Mobile/Person card* (DS section "Workspace & Crew components"). AC8 was replaced by WC1; AC9, AC9b, AC10, MA4, MA5 and lane E were moved.
 - New frames: page, table states, panel states, crew view, mobile, flow. Reuse CIR components and variables.
 - The five scratch nodes on the target page belong to the user and stay untouched.
 

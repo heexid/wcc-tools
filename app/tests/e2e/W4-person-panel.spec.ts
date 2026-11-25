@@ -42,16 +42,39 @@ test.describe("1440", () => {
     }
   });
 
-  test("a booking opens in Booking; Back returns with the panel open", async ({ page }) => {
+  test("a booking opens in place: the page stays, ×, Esc, scrim and Back return to the person", async ({ page }) => {
+    const detail = page.getByRole("dialog", { name: "Booking detail" });
     await row(page, "Raka Pratama").click();
-    await items(page).nth(1).click();
-    await expect(page).toHaveURL(/\/bookings\?booking=/);
-    await expect(page.getByRole("dialog", { name: "Booking detail" })).toContainText("BK-2026-0142");
-    await page.goBack();
-    await expect(page).toHaveURL(/\/workspace\?person=crew_rp$/);
-    await expect(items(page)).toHaveCount(5);
+    await panel(page).getByRole("tab", { name: "Past (5)" }).click();
+    for (const close of [() => detail.getByRole("button", { name: "Close" }).click(), () => page.keyboard.press("Escape"), () => page.mouse.click(200, 700), () => page.goBack()]) {
+      await items(page).nth(1).click();
+      await expect(detail).toContainText("Graduation · Kirana");
+      await expect(page).toHaveURL(/\/workspace\?person=crew_rp&booking=/);
+      await expect(page.locator("nav[aria-label=Breadcrumb]")).toContainText("Workspace & Crew");
+      await close();
+      await expect(detail).toHaveCount(0);
+      await expect(page).toHaveURL(/\/workspace\?person=crew_rp$/);
+      await expect(panel(page).getByRole("tab", { name: "Past (5)" })).toHaveAttribute("aria-selected", "true"); // kept
+    }
     await page.keyboard.press("Escape");
+    await expect(panel(page)).toHaveCount(0);
     await expect(row(page, "Raka Pratama")).toBeFocused();
+  });
+
+  test("a link to a person's booking opens both; closing keeps the person", async ({ page }) => {
+    await page.goto("/workspace?person=crew_rp&booking=BK-2026-0142");
+    const detail = page.getByRole("dialog", { name: "Booking detail" });
+    await expect(detail).toContainText("Wedding · Sari & Dimas");
+    await detail.getByRole("button", { name: "Close" }).click();
+    await expect(detail).toHaveCount(0);
+    await expect(items(page)).toHaveCount(5);
+    await expect(page).toHaveURL(/\/workspace\?person=crew_rp$/);
+  });
+
+  test("Edit booking leaves for the booking screen", async ({ page }) => {
+    await page.goto("/workspace?person=crew_rp&booking=BK-2026-0142");
+    await page.getByRole("dialog", { name: "Booking detail" }).getByRole("button", { name: "Edit booking" }).click();
+    await expect(page).toHaveURL(/\/bookings\/[^/]+\/edit$/, { timeout: 15_000 });
   });
 
   test("See in Booking → Table with only this person's filter", async ({ page }) => {
@@ -133,5 +156,10 @@ test("390 · bottom sheet, 44 px actions, no overflow at 320", async ({ page }) 
   await page.setViewportSize({ width: 320, height: 700 });
   expect(await sheet.evaluate((e) => Math.max(e.scrollWidth, document.documentElement.scrollWidth))).toBe(320);
   await sheet.getByRole("button", { name: /Sari & Dimas/ }).click();
-  await expect(page).toHaveURL(/\/bookings\?booking=/);
+  const detail = page.getByRole("dialog", { name: "Booking detail" });
+  await expect(detail).toContainText("Wedding · Sari & Dimas");
+  expect((await detail.boundingBox())!.width).toBe(320);
+  await detail.getByRole("button", { name: "Close booking detail" }).click();
+  await expect(detail).toHaveCount(0);
+  await expect(sheet).toContainText("Lead photographer");
 });

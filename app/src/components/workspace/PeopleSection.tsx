@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ds/Button";
 import { Avatar, Toast, ToastRegion } from "@/components/ds/Feedback";
@@ -12,6 +12,8 @@ import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { useIsMobile } from "@/components/ds/useBreakpoint";
 import { usePresence } from "@/components/ds/usePresence";
+import { BookingDetail } from "@/components/bookings/BookingDetail";
+import { SideSheet } from "@/components/ds/SideSheet";
 import { useLeaveGuard } from "@/components/shell/LeaveGuard";
 import { useDismiss } from "@/components/shell/useDismiss";
 import { TYPE_LABEL, TYPE_OPTIONS, countLabel, filterPeople, personLabel, sortPeople, type PersonType } from "@/lib/booking/people";
@@ -58,10 +60,9 @@ export function PeopleSection() {
     setRetrying(false);
   };
 
-  // Person panel (WC-4): ?person=<crew id>, so Back from a booking reopens it.
+  // Person panel (WC-4): ?person=<crew id>, and ?booking=<id> for the booking detail over it. The URL changes through the
+  // History API, which useSearchParams follows: no server request, so both open at once.
   const params = useSearchParams();
-  const router = useRouter();
-  const path = usePathname();
   const { navigate } = useLeaveGuard();
   const personId = params.get("person");
   const person = people?.find((p) => p.crewId === personId) ?? null;
@@ -71,10 +72,39 @@ export function PeopleSection() {
       const q = new URLSearchParams(window.location.search);
       if (id) q.set("person", id);
       else q.delete("person");
-      router.replace(`${path}${q.size ? `?${q}` : ""}`, { scroll: false });
+      q.delete("booking");
+      window.history.replaceState(null, "", `${window.location.pathname}${q.size ? `?${q}` : ""}`);
     },
-    [router, path],
+    [],
   );
+  // Booking detail, in place over the panel (the page stays Workspace & Crew). Opening adds a history entry, so the
+  // browser's Back returns to the person too.
+  const bookingId = params.get("booking");
+  const bookingOpen = !!bookingId && (!personId || !!people || failed); // from a link: after the person, so it stacks on top
+  const pushed = useRef(false);
+  useEffect(() => {
+    if (!bookingId) pushed.current = false;
+  }, [bookingId]);
+  const openBooking = useCallback((id: string) => {
+    const q = new URLSearchParams(window.location.search);
+    const switching = q.has("booking");
+    q.set("booking", id);
+    const url = `${window.location.pathname}?${q}`;
+    if (switching) window.history.replaceState(null, "", url);
+    else {
+      window.history.pushState(null, "", url);
+      pushed.current = true;
+    }
+  }, []);
+  const closeBooking = useCallback(() => {
+    if (pushed.current) {
+      pushed.current = false;
+      return window.history.back();
+    }
+    const q = new URLSearchParams(window.location.search);
+    q.delete("booking");
+    window.history.replaceState(null, "", `${window.location.pathname}${q.size ? `?${q}` : ""}`);
+  }, []);
   const closePanel = useCallback(() => setPerson(null), [setPerson]);
   // Closing focuses the person's row. The sheet only knows its opener, and after a link or Back that isn't the row.
   const openId = person?.crewId ?? null;
@@ -185,7 +215,20 @@ export function PeopleSection() {
         </div>
       )}
 
-      <PersonPanel person={person} onClose={closePanel} onOpenBooking={(id) => navigate(`/bookings?booking=${encodeURIComponent(id)}`)} onSeeInBooking={(id) => navigate(`/bookings?tab=table&crew=${encodeURIComponent(id)}`)} />
+      <PersonPanel person={person} onClose={closePanel} onOpenBooking={openBooking} onSeeInBooking={(id) => navigate(`/bookings?tab=table&crew=${encodeURIComponent(id)}`)} />
+      <SideSheet open={bookingOpen} onClose={closeBooking} label="Booking detail" stacked={!!person}>
+        {bookingId && (
+          <BookingDetail
+            id={bookingId}
+            mode="sheet"
+            onClose={closeBooking}
+            onOpenFull={(readOnlyPage) => navigate(readOnlyPage ? `/bookings/${bookingId}` : `/bookings/${bookingId}/edit`)}
+            onEdit={() => navigate(`/bookings/${bookingId}/edit`)}
+            onOpenBooking={openBooking}
+            onSeeInCalendar={(crewId) => navigate(`/bookings?crew=${crewId}`)}
+          />
+        )}
+      </SideSheet>
       {goneToast.mounted && (
         <ToastRegion>
           <Toast tone="info" presence={goneToast.presence}>

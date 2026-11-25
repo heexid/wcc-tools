@@ -252,5 +252,5 @@ Route: `/workspace`, from the app launcher.
 
 - **Business information** is the first card (see [17](#17-business-information)).
 - **Admin & crew** lists every active person: name, account type (Admin, Crew or No login), job title and number of upcoming bookings. You come first. Search by name or job title, and filter by type.
-- **Click a person** to see their **Upcoming** and **Past** bookings. Canceled bookings are left out. Click a booking to open it in Booking, or **See in Booking** for the table filtered by that person.
+- **Click a person** to see their **Upcoming** and **Past** bookings. Canceled bookings are left out. Click a booking to see its details without leaving the page, or **See in Booking** for the table filtered by that person.
 - The list is view only. The developer manages accounts (see [`DEPLOY.md`](DEPLOY.md)).
