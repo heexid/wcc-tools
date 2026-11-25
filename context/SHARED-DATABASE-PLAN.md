@@ -214,7 +214,9 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Pull request #8 merged and deployed (2026-11-25). Checked without logging in: `/workspace` asks for login and returns, the new illustration is served, live rows unchanged | W5 |
 | ✅ | Live hand checks, signed in (user, 2026-11-25): all pass, two changes asked: no lag, and stay in Workspace & Crew | W5 |
 | ✅ | Booking detail opens in place, without a page change | W5 |
-| ⬜ | Deploy that change | W5 |
+| ✅ | Booking: its own detail panel also opens without a page request | W5 |
+| ⬜ | Deploy these changes | W5 |
+| ✅ | `PRICING.md` and `supabase/templates/` are no longer tracked: kept on the owner's machine only | — |
 
 ### 9.1 Summary
 
