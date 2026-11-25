@@ -63,3 +63,4 @@ jobs:
       - run: npm run test:parity
       - run: npm run test:migrate-014
       - run: npm run test:migrate-016
+      - run: npm run test:workspace-tools

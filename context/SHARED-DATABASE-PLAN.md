@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4 is rehearsed, SD5 is built, SD6 is not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -99,7 +99,7 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1–SD3 are in draft pull request #10 and must not be merged or run on live before SD4.
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1–SD3 and SD5 are in draft pull request #10 and must not be merged or run on live before SD4.
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
@@ -107,8 +107,8 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Built and tested (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
 | ✅ Built and tested (migration 017); CI required on `main`; not on live | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ✅ Built and tested (migration 018); not on live | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
-| ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
-| 🟡 Template drafted | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
+| 🟡 Backed up and rehearsed; not run on live | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
+| 🟡 Template and export tested; timing on live ⬜ | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
 | ⬜ | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6 |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
@@ -166,6 +166,30 @@ A saved booking that lists another workspace's crew drops that person, like any 
 | ⬜ | Live: SD4 |
 
 A read-only customer isn't told why the buttons are gone; a closed one sees a page that doesn't load. Neither message is designed yet.
+
+### 4.4 SD4 checklist
+
+| | Step |
+|---|---|
+| ✅ | Fresh backup (2026-11-25): database, 18 of 18 Storage files, account triggers, Storage rules |
+| ✅ | Preconditions on live: one settings row, no logo, every login has a profile |
+| ✅ | Rehearsal of 016–018 on a restored copy: every row, hash and account unchanged; admin and crew see their data; a new booking numbers on |
+| ⬜ | 016, 017, 018 on live. Claude's attempt was stopped by the permission system; nothing ran |
+| ⬜ | Merge pull request #10 (deploys), right after the migrations |
+| ⬜ | Compare counts and hashes; check login, a booking, an invoice and a PDF by hand |
+| ⬜ | Test workspace B, its logins (Dashboard) and hand checks with both accounts |
+
+### 4.5 SD5 checklist
+
+| | Step |
+|---|---|
+| ✅ | Account template: all 8 blocks tested on the real migrations, with their refusals (`npm run test:workspace-tools`, 19 checks; the template itself stays on the owner's machine) |
+| ✅ | One-workspace export: `supabase/scripts/export-workspace.sql`, read only, 12 checks, in CI |
+| ⬜ | A new workspace takes under 15 minutes (measured on live, after SD4) |
+
+### 4.6 SD6: decisions needed before it starts
+
+The custom form field and custom invoice answers in §1 are still "not confirmed", and the order is Figma first, then build.
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
 **Total: about 14–20 days for SD0–SD6, plus 7–9 for W1–W5.** You can sell after SD5 (10–14 days) if you don't promise custom fields or invoices yet.
