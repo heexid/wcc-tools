@@ -5,19 +5,20 @@ import { ButtonLink } from "@/components/ds/Button";
 import { Mascot, type MascotApi, type MascotState } from "@/components/login/Mascot";
 import { GET_STARTED_HREF } from "./parts";
 
-// Figma LP-D › 08 · Final CTA › CTA card (231:81948): radius 12, border/default, Shadow/Floating, pad 64/24 (LP-M 40/20),
-// gap 12, centred. Asset/mascot-large 120 → the live three.js mascot (same scene as the login page): it watches the
-// cursor while idle and cheers when a call to action is hovered or focused.
+// Figma LP-D › 08 · Final CTA + Footer › CTA (231:81948 · LP-T 231:83734 · LP-M 231:83286): no card, straight on the
+// liquid background, centred. Mascot 320 · 240 · 200, 16 to the headings (8 apart), 24 to the button.
+// Asset/mascot-large → the live three.js mascot (same scene as the login page): it watches the cursor while idle and
+// cheers when the call to action is hovered or focused.
 
 export function FinalCta() {
   const [mood, setMood] = useState<MascotState>("idle");
-  const card = useRef<HTMLDivElement>(null);
+  const block = useRef<HTMLDivElement>(null);
   const mascot = useRef<MascotApi | null>(null);
 
-  // Delight, once per visit: the mascot bounces when the card first comes into view (the scene's own spring; it
+  // Delight, once per visit: the mascot bounces when the block first comes into view (the scene's own spring; it
   // skips the bounce under reduced motion). three.js loads after first paint, so wait for it if it isn't ready.
   useEffect(() => {
-    const el = card.current;
+    const el = block.current;
     if (!el) return;
     let timer = 0;
     const io = new IntersectionObserver(
@@ -41,17 +42,16 @@ export function FinalCta() {
   const cheer = { onPointerEnter: () => setMood("happy"), onPointerLeave: () => setMood("idle"), onFocus: () => setMood("happy"), onBlur: () => setMood("idle") };
 
   return (
-    <div
-      ref={card}
-      data-reveal
-      className="flex flex-col items-center gap-12 rounded-card border border-border-default bg-surface-default px-24 py-64 text-center shadow-floating max-tablet:px-20 max-tablet:py-[calc(var(--spacing-32)+var(--spacing-8))]"
-    >
-      <Mascot size={120} state={mood} apiRef={mascot} />
-      <h2 className="mt-4 text-marketing-heading text-balance">
+    <div ref={block} data-reveal className="flex flex-col items-center text-center">
+      <Mascot size="hero" state={mood} apiRef={mascot} />
+      {/* z-1: the mascot's canvas overflows its box and would cover the text */}
+      <h2 className="relative z-1 mt-16 text-marketing-heading text-balance">
         <span className="block text-text-primary">Stop adding it up by hand</span>
-        <span className="mt-12 block text-text-secondary">Move every booking and payment into one place</span>
+        <span className="mx-auto mt-8 block text-text-secondary max-desktop:max-w-[calc(var(--spacing-64)*7+var(--spacing-32))]">
+          Move every booking and payment into one place
+        </span>
       </h2>
-      <div className="flex items-center gap-12 pt-16 max-tablet:w-full max-tablet:flex-col max-tablet:items-stretch">
+      <div className="relative z-1 mt-24 flex items-center max-tablet:w-full max-tablet:flex-col max-tablet:items-stretch">
         <ButtonLink href={GET_STARTED_HREF} size="lg" {...cheer}>
           Start your first booking
         </ButtonLink>

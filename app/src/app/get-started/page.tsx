@@ -3,8 +3,7 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ds/Button";
 
 // Placeholder for the Get started flow (Figma "Get started · Desktop 1440", GS-1 to GS-3: a setup request — CIR has no
-// self sign-up). Every landing CTA lands here until that flow is built; ?plan=3-months|6-months|12-months is kept
-// in the URL for it.
+// self sign-up). Every landing CTA lands here until that flow is built.
 export const metadata: Metadata = { title: "CIR · Get started" };
 
 export default function GetStarted() {

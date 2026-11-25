@@ -10,16 +10,16 @@ import type { MascotApi, MascotState } from "./mascotScene";
 
 export type { MascotApi, MascotState };
 
-// Sizes: 32 (landing nav, Figma Asset/mascot), 64 (login, Figma Asset/mascot-large at 64) and 120 (landing final CTA, Asset/mascot-large at 120).
+// Sizes: 32 (landing nav, Figma Asset/mascot), 64 (login, Figma Asset/mascot-large at 64) and "hero" (landing final CTA, Asset/mascot-large at 320 · tablet 240 · phone 200).
 // The canvas overflows the box by a quarter of its size on every side (glow + bounce room).
 const SIZES = {
   32: { box: "size-32", inset: "-inset-8", png: "/assets/mascot-64.png", png2x: "/assets/mascot-64@2x.png" },
   64: { box: "size-64", inset: "-inset-16", png: "/assets/mascot-64.png", png2x: "/assets/mascot-64@2x.png" },
-  120: {
-    box: "size-[calc(var(--spacing-64)+var(--spacing-48)+var(--spacing-8))]",
-    inset: "-inset-[calc(var(--spacing-24)+var(--spacing-6))]",
-    png: "/assets/mascot-large.png",
-    png2x: "/assets/mascot-large@2x.png",
+  hero: {
+    box: "size-[calc(var(--spacing-64)*5)] max-desktop:size-[calc(var(--spacing-48)*5)] max-tablet:size-[calc(var(--spacing-64)*3+var(--spacing-8))]",
+    inset: "-inset-1/4",
+    png: "/assets/mascot-hero.png",
+    png2x: "/assets/mascot-hero@2x.png",
   },
 } as const;
 
@@ -75,6 +75,7 @@ export function Mascot({
         src={s.png}
         srcSet={`${s.png} 1x, ${s.png2x} 2x`}
         alt=""
+        loading={size === "hero" ? "lazy" : undefined}
         className={ready ? `invisible absolute inset-0 ${s.box}` : `absolute inset-0 block ${s.box}`}
       />
       <div ref={host} className={`absolute ${s.inset} ${calm ? "pointer-events-none" : ""}`} />

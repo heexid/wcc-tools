@@ -32,7 +32,6 @@ export function LandingPage() {
         <BookingForm />
         <Invoices />
         <Trust />
-        <Pricing />
         <FaqSection />
       </main>
       <FinalCtaAndFooter />
@@ -445,82 +444,6 @@ function Trust() {
   );
 }
 
-/* ── 06 · Pricing (agents/marketings/PRICING.md; Lite is not public) ───────────────────────────────────────────── */
-
-const PLANS = [
-  { term: "3 months", price: "Rp 1.399.000", billed: "Rp 4.197.000 billed every 3 months", plan: "3-months" },
-  { term: "6 months", price: "Rp 1.299.000", billed: "Rp 7.794.000 billed every 6 months", plan: "6-months" },
-  { term: "12 months", price: "Rp 1.199.000", billed: "Rp 14.388.000 billed yearly", plan: "12-months", best: true },
-];
-const INCLUDES = ["All features: bookings, invoices, calendar, PDFs", "1 admin account", "Free setup by our team"];
-const ADD_ONS = ["Extra admin account · Rp 185.000 / month", "Crew account (read only) · Rp 50.000 / month", "Custom development · per sprint"];
-
-function Pricing() {
-  return (
-    <section id="pricing" aria-labelledby="pricing-title" className="py-(--lp-section-y)">
-      <Container>
-        <div className="flex flex-col items-center text-center">
-          <div data-reveal>
-            <Chip icon="wallet">Pricing</Chip>
-          </div>
-          <h2 id="pricing-title" data-reveal className="mt-16 text-marketing-heading text-text-primary">
-            One plan, every feature
-          </h2>
-          <p data-reveal className="mt-16 text-mobile-body text-text-secondary">
-            Pick a term, setup included
-          </p>
-        </div>
-
-        <ul className="mt-48 grid grid-cols-3 gap-24 max-desktop:grid-cols-2 max-tablet:grid-cols-1">
-          {PLANS.map((p) => (
-            <li
-              key={p.term}
-              data-reveal
-              className={cn(
-                "flex flex-col gap-20 rounded-card border p-32",
-                p.best ? "border-border-accent bg-surface-accent shadow-focus-ring max-desktop:col-span-2 max-tablet:col-span-1" : "border-border-default bg-surface-default",
-              )}
-            >
-              <div className="flex items-center justify-between gap-8">
-                <h3 className="text-heading-section text-text-primary">{p.term}</h3>
-                {p.best && <span className="rounded-pill bg-accent-primary px-[calc(var(--spacing-8)+var(--spacing-2))] py-2 text-caption-strong text-text-on-accent">Best value</span>}
-              </div>
-              <p className="flex flex-wrap items-end gap-tight">
-                <span className="text-display-metric text-text-primary">{p.price}</span>
-                <span className="text-body text-text-secondary">/ month</span>
-              </p>
-              <p className="text-caption text-text-secondary">{p.billed}</p>
-              <ul className="flex flex-col gap-[calc(var(--spacing-8)+var(--spacing-2))]">
-                {INCLUDES.map((i) => (
-                  <li key={i} className="flex items-start gap-8 text-body text-text-primary">
-                    <Icon name="check" className="mt-px size-icon-md" />
-                    {i}
-                  </li>
-                ))}
-              </ul>
-              <ButtonLink href={`${GET_STARTED_HREF}?plan=${p.plan}`} variant={p.best ? "primary" : "secondary"} size="lg" className="mt-auto w-full">
-                {`Start with ${p.term}`}
-              </ButtonLink>
-            </li>
-          ))}
-        </ul>
-
-        <div
-          data-reveal
-          className="mt-16 flex items-center justify-center gap-32 rounded-card bg-surface-subtle px-24 py-16 max-desktop:flex-wrap max-desktop:justify-start max-desktop:gap-x-24 max-desktop:gap-y-8 max-tablet:flex-col max-tablet:items-start max-tablet:gap-32"
-        >
-          <p className="text-body-strong text-text-primary">Add-ons</p>
-          {ADD_ONS.map((a) => (
-            <p key={a} className="text-body text-text-secondary">
-              {a}
-            </p>
-          ))}
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 /* ── 07 · FAQ ──────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 function FaqSection() {
@@ -545,37 +468,37 @@ function FinalCtaAndFooter() {
     <div className="relative isolate overflow-hidden">
       {/* Same animated liquid gradient + grain as the hero (Figma: "Background · grainy gradient" glows + noise) */}
       <LiquidBackground />
-      <Container className="relative z-1 flex flex-col gap-64 pt-(--lp-section-y) pb-64">
+      <Container className="relative z-1 pt-(--lp-section-y)">
         <FinalCta />
-        <footer className="flex items-start justify-between gap-64 max-tablet:flex-col max-tablet:gap-32">
-          <div className="flex flex-col gap-12">
-            <p className="text-heading-panel text-text-primary">CIR</p>
-            <p className="text-body text-text-primary">Clarity for every invoice</p>
-            <p className="text-caption text-text-primary">© 2026 CIR · WCC &amp; ECC</p>
-          </div>
-          <nav aria-label="Footer" className="flex gap-64 max-tablet:gap-48">
-            <FooterColumn title="Product" links={[["Features", "#features"], ["Pricing", "#pricing"], ["FAQ", "#faq"]]} />
-            <FooterColumn title="Company" links={[["Log in", LOGIN_HREF]]} />
-          </nav>
-        </footer>
       </Container>
+      <footer className="relative z-1 flex flex-col gap-64 pt-64">
+        <nav aria-label="Footer" className="flex flex-col items-center gap-32">
+          <FooterColumn title="Product" links={[["Features", "#features"], ["FAQ", "#faq"]]} />
+          <FooterColumn title="Company" links={[["Log in", LOGIN_HREF]]} />
+        </nav>
+        {/* Figma "Bottom bar": page margin 32 · 24 · 16; stacked and centred on phones */}
+        <div className="flex items-center justify-between gap-12 px-32 pb-32 max-desktop:px-(--lp-gutter) max-desktop:pb-24 max-tablet:flex-col max-tablet:gap-8 max-tablet:pb-32 max-tablet:text-center">
+          <p className="text-heading-panel text-text-primary max-tablet:text-mobile-heading-module">Clarity for every invoice</p>
+          <p className="text-caption text-text-primary">© 2026 CIR · WCC &amp; ECC</p>
+        </div>
+      </footer>
     </div>
   );
 }
 
 function FooterColumn({ title, links }: { title: string; links: Array<[string, string]> }) {
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col items-center gap-12 text-center">
       <p className="text-body-strong text-text-primary">{title}</p>
-      <ul className="flex flex-col gap-12">
+      <ul className="flex flex-col items-center gap-12">
         {links.map(([label, href]) => (
           <li key={label}>
             {href.startsWith("#") ? (
-              <a href={href} className="lp-link text-body text-text-primary">
+              <a href={href} className="lp-link block text-body text-text-primary">
                 {label}
               </a>
             ) : (
-              <Link href={href} className="lp-link text-body text-text-primary">
+              <Link href={href} className="lp-link block text-body text-text-primary">
                 {label}
               </Link>
             )}

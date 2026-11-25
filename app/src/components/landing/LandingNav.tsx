@@ -21,7 +21,6 @@ import { GET_STARTED_HREF, LOGIN_HREF } from "./parts";
 
 const LINKS = [
   { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
   { href: "#faq", label: "FAQ" },
 ];
 
