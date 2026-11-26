@@ -83,7 +83,7 @@ export function BookingReadOnly({ b, onBack }: { b: BookingDetail; onBack: () =>
             <InputField label="Booking name" disabled readOnly value={b.bookingName} />
             <div className="flex items-start gap-base">
               <DisabledBox label="Booking date" required leading="calendar" value={formatDate(b.bookingDate)} />
-              <DisabledBox label="Event start" trailing="chevron-down" value={b.eventStart ?? "—"} />
+              <DisabledBox label="Event start" trailing="clock" value={b.eventStart ?? "—"} />
               <InputField label="Created" disabled readOnly value={formatDateTime(b.createdAt)} helper="Set automatically" />
             </div>
             <TextArea label="Location" helper="Venue or meeting point — printed on invoices" maxLength={LIMITS.locationMax} value={b.location} disabled readOnly />
@@ -215,7 +215,7 @@ function Divider() {
 }
 
 /** Select / Date field in the Disabled state (Figma Input field Type=Select|Date, State=Disabled). */
-function DisabledBox({ label, required, value, leading, trailing }: { label: string; required?: boolean; value: string; leading?: "calendar"; trailing?: "chevron-down" }) {
+function DisabledBox({ label, required, value, leading, trailing }: { label: string; required?: boolean; value: string; leading?: "calendar"; trailing?: "chevron-down" | "clock" }) {
   return (
     <div className="flex w-full flex-col gap-micro">
       <FieldLabel required={required}>{label}</FieldLabel>

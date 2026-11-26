@@ -61,9 +61,8 @@ test("F19 · event details: start time, location and notes save to Postgres and 
   await signIn(page);
   await openEdit(page, "BK-2026-0156"); // Draft, seeded without event details
   const client = main(page).getByRole("region", { name: "Client & schedule" });
-  await expect(client.getByRole("button", { name: "Event start" })).toHaveText("Select time");
-  await client.getByRole("button", { name: "Event start" }).click();
-  await page.getByRole("option", { name: "19:30" }).click();
+  await expect(client.getByRole("textbox", { name: "Event start" })).toHaveValue("");
+  await client.getByRole("textbox", { name: "Event start" }).fill("19:30");
   await client.getByLabel("Location").fill("  Gedung Serbaguna, Jakarta Timur ");
   await client.getByLabel("Notes").fill("Bring the drone.");
   await page.getByRole("button", { name: "Save changes" }).click();
