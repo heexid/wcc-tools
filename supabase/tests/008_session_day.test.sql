@@ -2,7 +2,7 @@
 begin;
 select plan(7);
 
-insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000c1', 'day@bs-moment.test', '{"role":"admin"}');
+insert into auth.users (id, email, raw_app_meta_data) values ('00000000-0000-4000-8000-0000000000c1', 'day@bs-moment.test', test_only.meta('{"role":"admin"}'));
 
 create function pg_temp.claims(p_signed_in timestamptz) returns text language sql as $$
   select set_config('request.jwt.claims',

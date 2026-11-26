@@ -5,6 +5,7 @@
 --   docker exec -i supabase_db_wcc-tools-booking psql -U postgres < supabase/perf-seed.sql
 do $$
 declare
+  v_ws uuid := (select id from public.workspaces where slug = 'main');
   first_names text[] := array['Sari','Budi','Rina','Andi','Dewi','Fajar','Nadia','Raka','Putri','Hendra','Maya','Bima','Citra','Yoga','Laras','Teguh','Aulia','Reza','Siti','Kevin'];
   last_names text[] := array['Wulandari','Hartono','Kartika','Pratama','Anggraini','Nugroho','Safitri','Santoso','Anjani','Gunawan','Kusuma','Maharani','Wijaya','Halim','Lestari','Puspita'];
   kinds text[] := array['Wedding','Prewedding','Engagement','Birthday','Graduation','Family Session','Corporate Gathering','Seminar','Product Shoot','Maternity'];
@@ -17,8 +18,8 @@ declare
   client text;
 begin
   -- 42 more packages (50 in total).
-  insert into public.packages (name, price, summary, description)
-  select 'Perf Package ' || g, (500 + (g * 137) % 4500) * 10000, 'perf · ' || g, ''
+  insert into public.packages (workspace_id, name, price, summary, description)
+  select v_ws, 'Perf Package ' || g, (500 + (g * 137) % 4500) * 10000, 'perf · ' || g, ''
   from generate_series(1, 42) g;
 
   select array_agg(id order by name), array_agg(price order by name) into pkg_ids, pkg_prices from public.packages where is_active;
@@ -28,9 +29,9 @@ begin
     d := date '2025-01-01' + ((i * 7919) % 1095);               -- spread over three years
     client := first_names[1 + (i % 20)] || ' ' || last_names[1 + ((i / 20) % 16)];
     pkg := 1 + (i * 31) % array_length(pkg_ids, 1);
-    insert into public.bookings (ref, booking_name, client_name, client_phone, package_id, package_name_snapshot, package_price_snapshot,
+    insert into public.bookings (workspace_id, ref, booking_name, client_name, client_phone, package_id, package_name_snapshot, package_price_snapshot,
                                  booking_date, terms, payment_instruction, created_at)
-    values ('BK-' || extract(year from d)::int || '-' || lpad((50000 + i)::text, 6, '0'),
+    values (v_ws, 'BK-' || extract(year from d)::int || '-' || lpad((50000 + i)::text, 6, '0'),
             kinds[1 + (i % 10)] || ' · ' || client, client,
             '+628' || lpad(((i * 104729) % 1000000000)::text, 10, '1'),
             pkg_ids[pkg], 'Perf', pkg_prices[pkg], d, 'Perf terms.',
@@ -39,12 +40,12 @@ begin
     returning id into b;
 
     for k in 1..(i % 4) loop                                      -- 0–3 items
-      insert into public.booking_items (booking_id, name, price, qty, position)
-      values (b, 'Extra ' || k, 250000 * k, 1 + (i + k) % 3, k - 1);
+      insert into public.booking_items (workspace_id, booking_id, name, price, qty, position)
+      values (v_ws, b, 'Extra ' || k, 250000 * k, 1 + (i + k) % 3, k - 1);
     end loop;
     for k in 1..(1 + i % 3) loop                                  -- 1–3 crew
-      insert into public.booking_crew (booking_id, crew_id, position)
-      values (b, crew_ids[1 + (i + k) % array_length(crew_ids, 1)], k - 1) on conflict do nothing;
+      insert into public.booking_crew (workspace_id, booking_id, crew_id, position)
+      values (v_ws, b, crew_ids[1 + (i + k) % array_length(crew_ids, 1)], k - 1) on conflict do nothing;
     end loop;
 
     -- 0–5 invoices (≈ 2.5 on average): DP or Full first, then Partial(s), maybe a final Paid.
@@ -60,8 +61,8 @@ begin
       else amt := least(v_total / 10, v_total - v_paid - 1);            -- Partial
       end if;
       exit when amt <= 0;
-      insert into public.invoices (booking_id, number, type, dp_method, dp_percentage, amount, snapshot, snapshot_hash, issued_at)
-      values (b, 'INV-' || extract(year from d)::int || '-' || lpad(inv_seq::text, 6, '0'),
+      insert into public.invoices (workspace_id, booking_id, number, type, dp_method, dp_percentage, amount, snapshot, snapshot_hash, issued_at)
+      values (v_ws, b, 'INV-' || extract(year from d)::int || '-' || lpad(inv_seq::text, 6, '0'),
               case when k = 1 and n_inv = 1 then 'full' when k = 1 then 'dp' when k = n_inv then 'paid' else 'partial' end,
               case when k = 1 and n_inv > 1 then 'percentage' end,
               case when k = 1 and n_inv > 1 then 30 end,

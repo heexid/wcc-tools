@@ -8,7 +8,9 @@ import { now } from "@/lib/clock";
 import { isAuthCookie, supabaseBrowser } from "@/lib/supabase/browser";
 import type { BookingErrors, BookingInput, BookingQuery, BookingRow, BookingDetail, InvoiceInput, PackageErrors, PackageInput, PackageRow } from "../repo";
 import type * as Mock from "../repo";
-import { invalidateAll } from "../cache";
+import { accountIdFromCookies } from "@/lib/supabase/cookie";
+import { announceAccountChange, expectAccountChange } from "../account-watch";
+import { invalidateAll, setCacheScope } from "../cache";
 import { NetworkError, PROFILE_CHANGED, type Catalog } from "../shared";
 import type { Business, Crew, Invoice, InvoiceSnapshot, PaymentInstruction, Person, Profile } from "../types";
 import * as act from "./actions";
@@ -43,6 +45,10 @@ const detailJson = <T>(d: string | null | undefined): T => (d ? (JSON.parse(d) a
 const LAST_EMAIL = "data:lastEmail";
 let profile: Profile | null = null;
 
+/** The account in this browser's session cookie, whichever tab signed in. */
+export const accountId: typeof Mock.accountId = () => (typeof document === "undefined" ? null : accountIdFromCookies(document.cookie));
+setCacheScope(() => accountId() ?? "");
+
 function setProfile(p: Profile | null) {
   profile = p;
   if (typeof window !== "undefined") window.dispatchEvent(new Event(PROFILE_CHANGED));
@@ -63,17 +69,20 @@ export const login: typeof Mock.login = async (email, password) => {
   try {
     localStorage.setItem(LAST_EMAIL, email.trim().toLowerCase());
   } catch {}
+  announceAccountChange();
   await getProfile().catch(() => null);
   return { ok: true as const };
 };
 
 export const logout: typeof Mock.logout = async () => {
+  expectAccountChange();
   invalidateAll();
   await act.logoutAction().catch(() => {});
   // Always clear this browser's session too: if the action didn't get through (offline), this still removes the
   // auth cookies, so the user is really signed out here (review P4 #4).
   await supabaseBrowser().auth.signOut({ scope: "local" }).catch(() => {});
   setProfile(null);
+  announceAccountChange();
 };
 
 /** UI guard only (sync, like the mock): an auth cookie exists. P4's proxy enforces sessions on the server. */
@@ -90,7 +99,14 @@ export const getProfile: typeof Mock.getProfile = async () => {
 };
 
 /** Pure read of the cache; AppShell loads it on mount (getProfile) and after sign-in. */
-export const peekProfile: typeof Mock.peekProfile = () => profile;
+export const peekProfile: typeof Mock.peekProfile = () => {
+  // Another account signed in on another tab: its header and role are never the previous account's.
+  if (profile && typeof document !== "undefined") {
+    const id = accountId();
+    if (id && id !== profile.id) profile = null;
+  }
+  return profile;
+};
 
 /** No cache: the form must read the current workspace defaults (terms, payment) every time it opens. */
 export const peekCatalog: typeof Mock.peekCatalog = () => null;

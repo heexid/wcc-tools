@@ -3,7 +3,7 @@
 //   - Who: the invoice is read through the CALLER's session, so RLS decides (staff only; sessions end at 00:00 WIB).
 //   - What: figures come from the invoice SNAPSHOT only, verified against its stored hash; the brand row / From block
 //     use the CURRENT business information (US-14, decided 2026-11-14).
-//   - Storage: `invoices/<number>/<business fingerprint>.pdf`. The same business → the stored file is reused; a
+//   - Storage: `invoices/<workspace id>/<invoice id>/<business fingerprint>.pdf`. The same business → the stored file is reused; a
 //     changed business → a new fingerprint → re-rendered once. A missing file is regenerated from the snapshot.
 //   - The invoice is never touched except `pdf_path` (append-only rule, P1).
 import { NextResponse, type NextRequest } from "next/server";
@@ -31,7 +31,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   // The invoice and the current business are independent reads (P9 review #9): run them together.
   const [{ data: inv, error }, settings] = await Promise.all([
-    sb.from("invoices").select("id, number, snapshot, snapshot_hash, pdf_path").eq(isUuid ? "id" : "number", id).maybeSingle(),
+    sb.from("invoices").select("id, workspace_id, snapshot, snapshot_hash, pdf_path").eq(isUuid ? "id" : "number", id).maybeSingle(),
     sb.rpc("get_settings"),
   ]);
   if (error) return fail(503, "unavailable");
@@ -46,7 +46,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
   if (settings.error || !settings.data) return fail(503, "unavailable");
   const business = (settings.data as { business: Business }).business;
   const fingerprint = sha256(stableStringify({ business, template: PDF_TEMPLATE_VERSION })).slice(0, 16);
-  const path = `${inv.number}/${fingerprint}.pdf`;
+  const path = `${inv.workspace_id}/${inv.id}/${fingerprint}.pdf`;
   const fileName = invoiceFileName(snapshot);
 
   try {

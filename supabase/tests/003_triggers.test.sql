@@ -86,9 +86,9 @@ select throws_ok(
 select is((select status from public.bookings where id = '00000000-0000-0000-0000-00000000b003'), 'canceled', 'status stays canceled');
 
 -- next_invoice_number is atomic per year and not callable by API roles.
-select is(next_invoice_number(2032), 'INV-2032-0001', 'first number of a new year');
-select is(next_invoice_number(2032), 'INV-2032-0002', 'second number follows');
-select ok(not has_function_privilege('authenticated', 'public.next_invoice_number(int)', 'execute'), 'authenticated cannot call next_invoice_number');
+select is(next_invoice_number(test_only.ws(), 2032), 'INV-2032-0001', 'first number of a new year');
+select is(next_invoice_number(test_only.ws(), 2032), 'INV-2032-0002', 'second number follows');
+select ok(not has_function_privilege('authenticated', 'public.next_invoice_number(uuid, int)', 'execute'), 'authenticated cannot call next_invoice_number');
 
 select * from finish();
 rollback;

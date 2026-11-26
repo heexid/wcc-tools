@@ -90,7 +90,7 @@ test("panel load error → Try again", async ({ page }) => {
 
 test("Show more: 20 at a time; a failed page keeps the list and can be retried", async ({ page }) => {
   const id = sql("select id from crew where name = 'Fajar Nugroho'");
-  sql(`with b as (select id from bookings where booking_date < '2026-11-10' and status <> 'canceled' and id not in (select booking_id from booking_crew where crew_id = '${id}')) insert into booking_crew (booking_id, crew_id, position) select id, '${id}', 9 from b`);
+  sql(`with b as (select id from bookings where booking_date < '2026-11-10' and status <> 'canceled' and id not in (select booking_id from booking_crew where crew_id = '${id}')) insert into booking_crew (workspace_id, booking_id, crew_id, position) select (select id from workspaces), id, '${id}', 9 from b`);
   const total = Number(sql(`select count(*) from booking_crew bc join bookings b on b.id = bc.booking_id where bc.crew_id = '${id}' and b.booking_date < '2026-11-10' and b.status <> 'canceled'`));
   expect(total).toBeGreaterThan(20);
   await open(page, undefined, undefined, `/workspace?person=${id}`);

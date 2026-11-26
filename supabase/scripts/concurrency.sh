@@ -10,9 +10,9 @@ psql_q() { psql "$DB_URL" -v ON_ERROR_STOP=1 -qAt "$@"; }
 as_admin="set local role authenticated; select set_config('request.jwt.claims', '{\"sub\":\"$ADMIN\",\"role\":\"authenticated\"}', true);"
 
 psql_q <<SQL
-insert into auth.users (id, email, aud, role, raw_app_meta_data) values ('$ADMIN', 'concurrency@example.test', 'authenticated', 'authenticated', '{"role":"admin"}') on conflict do nothing;
-insert into public.profiles (id, display_name, role) values ('$ADMIN', 'Concurrency Admin', 'admin') on conflict (id) do update set role = 'admin';
-insert into public.packages (id, name, price) values ('$PKG', 'Concurrency Package', 1000000) on conflict do nothing;
+insert into auth.users (id, email, aud, role, raw_app_meta_data) values ('$ADMIN', 'concurrency@example.test', 'authenticated', 'authenticated', jsonb_build_object('role', 'admin', 'workspace_id', (select id from public.workspaces where slug = 'main'))) on conflict do nothing;
+insert into public.profiles (id, workspace_id, display_name, role) values ('$ADMIN', (select id from public.workspaces where slug = 'main'), 'Concurrency Admin', 'admin') on conflict (id) do update set role = 'admin';
+insert into public.packages (id, workspace_id, name, price) values ('$PKG', (select id from public.workspaces where slug = 'main'), 'Concurrency Package', 1000000) on conflict do nothing;
 SQL
 
 BOOKING=$(psql_q -c "begin; $as_admin select (public.save_booking('{\"clientName\":\"Race Client\",\"clientPhone\":\"081234567890\",\"packageId\":\"$PKG\",\"bookingDate\":\"2026-12-31\",\"items\":[],\"crewIds\":[],\"terms\":\"\"}') ->> 'id'); commit;" | grep -E '^[0-9a-f-]{36}$')

@@ -1,6 +1,6 @@
 // Upgrade check for migration 014: accounts that exist BEFORE it runs (viewers → admins, inactive stay inactive,
 // crew_id linking), plus the append-only block on deleting an account that issued invoices. npm run test:migrate-014
-import { bootDb } from "./db-harness";
+import { bootDb, seedBefore016 } from "./db-harness";
 
 const id = (n: number) => `00000000-0000-4000-8000-0000000007${String(n).padStart(2, "0")}`;
 const CREW = "00000000-0000-4000-8000-0000000008aa";
@@ -8,7 +8,10 @@ const CREW = "00000000-0000-4000-8000-0000000008aa";
 async function main() {
   const pg = await bootDb({
     quiet: true,
+    seed: false,
     beforeMigration: async (db, file) => {
+      // 016 needs the seeded data (it refuses accounts without a settings row).
+      if (file.includes("000016_")) return void (await db.exec(seedBefore016()));
       if (!file.includes("000014_")) return;
       await db.exec(`
         insert into public.crew (id, name, role) values ('${CREW}', 'Existing Crew', 'Videographer');

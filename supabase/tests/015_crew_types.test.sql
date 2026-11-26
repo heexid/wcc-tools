@@ -4,11 +4,11 @@ select plan(24);
 
 insert into public.crew (id, name, role) values ('00000000-0000-4000-8000-00000000c001', 'Raka P.', 'Lead photographer');
 insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data) values
-  ('00000000-0000-4000-8000-0000000000e1', 'admin15@bs-moment.test', '{"display_name":"Admin One"}', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-0000000000e2', 'raka15@bs-moment.test', '{"display_name":"Raka Login"}', '{"role":"crew","crew_id":"00000000-0000-4000-8000-00000000c001"}'),
-  ('00000000-0000-4000-8000-0000000000e3', 'taken15@bs-moment.test', '{"display_name":"Second Claim"}', '{"role":"crew","crew_id":"00000000-0000-4000-8000-00000000c001"}'),
-  ('00000000-0000-4000-8000-0000000000e4', 'old15@bs-moment.test', '{}', '{"role":"viewer"}'),
-  ('00000000-0000-4000-8000-0000000000e5', 'bad15@bs-moment.test', '{"display_name":"Bad Link"}', '{"role":"crew","crew_id":"not-a-uuid"}');
+  ('00000000-0000-4000-8000-0000000000e1', 'admin15@bs-moment.test', '{"display_name":"Admin One"}', test_only.meta('{"role":"admin"}')),
+  ('00000000-0000-4000-8000-0000000000e2', 'raka15@bs-moment.test', '{"display_name":"Raka Login"}', test_only.meta('{"role":"crew","crew_id":"00000000-0000-4000-8000-00000000c001"}')),
+  ('00000000-0000-4000-8000-0000000000e3', 'taken15@bs-moment.test', '{"display_name":"Second Claim"}', test_only.meta('{"role":"crew","crew_id":"00000000-0000-4000-8000-00000000c001"}')),
+  ('00000000-0000-4000-8000-0000000000e4', 'old15@bs-moment.test', '{}', test_only.meta('{"role":"viewer"}')),
+  ('00000000-0000-4000-8000-0000000000e5', 'bad15@bs-moment.test', '{"display_name":"Bad Link"}', test_only.meta('{"role":"crew","crew_id":"not-a-uuid"}'));
 
 select is((select name from public.crew where user_id = '00000000-0000-4000-8000-0000000000e1'), 'Admin One', 'admin gets a crew entry');
 select is((select role from public.crew where user_id = '00000000-0000-4000-8000-0000000000e1'), '', 'its job title starts empty');

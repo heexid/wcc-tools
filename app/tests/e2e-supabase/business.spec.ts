@@ -47,12 +47,12 @@ test("E4 · save with a logo → stored in Storage, card shows it, and an old in
   await expect(page.getByRole("status").filter({ hasText: "Business information updated" })).toBeVisible();
 
   // Stored: the path (not a data URL) in the row, the file in the private bucket.
-  expect(sql("select business_name || '|' || business_logo_path from workspace_settings")).toMatch(/^Studio Baru\|logo\/[0-9a-f]{64}\.png$/);
+  expect(sql("select business_name || '|' || business_logo_path from workspace_settings")).toMatch(/^Studio Baru\|[0-9a-f-]{36}\/logo\/[0-9a-f]{64}\.png$/);
   expect(sql("select count(*) from storage.objects where bucket_id = 'branding'")).toBe("1");
   // The card loads it through a signed URL.
   await page.reload();
   const img = card(page).locator("img");
-  await expect(img).toHaveAttribute("src", /\/storage\/v1\/object\/sign\/branding\/logo\//);
+  await expect(img).toHaveAttribute("src", /\/storage\/v1\/object\/sign\/branding\/[0-9a-f-]{36}\/logo\//);
   await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
 
   // Change the bank details too — the old invoice must keep the ones it was issued with.

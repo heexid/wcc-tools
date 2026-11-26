@@ -6,8 +6,8 @@ begin;
 select plan(3);
 
 insert into auth.users (id, email, raw_app_meta_data) values
-  ('00000000-0000-4000-8000-0000000000a5', 'rls-admin@bs-moment.test', '{"role":"admin"}'),
-  ('00000000-0000-4000-8000-0000000000a6', 'rls-crew@bs-moment.test', '{"role":"crew"}');
+  ('00000000-0000-4000-8000-0000000000a5', 'rls-admin@bs-moment.test', test_only.meta('{"role":"admin"}')),
+  ('00000000-0000-4000-8000-0000000000a6', 'rls-crew@bs-moment.test', test_only.meta('{"role":"crew"}'));
 
 create temp table got (who text, obj text, op text, result text);
 grant all on got to anon, authenticated;
@@ -48,7 +48,7 @@ do $$
 declare
   who text;
   t text;
-  tables text[] := array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings'];
+  tables text[] := array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces'];
   bk text := (select id::text from public.bookings where ref = 'BK-2026-0144');
   pk text := (select package_id::text from public.bookings where ref = 'BK-2026-0144'); -- read as the owner, up front
 begin
@@ -73,7 +73,7 @@ begin
     perform pg_temp.try(who, 'list_people', 'select', $q$select jsonb_array_elements(public.list_people('2026-11-10'))$q$);
     perform pg_temp.try(who, 'get_settings', 'select', $q$select 1 where public.get_settings() is not null$q$);
     perform pg_temp.try(who, 'my_profile', 'select', $q$select 1 where public.my_profile() is not null$q$);
-    perform pg_temp.try(who, 'next_invoice_number', 'rpc', $q$select public.next_invoice_number(2099)$q$);
+    perform pg_temp.try(who, 'next_invoice_number', 'rpc', $q$select public.next_invoice_number(gen_random_uuid(), 2099)$q$);
     perform pg_temp.try(who, 'save_booking_tx', 'rpc', $q$select public.save_booking_tx('{}')$q$);
     execute 'reset role';
   end loop;
@@ -85,13 +85,13 @@ create temp table want (who text, obj text, op text, result text);
 insert into want
 select w.who, t.t, o.op,
   case
-    when o.op = 'select' and t.t in ('invoice_counters', 'booking_counters', 'workspace_settings') then '42501'
+    when o.op = 'select' and t.t in ('invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces') then '42501'
     when o.op = 'select' and w.who = 'anon' then '42501'
     when o.op = 'select' then 'rows'
     else '42501' -- no direct writes for anyone through the API
   end
 from (values ('anon'), ('crew'), ('admin')) w(who),
-     unnest(array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings']) t(t),
+     unnest(array['packages', 'crew', 'bookings', 'booking_items', 'booking_crew', 'invoices', 'profiles', 'invoice_counters', 'booking_counters', 'workspace_settings', 'workspaces']) t(t),
      (values ('select'), ('update'), ('delete')) o(op)
 union all
 select w.who, 'profiles', 'select_private', '42501' from (values ('anon'), ('crew'), ('admin')) w(who) -- private column: only via my_profile()

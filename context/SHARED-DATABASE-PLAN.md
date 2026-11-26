@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD6 are not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4 is rehearsed, SD5 is built. SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -44,13 +44,13 @@ A customer's business is called a **workspace**. This is the only name used for 
 | Delete bookings or invoices | No | No | **No** |
 | Create or manage workspaces, admins and crew | No (developer query) | No (developer query) | **No** |
 
-**Not confirmed yet**
+**Decided 2026-11-26**
 
-| # | Question | Recommended |
+| # | Question | Decision |
 |---|---|---|
-| 1 | Custom form fields | Settings per workspace: text, number, date, choice or checkbox. |
-| 2 | Custom invoice | Settings per workspace: colour, footer note, show or hide sections, choice of layouts. No code per customer. |
-| 3 | Time zone | WIB for everyone in v1, including the 00:00 session end. |
+| 1 | Custom form fields | **Parked.** A client request, not part of this plan. Quoted and planned separately when a client asks. |
+| 2 | Custom invoice | **Parked.** Same as 1. |
+| 3 | Time zone | WIB (Indonesia) for everyone in v1, including the 00:00 session end. |
 
 ## 2. What exists now
 
@@ -99,27 +99,104 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. For W2–W5 also means live since 2026-11-25 (pull request #8).
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1–SD3 and SD5 are in draft pull request #10 and must not be merged or run on live before SD4.
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
 | ✅ Backup and restore tested; automatic backups postponed (dummy data) | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
-| ⬜ | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
-| ⬜ | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
-| ⬜ | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
-| ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
-| 🟡 Template drafted | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
-| ⬜ | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6 |
+| ✅ Built and tested (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
+| ✅ Built and tested (migration 017); CI required on `main`; not on live | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
+| ✅ Built and tested (migration 018); not on live | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
+| 🟡 Backed up and rehearsed; not run on live | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
+| 🟡 Template and export tested; timing on live ⬜ | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
+| ⏸ Parked (client request, 2026-11-26) | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6, quoted separately |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
 | ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
-| ✅ Built | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
-| 🟡 Released ✅, live hand checks ⬜ | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
+| ✅ Live | **W4** Panel | Side panel, links, URL state, mobile | WC-4 and WC-5 pass | 2 |
+| ✅ Live | **W5** Docs and release | `PRD.md` US-11, US-13, US-14; INTERACTIONS; `setup-production.sql`; launcher illustration when provided | Live hand checks pass | 1 |
+
+### 4.1 SD1 checklist (2026-11-25)
+
+| | Step |
+|---|---|
+| ✅ | Migration `20261126000016_workspaces.sql`: `workspaces`, `workspace_id` on every business table, keys and uniqueness per workspace, numbering per workspace, `workspace_id` in existing accounts |
+| ✅ | It refuses to run when it can't tell which workspace the data belongs to (several settings rows, or data without one) |
+| ✅ | No silent mix-up meanwhile: with a second workspace, a write that doesn't name its workspace fails. SD2 removes this temporary default (`only_workspace()`) |
+| ✅ | A new account's crew entry is in the account's workspace, and `crew_id` can only link an entry there (moved forward from SD2) |
+| ✅ | Run: all 16 earlier database files, plus `017_workspace_tables` (38 checks with two workspaces) |
+| ✅ | Run: upgrade test from data before the migration (29 checks, `npm run test:migrate-016`) |
+| ✅ | Run: SQL and mock parity, 308 unit tests, types, lint |
+| ✅ | Run: on a restored copy of live: every row, invoice hash and account unchanged |
+| ✅ | Run: Supabase browser tests on a copy: 51 of 52; only "calendar loads only the visible range" fails, as before |
+| ✅ | `setup-production.sql`, seed and generated types updated |
+| ⬜ | Live: with SD2 and SD3, in SD4. **Don't run 016 on live before SD4** |
+
+### 4.2 SD2 checklist (2026-11-25)
+
+| | Step |
+|---|---|
+| ✅ | Migration `20261126000017_workspace_isolation.sql`: access rules by workspace, every write and settings function limited to it, accounts need a role and a workspace, read-only and closed workspaces, SD1's temporary default removed |
+| ✅ | Run: 18 database files, including `018_workspace_isolation` (96 checks, two workspaces with the same package name, booking ref and invoice number) |
+| ✅ | Run: the test is itself tested. Each of 35 workspace conditions was removed in turn: 27 are caught, the other 8 are second layers behind an earlier check |
+| ✅ | New code can't skip isolation: the test fails on a readable table without the workspace rule, a direct write, or a SECURITY DEFINER function that isn't on the reviewed list |
+| ✅ | Run: SQL and mock parity, upgrade tests 014 and 016, 308 unit tests, `setup-production.sql` gives the same functions as the migrations |
+| ✅ | Run: 016 and 017 on a restored copy of live: every row, hash and account unchanged |
+| ✅ | Run: Supabase browser tests on a copy: 51 of 52; only the known calendar test fails |
+| ✅ | Run: 60 invoices at the same moment by three admins in two workspaces: no duplicate, no gap, no error |
+| ✅ | Run: 50 workspaces, about 108,000 bookings (in memory): every read under 55 ms |
+| ✅ | CI: a "database" job (isolation, parity, upgrades) in `ci.yml` |
+| ✅ | CI: both jobs pass on GitHub and are required on `main` (pull requests only, admins included), so a failing test blocks a deploy |
+| ⬜ | Live: with SD3, in SD4 |
+
+A saved booking that lists another workspace's crew drops that person, like any unknown id; another workspace's package is rejected.
+
+### 4.3 SD3 checklist (2026-11-25)
+
+| | Step |
+|---|---|
+| ✅ | Migration `20261126000018_workspace_files.sql`: logos under `<workspace id>/logo/`, readable and writable only there; `my_profile` sends the workspace's id and status. It refuses to run while a logo is at its old path (live has none) |
+| ✅ | PDFs under `<workspace id>/<invoice id>/`; old files are re-created by themselves on the next download |
+| ✅ | Read-only workspace: admins see no write button; own name and password still work |
+| ✅ | Browser cache kept per account (stricter than per workspace). A tab whose browser signs in as someone else reloads, even with an unsaved form open |
+| ✅ | Run: `019_workspace_files` (23 checks), unit tests (311), mock browser tests |
+| ✅ | Run: `two-workspaces` on real Supabase: 7 of 7 (own PDF for the same number, logos, links, two tabs, read-only, closed) |
+| ✅ | Run: every other Supabase browser test: 51 of 52; only the known calendar test fails |
+| ✅ | Figma: read-only uses the crew view (WC2); nothing new to draw |
+| ⬜ | Live: SD4 |
+
+A read-only customer isn't told why the buttons are gone; a closed one sees a page that doesn't load. Neither message is designed yet.
+
+### 4.4 SD4 checklist
+
+| | Step |
+|---|---|
+| ✅ | Fresh backup (2026-11-25): database, 18 of 18 Storage files, account triggers, Storage rules |
+| ✅ | Preconditions on live: one settings row, no logo, every login has a profile |
+| ✅ | Rehearsal of 016–018 on a restored copy: every row, hash and account unchanged; admin and crew see their data; a new booking numbers on |
+| ⬜ | 016, 017, 018 on live. Claude's attempt was stopped by the permission system; nothing ran |
+| ⬜ | Merge pull request #10 (deploys), right after the migrations |
+| ⬜ | Compare counts and hashes; check login, a booking, an invoice and a PDF by hand |
+| ⬜ | Test workspace B, its logins (Dashboard) and hand checks with both accounts |
+
+### 4.5 SD5 checklist
+
+| | Step |
+|---|---|
+| ✅ | Account template: all 8 blocks tested on the real migrations, with their refusals (`npm run test:workspace-tools`, 19 checks; the template itself stays on the owner's machine) |
+| ✅ | One-workspace export: `supabase/scripts/export-workspace.sql`, read only, 12 checks, in CI |
+| ⬜ | A new workspace takes under 15 minutes (measured on live, after SD4) |
+
+### 4.6 SD6: parked
+
+Custom form fields and custom invoices are extras a client asks for, not part of this plan (decided 2026-11-26). When a client asks, quote it and plan it on its own: Figma first, then build. Time zone is WIB for everyone.
+
+Still open, small: a message telling read-only or closed customers why they can't edit or see anything. Not designed yet; Figma first.
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
-**Total: about 14–20 days for SD0–SD6, plus 7–9 for W1–W5.** You can sell after SD5 (10–14 days) if you don't promise custom fields or invoices yet.
+**Total: about 10–14 days for SD0–SD5, plus 7–9 for W1–W5.** You can sell after SD4 and SD5; custom fields and invoices are quoted separately.
 
-**Pricing dependency:** the first setup in `agents/marketings/PRICING.md` (Rp 400.000) includes a custom invoice and custom form fields. Don't sell that setup before SD6 is done. Before SD6, sell the subscription and accounts only.
+**Pricing dependency:** the first setup in `agents/marketings/PRICING.md` (Rp 400.000) includes a custom invoice and custom form fields. SD6 is parked, so sell the subscription and accounts; quote a custom form or invoice as a separate client request.
 
 ## 5. Tests that must pass
 
@@ -127,26 +204,26 @@ Use workspaces A and B, each with an admin and a crew account.
 
 | Run | # | Test | Expected |
 |---|---|---|---|
-| ⬜ | 1 | A reads every table and calls every read function | No B rows |
-| ⬜ | 2 | A's admin calls every write function with B's booking, package or crew id | Rejected; B is unchanged |
-| ⬜ | 3 | A saves its own booking with B's package or crew | Rejected |
-| ⬜ | 4 | A opens B's invoice PDF by id or number | 404 |
-| ⬜ | 5 | Both have `INV-2026-0001` | Each downloads its own PDF |
-| ⬜ | 6 | A reads, replaces or deletes B's logo | Rejected |
-| ⬜ | 7 | Settings, totals, search, filters, crew schedule, people list and upcoming counts | Only own data and own bank account |
-| ⬜ | 8 | Account without a workspace, inactive account, yesterday's session, closed workspace | No data |
-| ⬜ | 9 | Read-only workspace | Reads and existing PDFs work; every business write fails |
-| ⬜ | 10 | Two admins in one workspace create invoices at the same time | No duplicate number |
-| ⬜ | 11 | Two tabs, A signs out and B signs in | No A data on B's screen |
-| ⬜ | 12 | Every invoice hash before and after migration | Identical |
-| ⬜ | 13 | Every public table has a workspace policy, and every `SECURITY DEFINER` function is on a reviewed list | Passes, so new code can't skip isolation |
-| ⬜ | 14 | Performance with 50 workspaces | Within the existing budgets |
-| ⬜ | 15 | Accounts that existed before the migration: sign in, change role, remove and restore access | Same workspace throughout; inactive accounts stay inactive after the migration |
-| ⬜ | 16 | A opens `/workspace?person=<B's crew id>` | No panel and no B data; same message as an unknown id |
-| ⬜ | 17 | A's admin edits business information | Only A's settings and PDFs change |
-| ⬜ | 18 | Business information in a read-only workspace | Visible, no Edit button; a direct save is rejected |
+| ✅ | 1 | A reads every table and calls every read function | No B rows |
+| ✅ | 2 | A's admin calls every write function with B's booking, package or crew id | Rejected; B is unchanged |
+| ✅ | 3 | A saves its own booking with B's package or crew | Rejected |
+| ✅ | 4 | A opens B's invoice PDF by id or number | 404 |
+| ✅ | 5 | Both have `INV-2026-0001` | Each downloads its own PDF |
+| ✅ | 6 | A reads, replaces or deletes B's logo | Rejected |
+| ✅ | 7 | Settings, totals, search, filters, crew schedule, people list and upcoming counts | Only own data and own bank account |
+| ✅ | 8 | Account without a workspace, inactive account, yesterday's session, closed workspace | No data |
+| ✅ | 9 | Read-only workspace | Reads and existing PDFs work; every business write fails |
+| ✅ | 10 | Two admins in one workspace create invoices at the same time | No duplicate number |
+| ✅ | 11 | Two tabs, A signs out and B signs in | No A data on B's screen |
+| ✅ on a copy | 12 | Every invoice hash before and after migration | Identical |
+| ✅ | 13 | Every public table has a workspace policy, and every `SECURITY DEFINER` function is on a reviewed list | Passes, so new code can't skip isolation |
+| ✅ locally | 14 | Performance with 50 workspaces | Within the existing budgets |
+| ✅ | 15 | Accounts that existed before the migration: sign in, change role, remove and restore access | Same workspace throughout; inactive accounts stay inactive after the migration |
+| ✅ | 16 | A opens `/workspace?person=<B's crew id>` | No panel and no B data; same message as an unknown id |
+| ✅ | 17 | A's admin edits business information | Only A's settings and PDFs change |
+| ✅ | 18 | Business information in a read-only workspace | Visible, no Edit button; a direct save is rejected |
 
-**CI (part of SD2):** `.github/workflows/ci.yml` runs only typecheck, lint, unit tests and build. Add `npm run db:test`, `npm run test:parity` and `npm run test:rls` as required checks. Vercel builds from GitHub on its own, so also block production deploys until the checks pass. Tests that need real Storage or a browser (4–6, 11) stay in `e2e:supabase`, run before each release on a separate stack because it resets its database.
+**CI (part of SD2, added 2026-11-25):** before SD2, `.github/workflows/ci.yml` ran only typecheck, lint, unit tests and build. Original note: add `npm run db:test`, `npm run test:parity` and `npm run test:rls` as required checks. Vercel builds from GitHub on its own, so also block production deploys until the checks pass. Tests that need real Storage or a browser (4–6, 11) stay in `e2e:supabase`, run before each release on a separate stack because it resets its database.
 
 ## 6. Moving the live data
 
@@ -171,7 +248,7 @@ Use workspaces A and B, each with an admin and a crew account.
 | Restoring one customer restores everyone | Export and restore per workspace (SD5) |
 | One customer's custom request breaks others | Settings only; quote new features separately |
 | Existing accounts lose access because they have no `workspace_id` | §6 step 5; test 15 |
-| Custom setup is sold before it exists | Not sold before SD6 (§4) |
+| Custom setup is sold before it exists | Quoted as a separate client request (§4.6) |
 | Server gets too small | Watch load; a bigger server raises the running cost |
 | Admins look for Business information in Account settings | Mention the move in release notes; the tile is in the launcher on every screen |
 | "Workspace" suggests switching workspaces | The page shows the signed-in workspace only and has no switcher |
@@ -215,7 +292,7 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Live hand checks, signed in (user, 2026-11-25): all pass, two changes asked: no lag, and stay in Workspace & Crew | W5 |
 | ✅ | Booking detail opens in place, without a page change | W5 |
 | ✅ | Booking: its own detail panel also opens without a page request | W5 |
-| ⬜ | Deploy these changes | W5 |
+| ✅ | Deployed (pull request #9, 2026-11-25); the user reported the checks pass, before it was merged | W5 |
 | ✅ | `PRICING.md` and `supabase/templates/` are no longer tracked: kept on the owner's machine only | — |
 
 ### 9.1 Summary

@@ -127,7 +127,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | W2 | `/workspace`, launcher tile, Business information moved from Account settings | ✅ live 2026-11-25 |
 | W3 | People list, search, type filter, migration 015 | ✅ live 2026-11-25 |
 | W4 | Person panel, links into Booking, mobile sheet | ✅ live 2026-11-25 |
-| W5 | Docs, release | 🟡 released ✅, live hand checks ✅, booking detail in place ⬜ deploy |
+| W5 | Docs, release | ✅ live 2026-11-25 |
 
 ### Mobile layouts
 

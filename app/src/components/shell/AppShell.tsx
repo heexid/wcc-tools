@@ -9,7 +9,8 @@ import { ToastSlot, ToastStack } from "@/components/ds/Feedback";
 import { Icon } from "@/components/ds/Icon";
 import { Txt } from "@/components/ds/Txt";
 import { PdfToasts } from "@/components/pdf/PdfToasts";
-import { getProfile, hasSession, logout, peekProfile } from "@/lib/data/repo";
+import { watchAccount } from "@/lib/data/account-watch";
+import { accountId, getProfile, hasSession, logout, peekProfile } from "@/lib/data/repo";
 import { PROFILE_CHANGED } from "@/lib/data/shared";
 import { nextStudioMidnight } from "@/lib/session-day";
 import { AccountMenu } from "./AccountMenu";
@@ -158,6 +159,8 @@ function useSessionGate() {
   useEffect(() => {
     if (!hasSession()) router.replace(`/login?next=${encodeURIComponent(path + window.location.search)}`);
   }, [router, path]);
+  // Another tab signed in as someone else (or out): reload, so nothing of this account stays on screen.
+  useEffect(() => watchAccount(accountId), []);
   // Sessions end at 00:00 WIB (Supabase source; the prototype keeps you signed in). A tab left open past midnight
   // signs out at 00:00 and shows E4, instead of sitting on reads the database now refuses.
   useEffect(() => {

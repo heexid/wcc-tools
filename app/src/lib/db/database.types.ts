@@ -37,47 +37,68 @@ export type Database = {
       booking_counters: {
         Row: {
           last_value: number
+          workspace_id: string
           year: number
         }
         Insert: {
           last_value?: number
+          workspace_id: string
           year: number
         }
         Update: {
           last_value?: number
+          workspace_id?: string
           year?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "booking_counters_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       booking_crew: {
         Row: {
           booking_id: string
           crew_id: string
           position: number
+          workspace_id: string
         }
         Insert: {
           booking_id: string
           crew_id: string
           position?: number
+          workspace_id: string
         }
         Update: {
           booking_id?: string
           crew_id?: string
           position?: number
+          workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "booking_crew_booking_id_fkey"
-            columns: ["booking_id"]
+            columns: ["workspace_id", "booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
-            referencedColumns: ["id"]
+            referencedColumns: ["workspace_id", "id"]
           },
           {
             foreignKeyName: "booking_crew_crew_id_fkey"
-            columns: ["crew_id"]
+            columns: ["workspace_id", "crew_id"]
             isOneToOne: false
             referencedRelation: "crew"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "booking_crew_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -90,6 +111,7 @@ export type Database = {
           position: number
           price: number
           qty: number
+          workspace_id: string
         }
         Insert: {
           booking_id: string
@@ -98,6 +120,7 @@ export type Database = {
           position?: number
           price: number
           qty: number
+          workspace_id: string
         }
         Update: {
           booking_id?: string
@@ -106,13 +129,21 @@ export type Database = {
           position?: number
           price?: number
           qty?: number
+          workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "booking_items_booking_id_fkey"
-            columns: ["booking_id"]
+            columns: ["workspace_id", "booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "booking_items_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -128,7 +159,10 @@ export type Database = {
           client_phone: string
           created_at: string
           created_by: string | null
+          event_start: string | null
           id: string
+          location: string
+          notes: string
           package_id: string
           package_name_snapshot: string
           package_price_snapshot: number
@@ -139,6 +173,7 @@ export type Database = {
           total: number
           total_paid: number
           updated_at: string
+          workspace_id: string
         }
         Insert: {
           booking_date: string
@@ -150,7 +185,10 @@ export type Database = {
           client_phone: string
           created_at?: string
           created_by?: string | null
+          event_start?: string | null
           id?: string
+          location?: string
+          notes?: string
           package_id: string
           package_name_snapshot: string
           package_price_snapshot: number
@@ -161,6 +199,7 @@ export type Database = {
           total?: number
           total_paid?: number
           updated_at?: string
+          workspace_id: string
         }
         Update: {
           booking_date?: string
@@ -172,7 +211,10 @@ export type Database = {
           client_phone?: string
           created_at?: string
           created_by?: string | null
+          event_start?: string | null
           id?: string
+          location?: string
+          notes?: string
           package_id?: string
           package_name_snapshot?: string
           package_price_snapshot?: number
@@ -183,27 +225,35 @@ export type Database = {
           total?: number
           total_paid?: number
           updated_at?: string
+          workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "bookings_canceled_by_fkey"
-            columns: ["canceled_by"]
+            columns: ["workspace_id", "canceled_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedColumns: ["workspace_id", "id"]
           },
           {
             foreignKeyName: "bookings_created_by_fkey"
-            columns: ["created_by"]
+            columns: ["workspace_id", "created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedColumns: ["workspace_id", "id"]
           },
           {
             foreignKeyName: "bookings_package_id_fkey"
-            columns: ["package_id"]
+            columns: ["workspace_id", "package_id"]
             isOneToOne: false
             referencedRelation: "packages"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "bookings_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -216,6 +266,7 @@ export type Database = {
           name: string
           role: string
           user_id: string | null
+          workspace_id: string
         }
         Insert: {
           created_at?: string
@@ -224,6 +275,7 @@ export type Database = {
           name: string
           role?: string
           user_id?: string | null
+          workspace_id: string
         }
         Update: {
           created_at?: string
@@ -232,13 +284,21 @@ export type Database = {
           name?: string
           role?: string
           user_id?: string | null
+          workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "crew_user_id_fkey"
-            columns: ["user_id"]
+            columns: ["workspace_id", "user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "crew_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -246,17 +306,28 @@ export type Database = {
       invoice_counters: {
         Row: {
           last_value: number
+          workspace_id: string
           year: number
         }
         Insert: {
           last_value?: number
+          workspace_id: string
           year: number
         }
         Update: {
           last_value?: number
+          workspace_id?: string
           year?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invoice_counters_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {
@@ -275,6 +346,7 @@ export type Database = {
           type: string
           void_reason: string | null
           voided_at: string | null
+          workspace_id: string
         }
         Insert: {
           amount: number
@@ -292,6 +364,7 @@ export type Database = {
           type: string
           void_reason?: string | null
           voided_at?: string | null
+          workspace_id: string
         }
         Update: {
           amount?: number
@@ -309,20 +382,28 @@ export type Database = {
           type?: string
           void_reason?: string | null
           voided_at?: string | null
+          workspace_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "invoices_booking_id_fkey"
-            columns: ["booking_id"]
+            columns: ["workspace_id", "booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
-            referencedColumns: ["id"]
+            referencedColumns: ["workspace_id", "id"]
           },
           {
             foreignKeyName: "invoices_created_by_fkey"
-            columns: ["created_by"]
+            columns: ["workspace_id", "created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "invoices_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -338,6 +419,7 @@ export type Database = {
           price: number
           summary: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
           archived_at?: string | null
@@ -349,6 +431,7 @@ export type Database = {
           price: number
           summary?: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
           archived_at?: string | null
@@ -360,8 +443,17 @@ export type Database = {
           price?: number
           summary?: string
           updated_at?: string
+          workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "packages_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -372,6 +464,7 @@ export type Database = {
           password_changed_at: string | null
           role: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
           active?: boolean
@@ -381,6 +474,7 @@ export type Database = {
           password_changed_at?: string | null
           role?: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
           active?: boolean
@@ -390,8 +484,17 @@ export type Database = {
           password_changed_at?: string | null
           role?: string
           updated_at?: string
+          workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workspace_settings: {
         Row: {
@@ -433,18 +536,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "workspace_settings_updated_by_fkey"
-            columns: ["updated_by"]
+            columns: ["workspace_id", "updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["workspace_id", "id"]
+          },
+          {
+            foreignKeyName: "workspace_settings_workspace_fk"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          paid_until: string | null
+          slug: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          paid_until?: string | null
+          slug: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          paid_until?: string | null
+          slug?: string
+          status?: string
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      account_workspace: { Args: { p_meta: Json }; Returns: string }
       archive_package: { Args: { p_id: string }; Returns: undefined }
       below_paid_error: { Args: { p_booking_id: string }; Returns: undefined }
       booking_errors: { Args: { p: Json }; Returns: Json }
@@ -478,6 +616,8 @@ export type Database = {
         }
         Returns: string
       }
+      current_workspace_id: { Args: never; Returns: string }
+      ensure_crew_entry: { Args: { p_user: string }; Returns: undefined }
       filter_bookings: { Args: { q: Json }; Returns: Json[] }
       get_booking: { Args: { p_id: string }; Returns: Json }
       get_crew_schedule: {
@@ -520,8 +660,14 @@ export type Database = {
       list_people: { Args: { p_today: string }; Returns: Json }
       mark_password_changed: { Args: never; Returns: undefined }
       my_profile: { Args: never; Returns: Json }
-      next_booking_ref: { Args: { p_year: number }; Returns: string }
-      next_invoice_number: { Args: { p_year: number }; Returns: string }
+      next_booking_ref: {
+        Args: { p_workspace: string; p_year: number }
+        Returns: string
+      }
+      next_invoice_number: {
+        Args: { p_workspace: string; p_year: number }
+        Returns: string
+      }
       normalize_phone: { Args: { p_input: string }; Returns: string }
       ordered_booking_ids: {
         Args: { q: Json }
