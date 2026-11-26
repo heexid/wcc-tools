@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4 is rehearsed, SD5 is built, SD6 is not started, apart from the SD5 template draft. The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4 is rehearsed, SD5 is built. SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -44,13 +44,13 @@ A customer's business is called a **workspace**. This is the only name used for 
 | Delete bookings or invoices | No | No | **No** |
 | Create or manage workspaces, admins and crew | No (developer query) | No (developer query) | **No** |
 
-**Not confirmed yet**
+**Decided 2026-11-26**
 
-| # | Question | Recommended |
+| # | Question | Decision |
 |---|---|---|
-| 1 | Custom form fields | Settings per workspace: text, number, date, choice or checkbox. |
-| 2 | Custom invoice | Settings per workspace: colour, footer note, show or hide sections, choice of layouts. No code per customer. |
-| 3 | Time zone | WIB for everyone in v1, including the 00:00 session end. |
+| 1 | Custom form fields | **Parked.** A client request, not part of this plan. Quoted and planned separately when a client asks. |
+| 2 | Custom invoice | **Parked.** Same as 1. |
+| 3 | Time zone | WIB (Indonesia) for everyone in v1, including the 00:00 session end. |
 
 ## 2. What exists now
 
@@ -109,7 +109,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Built and tested (migration 018); not on live | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
 | 🟡 Backed up and rehearsed; not run on live | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
 | 🟡 Template and export tested; timing on live ⬜ | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
-| ⬜ | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6 |
+| ⏸ Parked (client request, 2026-11-26) | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6, quoted separately |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
 | ✅ Approved; migration 015 live | **W3** People | `listPeople` migration, table, search, filter | WC-3 passes | 1–2 |
@@ -187,14 +187,16 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 | ✅ | One-workspace export: `supabase/scripts/export-workspace.sql`, read only, 12 checks, in CI |
 | ⬜ | A new workspace takes under 15 minutes (measured on live, after SD4) |
 
-### 4.6 SD6: decisions needed before it starts
+### 4.6 SD6: parked
 
-The custom form field and custom invoice answers in §1 are still "not confirmed", and the order is Figma first, then build.
+Custom form fields and custom invoices are extras a client asks for, not part of this plan (decided 2026-11-26). When a client asks, quote it and plan it on its own: Figma first, then build. Time zone is WIB for everyone.
+
+Still open, small: a message telling read-only or closed customers why they can't edit or see anything. Not designed yet; Figma first.
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
-**Total: about 14–20 days for SD0–SD6, plus 7–9 for W1–W5.** You can sell after SD5 (10–14 days) if you don't promise custom fields or invoices yet.
+**Total: about 10–14 days for SD0–SD5, plus 7–9 for W1–W5.** You can sell after SD4 and SD5; custom fields and invoices are quoted separately.
 
-**Pricing dependency:** the first setup in `agents/marketings/PRICING.md` (Rp 400.000) includes a custom invoice and custom form fields. Don't sell that setup before SD6 is done. Before SD6, sell the subscription and accounts only.
+**Pricing dependency:** the first setup in `agents/marketings/PRICING.md` (Rp 400.000) includes a custom invoice and custom form fields. SD6 is parked, so sell the subscription and accounts; quote a custom form or invoice as a separate client request.
 
 ## 5. Tests that must pass
 
@@ -246,7 +248,7 @@ Use workspaces A and B, each with an admin and a crew account.
 | Restoring one customer restores everyone | Export and restore per workspace (SD5) |
 | One customer's custom request breaks others | Settings only; quote new features separately |
 | Existing accounts lose access because they have no `workspace_id` | §6 step 5; test 15 |
-| Custom setup is sold before it exists | Not sold before SD6 (§4) |
+| Custom setup is sold before it exists | Quoted as a separate client request (§4.6) |
 | Server gets too small | Watch load; a bigger server raises the running cost |
 | Admins look for Business information in Account settings | Mention the move in release notes; the tile is in the launcher on every screen |
 | "Workspace" suggests switching workspaces | The page shows the signed-in workspace only and has no switcher |
