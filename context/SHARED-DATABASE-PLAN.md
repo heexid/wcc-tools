@@ -108,7 +108,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Built and tested (migration 017); CI required on `main`; live 2026-11-26 | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ✅ Built and tested (migration 018); live 2026-11-26 | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
 | 🟡 Migrations 016–018 live and deployed 2026-11-26; hand checks and workspace B ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
-| 🟡 Template and export tested; timing on live ⬜ | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
+| ✅ Template, export and live timing (about 10 minutes) | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
 | ⏸ Parked (client request, 2026-11-26) | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6, quoted separately |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
 | ✅ Approved | **W2** Move | Route, launcher tile without illustration, Business information, Account settings cleanup | F18 tests pass at the new location | 1 |
@@ -177,7 +177,7 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 | ✅ | 016, 017, 018 on live (2026-11-26), each in one transaction; rows and hashes checked after each; one workspace, 3 accounts with `workspace_id`, 0 rows outside it |
 | ✅ | Pull request #10 merged and deployed right after the migrations |
 | 🟡 | Counts and invoice hashes identical to the backup after the deploy ✅; login, a booking, an invoice and a PDF by hand ⬜ (owner) |
-| ⬜ | Test workspace B, its logins (Dashboard) and hand checks with both accounts |
+| 🟡 | Test workspace B (`test-b`) and its admin and crew logins created ✅; hand checks with both workspaces ⬜ (owner) |
 
 ### 4.5 SD5 checklist
 
@@ -185,7 +185,7 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 |---|---|
 | ✅ | Account template: all 8 blocks tested on the real migrations, with their refusals (`npm run test:workspace-tools`, 19 checks; the template itself stays on the owner's machine) |
 | ✅ | One-workspace export: `supabase/scripts/export-workspace.sql`, read only, 12 checks, in CI |
-| ⬜ | A new workspace takes under 15 minutes (measured on live, after SD4) |
+| ✅ | A new workspace takes under 15 minutes: test workspace B on live took about 10 minutes (2026-11-26), including creating its two logins in the Dashboard |
 
 ### 4.6 SD6: parked
 
