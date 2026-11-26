@@ -33,7 +33,7 @@ test.describe("M05 · new booking", () => {
     expect((await client.locator("..").boundingBox())!).toMatchObject({ x: 16, width: 358, height: 44 });
     expect(await client.evaluate((e) => getComputedStyle(e).fontSize)).toBe("16px");
     const date = (await page.getByRole("button", { name: "Booking date" }).boundingBox())!;
-    const start = (await page.getByRole("button", { name: /Event start/ }).boundingBox())!;
+    const start = (await page.getByRole("textbox", { name: "Event start" }).boundingBox())!;
     expect(Math.abs(date.y - start.y)).toBeLessThan(1);
     expect(start.x).toBeGreaterThan(date.x + date.width);
     expect((await page.getByLabel("Created").locator("..").boundingBox())!.width).toBe(358);

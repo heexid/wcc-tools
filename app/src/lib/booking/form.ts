@@ -21,7 +21,7 @@ export const MSG = {
   termsMax: `Max ${LIMITS.termsMax} characters`,
   locationMax: `Max ${LIMITS.locationMax} characters`,
   notesMax: `Max ${LIMITS.notesMax} characters`,
-  eventStartInvalid: "Pick a start time",
+  eventStartInvalid: "Enter a time like 19:30",
 };
 
 const digits = (v: string) => v.replace(/\D/g, "");

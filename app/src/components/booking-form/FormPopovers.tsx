@@ -11,6 +11,7 @@ import { Txt } from "@/components/ds/Txt";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { useDismiss } from "@/components/shell/useDismiss";
+import { EVENT_START_RE } from "@/lib/booking/calc";
 import { crewOptions } from "@/lib/booking/crew";
 import type { Crew, Package } from "@/lib/data/types";
 import { useMyId } from "@/lib/role";
@@ -365,76 +366,153 @@ export function CrewSelect({ value, onChange, crew }: { value: string[]; onChang
   );
 }
 
-/** 30-minute slots, 00:00 → 23:30. */
-const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => `${String(Math.floor(i / 2)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`);
+const pad2 = (n: number) => String(n).padStart(2, "0");
+const HOURS = Array.from({ length: 24 }, (_, i) => pad2(i));
+const MINUTES = Array.from({ length: 60 }, (_, i) => pad2(i));
 
 /**
- * Event start (Figma Bookings 03 "Client & schedule", 2026-11-21): DS Select field, optional. Listbox of 30-minute
- * slots below the field, the selected slot scrolled into view (08:00 when empty); "No start time" clears it.
+ * Typed time → "HH:MM", "" for empty, null when it can't be read. Accepts 24-hour "9", "09", "930", "0930",
+ * "9:30", "9.30", "9 30", "21:05" and 12-hour "7pm", "7.30 am", "12:15 PM".
+ */
+export function parseTime(raw: string): string | null {
+  const s = raw.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!s) return "";
+  const m = s.match(/^(\d{1,2})(?:[:.\s]?(\d{2}))?\s?(am|pm|a|p)?$/);
+  if (!m) return null;
+  let h = Number(m[1]);
+  const min = m[2] ? Number(m[2]) : 0;
+  const ap = m[3]?.[0];
+  if (ap) {
+    if (h < 1 || h > 12) return null;
+    h = (h % 12) + (ap === "p" ? 12 : 0);
+  }
+  if (h > 23 || min > 59) return null;
+  return `${pad2(h)}:${pad2(min)}`;
+}
+
+/** One scrolling column of the time picker (hours or minutes). */
+function TimeColumn({ label, items, value, onPick }: { label: string; items: string[]; value: string; onPick: (v: string) => void }) {
+  return (
+    <div className="flex min-w-0 flex-1 flex-col gap-micro">
+      <span className="flex justify-center text-timestamp text-text-tertiary">
+        <Txt>{label}</Txt>
+      </span>
+      <ul role="listbox" aria-label={label} className="flex max-h-[calc(var(--spacing-64)*3)] flex-col gap-2 overflow-y-auto">
+        {items.map((t) => {
+          const on = t === value;
+          return (
+            <li key={t} role="option" aria-selected={on}>
+              <button
+                type="button"
+                data-cell={t}
+                onClick={() => onPick(t)}
+                className={cn(
+                  "flex w-full cursor-pointer items-center justify-center rounded-6 py-tight outline-none focus-visible:shadow-focus-ring",
+                  "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover)",
+                  on ? "bg-accent-primary text-caption-strong text-text-on-accent" : "text-caption text-text-primary hover:bg-surface-subtle",
+                )}
+              >
+                <Txt>{t}</Txt>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * Event start (Figma Bookings 03 "Client & schedule", 2026-11-21): optional time field. Type a time ("9", "930",
+ * "19:30", "7.30pm" — tidied to HH:MM on blur / Enter) or open the picker from the clock button: free hour (00–23)
+ * and minute (00–59) columns, any minute allowed. Picking an hour keeps the minute (00 when empty); picking a minute
+ * closes the picker. "Clear" removes the time.
  */
 export function TimeSelect({ value, onChange, error, disabled }: { value: string; onChange: (v: string) => void; error?: string; disabled?: boolean }) {
   const { open, setOpen, box, panel, mounted, presence } = usePopover();
   const id = useId();
-  const list = useRef<HTMLUListElement>(null);
-  const slots = value && !TIME_SLOTS.includes(value) ? [...TIME_SLOTS, value].sort() : TIME_SLOTS;
-  const pick = (v: string) => {
-    onChange(v);
-    setOpen(false);
+  const [draft, setDraft] = useState<string | null>(null); // text while typing; null = show value
+  const [hh, mm] = EVENT_START_RE.test(value) ? value.split(":") : ["", ""];
+  const commit = () => {
+    if (draft === null) return;
+    const t = parseTime(draft);
+    onChange(t ?? draft.trim()); // unreadable text stays so the form shows its error
+    setDraft(null);
   };
+  const scrollToValue = () =>
+    requestAnimationFrame(() => {
+      for (const [col, v] of [["Hour", hh || "08"], ["Minute", mm || "00"]] as const)
+        panel.current?.querySelector<HTMLElement>(`[aria-label="${col}"] [data-cell="${v}"]`)?.scrollIntoView({ block: "center" });
+    });
   return (
     <div className="flex w-full flex-col gap-micro">
       <FieldLabel htmlFor={id}>Event start</FieldLabel>
       <div ref={box} className="relative w-full">
         <FieldBox error={!!error} disabled={disabled} forceFocus={open}>
-          <button
+          <input
             id={id}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            disabled={disabled}
+            placeholder="HH:MM"
+            value={draft ?? value}
+            aria-invalid={!!error || undefined}
+            aria-describedby={error ? `${id}-msg` : undefined}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit();
+              if (e.key === "Escape" && draft !== null) setDraft(null);
+            }}
+            className="h-full min-w-0 flex-1 bg-transparent text-ui-input text-text-primary outline-none placeholder:text-text-placeholder disabled:cursor-not-allowed disabled:text-text-placeholder"
+          />
+          <button
             type="button"
             disabled={disabled}
-            aria-haspopup="listbox"
+            aria-label="Choose event start time"
+            aria-haspopup="dialog"
             aria-expanded={open}
-            aria-describedby={error ? `${id}-msg` : undefined}
             onClick={() => {
+              commit();
+              if (!open) scrollToValue();
               setOpen(!open);
-              if (!open)
-                requestAnimationFrame(() => list.current?.querySelector<HTMLElement>(`[data-slot="${value || "08:00"}"]`)?.scrollIntoView({ block: "center" }));
             }}
-            className="flex h-full min-w-0 flex-1 cursor-pointer items-center gap-tight text-left outline-none disabled:cursor-not-allowed"
+            className="flex cursor-pointer rounded-small text-text-secondary outline-none hover:text-text-primary focus-visible:shadow-focus-ring disabled:cursor-not-allowed"
           >
-            <span className={cn("min-w-0 flex-1 truncate text-ui-input", value && !disabled ? "text-text-primary" : "text-text-placeholder")}>{value || "Select time"}</span>
-            <Icon name="chevron-down" className="size-icon-sm text-text-secondary" />
+            <Icon name="clock" className="size-icon-sm" />
           </button>
         </FieldBox>
         {mounted && (
-          <div ref={panel} role="dialog" aria-label="Event start" {...presence} className={cn(shell, "top-[calc(100%+var(--spacing-6))] left-0 w-full gap-micro p-popover-inset [--transform-origin:top_left]")}>
-            <ul ref={list} role="listbox" aria-label="Start times" className="flex max-h-[calc(var(--spacing-64)*4)] flex-col gap-micro overflow-y-auto">
-              {value && (
-                <li role="option" aria-selected={false}>
-                  <button type="button" onClick={() => pick("")} className="flex w-full cursor-pointer items-center rounded-6 px-[calc(var(--spacing-12)-var(--spacing-2))] py-compact text-left text-caption text-text-secondary outline-none hover:bg-surface-subtle focus-visible:shadow-focus-ring">
-                    No start time
-                  </button>
-                </li>
-              )}
-              {slots.map((t) => {
-                const on = t === value;
-                return (
-                  <li key={t} role="option" aria-selected={on}>
-                    <button
-                      type="button"
-                      data-slot={t}
-                      onClick={() => pick(t)}
-                      className={cn(
-                        "flex w-full cursor-pointer items-center gap-compact rounded-6 px-[calc(var(--spacing-12)-var(--spacing-2))] py-compact text-left outline-none focus-visible:shadow-focus-ring",
-                        "transition-[background-color] duration-(--dur-hover) ease-(--ease-hover)",
-                        on ? "bg-surface-accent" : "hover:bg-surface-subtle",
-                      )}
-                    >
-                      <Txt className={cn("min-w-0 flex-1 text-caption-strong", on ? "text-text-accent" : "text-text-primary")}>{t}</Txt>
-                      <Icon name="check" className={cn("size-icon-sm text-text-accent", !on && "opacity-0")} />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+          <div ref={panel} role="dialog" aria-label="Choose event start time" {...presence} className={cn(shell, "top-[calc(100%+var(--spacing-6))] left-0 w-full min-w-[calc(var(--spacing-64)*3)] gap-compact p-popover-inset [--transform-origin:top_left]")}>
+            <div className="flex gap-compact">
+              <TimeColumn label="Hour" items={HOURS} value={hh} onPick={(h) => onChange(`${h}:${mm || "00"}`)} />
+              <TimeColumn
+                label="Minute"
+                items={MINUTES}
+                value={mm}
+                onPick={(m) => {
+                  onChange(`${hh || "08"}:${m}`);
+                  setOpen(false);
+                }}
+              />
+            </div>
+            <div className="flex items-center border-t border-border-default pt-compact">
+              <Button
+                variant="ghost"
+                disabled={!value}
+                onClick={() => {
+                  onChange("");
+                  setOpen(false);
+                }}
+              >
+                Clear
+              </Button>
+              <span className="flex-1" />
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Done
+              </Button>
+            </div>
           </div>
         )}
       </div>
