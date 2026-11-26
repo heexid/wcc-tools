@@ -11,12 +11,17 @@ About 15 minutes, all in the browser. Do Supabase first, then Vercel.
 4. **Add yourself:** *Authentication → Users* → *Add user* → *Create new user* → your email and a password → tick **Auto Confirm User**.
 5. **Make yourself admin:** *SQL Editor* → run (with your email):
    ```sql
-   update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}' where email = 'you@example.com';
+   update auth.users set raw_app_meta_data = raw_app_meta_data
+     || jsonb_build_object('role', 'admin', 'workspace_id', (select id from public.workspaces where slug = 'main'))
+   where email = 'you@example.com';
    ```
-   Your crew entry is added automatically, so you can assign yourself to bookings. For a read-only crew account, add the user the same way and use `'{"role":"crew"}'`.
+   Your crew entry is added automatically, so you can assign yourself to bookings. For a read-only crew account, add the user the same way with `'role', 'crew'`. An account needs both a role and a workspace; with only a role, no account is made.
 6. **Add crew who won't log in** (accounts get their crew entry automatically), one line per person:
    ```sql
-   insert into public.crew (name, role) values ('Raka Pratama', 'Lead photographer'), ('Dinda Ayu', 'Videographer');
+   insert into public.crew (workspace_id, name, role)
+   select w.id, v.name, v.role from public.workspaces w,
+     (values ('Raka Pratama', 'Lead photographer'), ('Dinda Ayu', 'Videographer')) v(name, role)
+   where w.slug = 'main';
    ```
 7. **Copy three values** from *Project Settings → API Keys* (and *Data API* for the URL):
    - Project URL (`https://xxxx.supabase.co`)
@@ -63,14 +68,18 @@ app/node_modules/.bin/supabase db dump --linked --data-only --use-copy -s public
 
 ## Accounts (admin and crew)
 
+Every account belongs to one workspace and never moves. Replace `'main'` with the customer's workspace code (`select slug, name, status from public.workspaces;`).
+
 **Create.** Add the user in Supabase → Authentication → Users (Auto Confirm), then:
 
 ```sql
 -- Optional: for someone already in the crew list, add "crew_id" to link them and avoid a duplicate.
--- select id, name, role from public.crew where user_id is null;
+-- select id, name, role from public.crew where user_id is null and workspace_id = (select id from public.workspaces where slug = 'main');
 update auth.users
 set raw_user_meta_data = coalesce(raw_user_meta_data, '{}') || '{"display_name":"Raka Pratama"}',
-    raw_app_meta_data  = raw_app_meta_data || '{"role":"crew"}'   -- or "admin"; optionally ,"crew_id":"<uuid>"
+    raw_app_meta_data  = raw_app_meta_data
+      || jsonb_build_object('role', 'crew',   -- or 'admin'; optionally , 'crew_id', '<uuid>'
+                            'workspace_id', (select id from public.workspaces where slug = 'main'))
 where email = 'raka@example.com';
 ```
 
