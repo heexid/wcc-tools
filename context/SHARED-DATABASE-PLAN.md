@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3). SD4 is rehearsed, SD5 is built. SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3) and live since 2026-11-26 (SD4: migrations run, rows and invoice hashes unchanged). SD5 is built. SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -99,15 +99,15 @@ A customer's business is called a **workspace**. This is the only name used for 
 
 Effort is a rough guess for one developer with Claude, not a measurement.
 
-**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1–SD3 and SD5 are in draft pull request #10 and must not be merged or run on live before SD4.
+**Status:** ✅ built or run · 🟡 partly · ⬜ not started. W1–W5 are live. SD1–SD3 and SD5 are live since 2026-11-26 (pull request #10).
 
 | Status | Phase | Work | Done when | Days |
 |---|---|---|---|---|
 | ✅ Backup and restore tested; automatic backups postponed (dummy data) | **SD0** Safety | Turn on and test backups. Dump the live database and copy Storage files. Check that live has exactly one settings row. | A restore works on a separate project. **Blocks every later SD phase:** no migration, including W3's, runs on live before this passes | 1 |
-| ✅ Built and tested (migration 016); not on live | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
-| ✅ Built and tested (migration 017); CI required on `main`; not on live | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
-| ✅ Built and tested (migration 018); not on live | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
-| 🟡 Backed up and rehearsed; not run on live | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
+| ✅ Built and tested (migration 016); live 2026-11-26 | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
+| ✅ Built and tested (migration 017); CI required on `main`; live 2026-11-26 | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
+| ✅ Built and tested (migration 018); live 2026-11-26 | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
+| 🟡 Migrations 016–018 live and deployed 2026-11-26; hand checks and workspace B ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
 | 🟡 Template and export tested; timing on live ⬜ | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
 | ⏸ Parked (client request, 2026-11-26) | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6, quoted separately |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
@@ -130,7 +130,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ | Run: on a restored copy of live: every row, invoice hash and account unchanged |
 | ✅ | Run: Supabase browser tests on a copy: 51 of 52; only "calendar loads only the visible range" fails, as before |
 | ✅ | `setup-production.sql`, seed and generated types updated |
-| ⬜ | Live: with SD2 and SD3, in SD4. **Don't run 016 on live before SD4** |
+| ✅ | Live: 2026-11-26, in SD4 |
 
 ### 4.2 SD2 checklist (2026-11-25)
 
@@ -147,7 +147,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ | Run: 50 workspaces, about 108,000 bookings (in memory): every read under 55 ms |
 | ✅ | CI: a "database" job (isolation, parity, upgrades) in `ci.yml` |
 | ✅ | CI: both jobs pass on GitHub and are required on `main` (pull requests only, admins included), so a failing test blocks a deploy |
-| ⬜ | Live: with SD3, in SD4 |
+| ✅ | Live: 2026-11-26, in SD4 |
 
 A saved booking that lists another workspace's crew drops that person, like any unknown id; another workspace's package is rejected.
 
@@ -163,7 +163,7 @@ A saved booking that lists another workspace's crew drops that person, like any 
 | ✅ | Run: `two-workspaces` on real Supabase: 7 of 7 (own PDF for the same number, logos, links, two tabs, read-only, closed) |
 | ✅ | Run: every other Supabase browser test: 51 of 52; only the known calendar test fails |
 | ✅ | Figma: read-only uses the crew view (WC2); nothing new to draw |
-| ⬜ | Live: SD4 |
+| ✅ | Live: 2026-11-26, in SD4 |
 
 A read-only customer isn't told why the buttons are gone; a closed one sees a page that doesn't load. Neither message is designed yet.
 
@@ -174,9 +174,9 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 | ✅ | Fresh backup (2026-11-25): database, 18 of 18 Storage files, account triggers, Storage rules |
 | ✅ | Preconditions on live: one settings row, no logo, every login has a profile |
 | ✅ | Rehearsal of 016–018 on a restored copy: every row, hash and account unchanged; admin and crew see their data; a new booking numbers on |
-| ⬜ | 016, 017, 018 on live. Claude's attempt was stopped by the permission system; nothing ran |
-| ⬜ | Merge pull request #10 (deploys), right after the migrations |
-| ⬜ | Compare counts and hashes; check login, a booking, an invoice and a PDF by hand |
+| ✅ | 016, 017, 018 on live (2026-11-26), each in one transaction; rows and hashes checked after each; one workspace, 3 accounts with `workspace_id`, 0 rows outside it |
+| ✅ | Pull request #10 merged and deployed right after the migrations |
+| 🟡 | Counts and invoice hashes identical to the backup after the deploy ✅; login, a booking, an invoice and a PDF by hand ⬜ (owner) |
 | ⬜ | Test workspace B, its logins (Dashboard) and hand checks with both accounts |
 
 ### 4.5 SD5 checklist
@@ -189,9 +189,9 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 
 ### 4.6 SD6: parked
 
-Custom form fields and custom invoices are extras a client asks for, not part of this plan (decided 2026-11-26). When a client asks, quote it and plan it on its own: Figma first, then build. Time zone is WIB for everyone.
+Custom form fields and custom invoices are extras a client asks for, not part of this plan (decided 2026-11-26). When a client asks, quote it and plan it on its own: Figma first, then build. The developer sets these up per customer by query (owner's work, priced in `PRICING.md`); no admin settings screen. Time zone is WIB for everyone.
 
-Still open, small: a message telling read-only or closed customers why they can't edit or see anything. Not designed yet; Figma first.
+A message telling read-only or closed customers why they can't edit or see anything: not needed for now (owner, 2026-11-26).
 
 **Order (user, 2026-11-25): one phase at a time, design in Figma first, then build.** W1 is the Figma design; nothing is built before it is finished and reviewed. Then W2 → W3 → W4 → W5, each starting only when the one before is done. W1 and W2 need no migration; W3's migration reaches live only after SD0. If W3 ships before SD2, SD2 adds workspace tests for `listPeople`; the function itself stays the same, because RLS does the filtering. The W phases don't block selling.
 **Total: about 10–14 days for SD0–SD5, plus 7–9 for W1–W5.** You can sell after SD4 and SD5; custom fields and invoices are quoted separately.
