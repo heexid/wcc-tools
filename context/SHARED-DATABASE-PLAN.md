@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3) and live since 2026-11-26 (SD4: migrations run, rows and invoice hashes unchanged). SD5 is built. SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
+| **Status** | Written 2026-11-25. The Workspace & Crew module is live since 2026-11-25 (see §9.0). SD0: one backup is tested, automatic backups are still off. SD1–SD3 are built (see §4.1–4.3) and live since 2026-11-26 (SD4 done: rows and invoice hashes unchanged, hand checks pass with two workspaces). SD5 is done (a new workspace in about 10 minutes). Before the first real customer: turn on automatic backups (SD0). SD6 (custom form and invoice) is parked as a client request (2026-11-26). The Workspace & Crew requirements (§9) were merged in on 2026-11-25. |
 | **Goal** | One Vercel app and one Supabase project serve every customer. No customer can see or change another's data. Inside its workspace, a team manages its business information and sees who works on what (§9). |
 | **Why** | Removes the server cost per customer, and gives workspace-level data its own module. |
 | **Companions** | `PRD.md` §4.2–4.4, US-9, US-11, US-13, US-14 · `CREW-TYPE-PLAN.md` · `PRODUCTION-PLAN.md` P10 (RLS) and D3 (workspace membership) |
@@ -107,7 +107,7 @@ Effort is a rough guess for one developer with Claude, not a measurement.
 | ✅ Built and tested (migration 016); live 2026-11-26 | **SD1** Tables | Migrations: workspaces, `workspace_id`, composite keys, uniqueness, counters, and `workspace_id` in existing accounts' `app_metadata` | Existing database tests pass; row counts and invoice hashes are unchanged | 2–3 |
 | ✅ Built and tested (migration 017); CI required on `main`; live 2026-11-26 | **SD2** Isolation | RLS, every read and write function, accounts, settings, read-only status. Add the database tests to CI and make CI required before a production deploy | Two-workspace database tests pass (§5) in CI, and a failing test blocks a deploy | 3–4 |
 | ✅ Built and tested (migration 018); live 2026-11-26 | **SD3** App and files | Logo and PDF paths, PDF route, browser cache, seeds, mock parity, generated types, `setup-production.sql`, workspace status in `my_profile` so the app can hide write buttons | App and Supabase end-to-end tests pass with two workspaces | 2–3 |
-| 🟡 Migrations 016–018 live and deployed 2026-11-26; hand checks and workspace B ⬜ | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
+| ✅ Live 2026-11-26; hand checks pass with both workspaces | **SD4** Go live | Rehearse on a copy, migrate live (§6), create a second test workspace | Hand checks pass with both accounts | 1–2 |
 | ✅ Template, export and live timing (about 10 minutes) | **SD5** Customer setup | Finalize `supabase/templates/workspace-accounts.sql` (drafted) against the real migrations; add it to the database tests; add a one-workspace export | A new workspace takes under 15 minutes | 1 |
 | ⏸ Parked (client request, 2026-11-26) | **SD6** Customization | Custom fields in form, detail panel, invoice and PDF; invoice settings | Two workspaces have different forms and invoices | 4–6, quoted separately |
 | ✅ Approved | **W1** Figma | Move business information; design the new screens, flow and mobile (§9.4) | Every §9.3 state exists; no business card is left in Account settings | 2–3 |
@@ -176,8 +176,8 @@ A read-only customer isn't told why the buttons are gone; a closed one sees a pa
 | ✅ | Rehearsal of 016–018 on a restored copy: every row, hash and account unchanged; admin and crew see their data; a new booking numbers on |
 | ✅ | 016, 017, 018 on live (2026-11-26), each in one transaction; rows and hashes checked after each; one workspace, 3 accounts with `workspace_id`, 0 rows outside it |
 | ✅ | Pull request #10 merged and deployed right after the migrations |
-| 🟡 | Counts and invoice hashes identical to the backup after the deploy ✅; login, a booking, an invoice and a PDF by hand ⬜ (owner) |
-| 🟡 | Test workspace B (`test-b`) and its admin and crew logins created ✅; hand checks with both workspaces ⬜ (owner) |
+| ✅ | Counts and invoice hashes identical to the backup after the deploy; login, a booking, an invoice and a PDF checked by hand (owner, 2026-11-26) |
+| ✅ | Test workspace B (`test-b`) with an admin and a crew login; hand checks pass with both workspaces (owner, 2026-11-26) |
 
 ### 4.5 SD5 checklist
 
