@@ -8,6 +8,7 @@ import { FinalCta } from "./FinalCta";
 import { LiquidBackground } from "@/components/login/LiquidBackground";
 import { LandingMotion } from "./LandingMotion";
 import { LandingNav } from "./LandingNav";
+import { Videos } from "./Videos";
 import { Chip, Container, GET_STARTED_HREF, Glow, IconTile, LOGIN_HREF, SECTION_LINKS, SectionIntro, Shot } from "./parts";
 
 // CIR marketing landing page — Figma "bs internal tools" › Landing Page:
@@ -32,6 +33,7 @@ export function LandingPage() {
         <BookingForm />
         <Invoices />
         <Trust />
+        <Videos />
         <FaqSection />
       </main>
       <FinalCtaAndFooter />
