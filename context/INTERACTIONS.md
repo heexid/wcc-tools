@@ -5,7 +5,7 @@ Companion to `context/PRD.md` (stories + rules), `context/PLAN.md` (architecture
 Audited and completed 2026-11-10 against Figma `bs internal tools`:
 - **Bookings page**: *Booking · Screens* (01–11), *Booking · Interaction states* (12–40) and *Booking · Hi-fi flow* (lanes A–H).
 - **Package Lib page**: screens 01–08 and the hi-fi flow (lanes A–D).
-- **Login page**: P1–P3 and errors E1–E7.
+- **Login page**: P1–P3 and errors E1–E6; Forgot & reset password FP1–FP3, FP-E1–E3, RP1–RP3, RP-E1–E2, RP-X, L-S1–L-S2.
 - **Launchpad & Profile page**: *Launchpad · Hi-fi flow* (module switching), *Profile · Screens* (AC1–AC10, LO1–LO2, LO1b) and *Profile · Hi-fi flow* (lanes A–E: account menu, change name, change password, log out, business information).
 
 **Status legend**
@@ -135,7 +135,7 @@ All 96 interactions are now defined. There are no ❌ items left.
 | 6.2 | Success toasts | ✅ | 05, 05c, B5 |
 | 6.3 | Loading | ✅ | Skeleton rows (table, 8 + footer), skeleton date cells (calendar; week / day 3–4 blocks), KPI value + rail skeletons, DS `Loader` (5×5 orchid dots) in the detail panel — appears only after 250 ms so fast loads never flash it. Filters, search and view switch stay interactive. Figma: CIR · Design System → Pattern · Data & content (`Skeleton`, `Loader`). Package library has no skeleton yet |
 | 6.4 | `crew` account type (read-only; was `viewer` until 2026-11-24) | ✅ | Hide New booking (header, empty states, quick-add targets), Edit booking, Create invoice, the Cancel booking section, Archive / Restore, New package and Edit package. `/bookings/new` → `/bookings`; `/bookings/[id]/edit` → read-only view. Everything else stays visible. Prototype switch: `/dev/role` |
-| 6.5 | Login **Forgot password?** | ✅ | Info alert "contact your workspace admin" — Login **E7**. Other login states: required (E1), email format (E2), wrong credentials (E3, password cleared + focused), session expired (E4, `?expired=1`, email prefilled; also every day at 00:00 WIB — sessions end at midnight, decided 2026-11-16), Caps Lock (E5), server unreachable (E6, "Try again") |
+| 6.5 | Login **Forgot password?** | ✅ | Opens **Forgot password** (`/forgot-password`, email carried over) → **Send reset link** → Login + snackbar "Check your email for a reset link" for any email (FP1–FP3, L-S1; errors FP-E1–E3). Email link → **Create new password** (RP1–RP3, RP-E1–E2) → every session signed out → Login + "Password updated. Log in with your new password" (L-S2); expired / used link → RP-X **Send a new link**. Card, background and mascot stay mounted between the three screens; only the content swaps and the card height eases (--dur-modal, --ease-out). Replaces E7 (PASSWORD-RESET-PLAN). Other login states: required (E1), email format (E2), wrong credentials (E3, password cleared + focused), session expired (E4, `?expired=1`, email prefilled; also every day at 00:00 WIB — sessions end at midnight, decided 2026-11-16), Caps Lock (E5), server unreachable (E6, "Try again") |
 | 6.6 | **Profile** (header) → Account menu | Popover: Account Setting · Log out; ↑ ↓ move between items; Esc / outside / profile again closes (focus back to the profile) | ✅ | Launchpad & Profile **AC1** · Profile flow A |
 | 6.7 | **Account Setting** → Account settings page | Profile (name, email, role) + Security (password) | ✅ | **AC2** · flow A |
 | 6.8 | **Edit name** → modal → Save | 2–50 chars; error "Enter 2–50 characters."; toast "Name updated", header updates | ✅ | **AC3**, **AC3b**, **AC4** · flow B |

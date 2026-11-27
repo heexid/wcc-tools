@@ -257,7 +257,7 @@ Standard loop; biggest refactor in the plan — land it in small PRs by seam: (a
 
 **Feature**
 - Supabase Auth with `@supabase/ssr`: cookie session, `proxy`/middleware refresh, route guard (everything except `/login` redirects with `?next=`, INTERACTIONS 6.5), `redirect to ?next= or /bookings` after login.
-- Login errors E1–E6 from **real** auth errors (wrong credentials, locked, network, expired session E4 with prefilled email); **Forgot password?** keeps the Info alert E7 (no self-service reset, PRD §4.3).
+- Login errors E1–E6 from **real** auth errors (wrong credentials, locked, network, expired session E4 with prefilled email); **Forgot password?** — self-service email reset since 2026-11-27 (PASSWORD-RESET-PLAN.md; replaces E7).
 - `profiles` row created on first sign-in (trigger on `auth.users`); `role` ∈ `admin | crew` from the workspace membership (D3); `useIsReadOnly()` reads the real role; `/dev/role` is removed from production.
 - Account (US-13, PLAN §8b): change name (zod 2–50 trimmed + DB check; header and menu update), change password (re-verify current password, rules checklist client + server, **sign out other sessions** with scope `others`, `password_changed_at`), log out → `/login?loggedOut=1` after the leave guard.
 - Login hardening: rate limit / lockout via Supabase Auth settings, generic error text (no account enumeration).
@@ -510,7 +510,7 @@ Standard loop; any failure reopens the slice that owns the broken behaviour.
 - Database: PITR / daily backups enabled on production, **one restore rehearsal** on staging recorded; migration rollback notes per migration; connection pooling settings.
 - **Reconciliation** (PRD success criterion #3): nightly job that checks, per booking, `bookings.total` = package + Σ items, `total_paid` = Σ non-void invoices, `status` matches PRD §2.5, invoice snapshot hash matches a recomputed hash, no gaps in `INV-YYYY-NNNN` per year. Failures notify a channel and fail loudly.
 - Alerts: error-rate spike, failed PDF generation, failed reconciliation, auth error spike.
-- Runbook `production/docs/RUNBOOK.md`: deploy, roll back, restore, rotate keys, reset a user's password (admin path, since there's no self-service reset), investigate a wrong total.
+- Runbook `production/docs/RUNBOOK.md`: deploy, roll back, restore, rotate keys, reset a user's password (users reset their own by email, PASSWORD-RESET-PLAN; SQL path in DEPLOY.md as the fallback), investigate a wrong total.
 - **Done when:** a deliberately corrupted row on staging is caught by the nightly check, an alert fires, and the restore rehearsal is written up.
 
 **Prompt**

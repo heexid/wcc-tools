@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Draft v1 · 2026-11-10 |
 | **Owner** | WCC & ECC internal tools (Wedding Content Creator · Event Content Creator) |
-| **Design source** | Figma `bs internal tools` → page **CIR · Design System** (tokens, components, layouts) · pages **Bookings** (screens 01–11, interaction states 12–40, hi-fi flow lanes A–H), **Package Lib** (01–08, lanes A–D), **Login** (P1–P3, E1–E7), **Launchpad & Profile** (launcher flow, AC1–AC10, LO1–LO2, Profile lanes A–E) |
+| **Design source** | Figma `bs internal tools` → page **CIR · Design System** (tokens, components, layouts) · pages **Bookings** (screens 01–11, interaction states 12–40, hi-fi flow lanes A–H), **Package Lib** (01–08, lanes A–D), **Login** (P1–P3, E1–E6; section *Forgot & reset password*: FP1–FP3, FP-E1–E3, EM1, RP1–RP3, RP-E1–E2, RP-X, L-S1–L-S2; mobile FMP1–FMP3), **Launchpad & Profile** (launcher flow, AC1–AC10, LO1–LO2, Profile lanes A–E) |
 | **Companions** | `context/PLAN.md` (build plan, DS mapping) · `context/INTERACTIONS.md` (96 interactions) · `context/PROTOTYPE-PLAN.md` (prototype slices F0–F18) · last synced 2026-11-14 |
 | **Stack** | Next.js (App Router) · Tailwind (CIR tokens) · Supabase (Postgres, Auth, Storage) · `@react-pdf/renderer` |
 | **Currency** | IDR only (`Rp 1.250.000`, `id-ID` locale, no decimals) |
@@ -303,7 +303,10 @@ Next.js App Router (RSC + Server Actions)
  ├─ /bookings/[id]       Read-only detail (also a side panel via parallel route @panel) + invoice cards
  ├─ /bookings/[id]/edit  Same editor as /new: updated totals + Invoices (n) + New invoice #n modal
  ├─ /packages            Package Library (List layout)
- ├─ /login               Login (no self-service reset, see §4.3)
+ ├─ /login               Login
+ ├─ /forgot-password     Forgot password → reset email (§4.3, PASSWORD-RESET-PLAN.md)
+ ├─ /auth/confirm        Reset link check → /reset-password
+ ├─ /reset-password      Create new password / link expired
  ├─ /workspace           Workspace & Crew (business information, people, person panel) — US-14, US-15
  ├─ /account             Account settings (name, password) — US-13
  └─ /api/invoices/[id]/pdf  → renders @react-pdf from snapshot, caches in Supabase Storage
@@ -384,7 +387,7 @@ Indexes: `booking_crew(crew_id)` (crew filter), `bookings(booking_date)`, `booki
 
 ### 4.3 Integration points
 
-- **Login → Forgot password:** there's no self-service reset. The **Forgot password?** link under the password field shows an Info alert in the login card: "Forgot your password? Passwords are managed by your workspace admin. Ask them to reset it, then log in with the new password." (Login screen E7).
+- **Login → Forgot password (self-service reset, 2026-11-27):** **Forgot password?** opens `/forgot-password` (same card as Login). The user enters their email; **every** address gets the same answer — back to Login with the snackbar "Check your email for a reset link" — and only registered accounts get an email (no account enumeration). The CIR-branded email links to `/auth/confirm` (one use, 1 hour), which opens **Create new password** (new + confirm, rules: 8+ characters, a letter and a number). On success every session of the account is signed out and Login shows "Password updated. Log in with your new password". An expired or used link shows "This link has expired" with **Send a new link**. Replaces Login E7. Plan and live setup: `PASSWORD-RESET-PLAN.md`; emails go through Resend SMTP.
 - **Auth:** existing internal-tools Supabase Auth. Roles: `admin` (everything) and `crew` (read-only: sees everything, changes nothing). Enforced by RLS. The old `viewer` role was removed on 2026-11-24; migration 014 turns active viewers, including the Owner, into admins. The developer creates, changes and revokes accounts with SQL (`agents/DEPLOY.md`); see `CREW-TYPE-PLAN.md`.
 - **Sessions end at 00:00 WIB every day** (decided 2026-11-16). A session that signed in before today's midnight is refused by the server and the database; an open tab signs out at 00:00. Both show Login **E4** ("Your session expired"), email prefilled. Only accounts an admin provisioned with a role are staff (P4).
 - **Settings:** bank details and default terms are read from the existing workspace settings (the *Payment receiver* block in the Invoice module). This is reused, not duplicated. The **business profile** (name, address, email, phone, logo) is edited inside this module on Workspace & Crew (US-14) and stored in `workspace_settings`.

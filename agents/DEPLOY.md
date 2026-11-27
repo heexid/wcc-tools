@@ -48,6 +48,18 @@ Supabase → *Authentication → URL Configuration* → **Site URL** = your Verc
 
 Open the site, log in with the account from step 1.4, and you're live. From now on, every push to GitHub redeploys automatically.
 
+### Password reset emails (PASSWORD-RESET-PLAN.md)
+
+**Forgot password?** emails a reset link. Supabase's built-in sender only reaches your own Supabase team and about 2 emails an hour, so real users need your own sender (Resend):
+
+1. [resend.com](https://resend.com) → add and verify your domain (DNS records; can take a few hours) → *API Keys* → create a key with sending access.
+2. Supabase → *Authentication → Emails → SMTP Settings* → enable custom SMTP: host `smtp.resend.com`, port `465`, user `resend`, password = the API key, sender `no-reply@<your domain>`, sender name `CIR`.
+3. *Authentication → Emails → Templates → Reset password*: subject `Reset your CIR password`, body = the whole of `supabase/email/reset-password.html`.
+4. *Authentication → URL Configuration*: **Site URL** = your live address (the email link uses it); add `<live address>/auth/confirm` to **Redirect URLs**.
+5. Check: *Forgot password?* with your own email → the email arrives → *Reset password* → set a new password → log in with it.
+
+Until step 1–2 are done, reset a password with SQL (below).
+
 ## 4 · Check it works (10 minutes, on the live site)
 
 1. Log in with your admin account.
@@ -108,6 +120,16 @@ Don't delete the auth user as routine. Deleting an admin who issued an invoice *
 
 ```sql
 select count(*) from public.profiles where active and role = 'admin';   -- must be ≥ 1
+```
+
+**Reset someone's password by hand** (fallback — people normally use *Forgot password?*). Check who is asking first. Set a temporary password (8+ characters, a letter and a number), send it privately, and ask them to change it in *Account → Change password*:
+
+```sql
+update auth.users set encrypted_password = extensions.crypt('Temp1234x', extensions.gen_salt('bf')), updated_at = now()
+where email = 'raka@example.com';                                   -- must say 1 row
+update public.profiles set password_changed_at = now()
+where id = (select id from auth.users where email = 'raka@example.com');
+delete from auth.sessions where user_id = (select id from auth.users where email = 'raka@example.com');  -- signs them out everywhere
 ```
 
 ## Upgrade to crew types (databases set up before 2026-11-24)

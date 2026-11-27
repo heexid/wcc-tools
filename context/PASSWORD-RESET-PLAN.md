@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | **Planned 2026-11-27.** PW0 plan · PW1 Figma · PW2 code · PW3 ship + live config. |
+| **Status** | **2026-11-27:** PW0 plan ✅ · PW1 Figma ✅ · PW2 code ✅ (mock e2e + local Supabase/Mailpit end to end) · PW3 ship + live config: see §7. |
 | **Goal** | Anyone with a CIR login who forgot their password can set a new one by email, without the developer running SQL. |
 | **Companions** | `PRD.md` §4.3, §4.4, US-13 · `INTERACTIONS.md` 6.5 · `agents/DEPLOY.md` · Figma page **Login** |
 | **Replaces** | Login **E7** ("Passwords are managed by your workspace admin") and the SQL reset path. |
@@ -46,7 +46,7 @@ Email "Reset your CIR password" ──Reset password──▶ /auth/confirm (ver
 **US-PW2. As that user, I want the email link to let me set a new password so that I can log in again.**
 - The email: subject "Reset your CIR password", CIR mascot and wordmark, the line "We got a request to reset the password for {{ .Email }}.", primary button **Reset password**, "This link expires in 1 hour and works once. If you didn’t ask for this, you can ignore this email — your password won’t change." It uses brand colours from the DS tokens, inlined because email clients don't support CSS variables.
 - The link goes to `/auth/confirm?token_hash=…&type=recovery`, which verifies it on the server and redirects to `/reset-password`. It works on any device, because it uses `token_hash` rather than PKCE.
-- The RP card looks like Login: title "Reset password", mascot, heading "Create a new password", body "Choose a password you don’t use anywhere else", **New password** and **Confirm new password** fields (show/hide), and the live rules checklist from Change password (at least 8 characters · contains a letter and a number). There's no "different from current" row, since we don't know the current password; Supabase's `same_password` answer is shown as "Use a password you haven’t used for CIR before".
+- The RP card looks like Login: title "Reset password", mascot, heading "Create a new password", body "Pick one you don’t use anywhere else" (shortened in PW1: the longer line left an orphan word), **New password** and **Confirm new password** fields (show/hide), and the live rules checklist from Change password (at least 8 characters · contains a letter and a number). A rules error reads "Use a password that meets both rules". There's no "different from current" row, since we don't know the current password; Supabase's `same_password` answer is shown as "Use a password you haven’t used for CIR before".
 - Errors on submit: unmet rules stay grey with ×, the confirm field shows "Passwords don’t match.", and the first wrong field is focused with the mascot shaking.
 - While saving, the button reads "Updating…"; on success the user goes to `/login?reset=1` with the snackbar **"Password updated. Log in with your new password"**. Every session of the account is signed out, including the recovery session.
 - An expired, used or malformed link, or `/reset-password` opened with no recovery session, shows **RP-X**: heading "This link has expired", body "Reset links work once and expire after 1 hour. Ask for a new one.", primary **Send a new link** (→ FP) and **Back to login**.
@@ -74,9 +74,13 @@ Not applicable.
 | Mock repo | `src/lib/data/repo.ts` | Same contract for local dev and tests: unknown email = no-op; `?fail=requestPasswordReset` / `?fail=resetPassword` drive the network states. The mock reset page treats `/reset-password?token=mock` as a valid session. |
 | Route guard | `src/proxy.ts` | `PUBLIC` adds `/forgot-password`, `/reset-password`, `/auth/confirm`. |
 | Login toasts | `src/app/login/page.tsx` | `?sent=1` / `?reset=1` snackbars (`Toast`, 4 s, like `?loggedOut=1`); E7 alert removed. |
-| Email template | `supabase/templates/reset-password.html` | Local `config.toml [auth.email.template.recovery]`; live via the Management API. |
+| Email template | `supabase/email/reset-password.html` | Local `config.toml [auth.email.template.recovery]`; live via the Management API. |
 
 **Password rules.** `passwordRules` gets a mode without the "differs" rule; client and server both use it.
+
+**Recovery session check** (`src/lib/recovery.ts`): the access token's `amr` must hold method `recovery` or `otp` (local Supabase CLI 2.109 reports `otp`) stamped within the last hour. An ordinary signed-in session opening `/reset-password` gets RP-X, so it can't skip "Current password".
+
+**Cache Components.** Visited routes stay mounted but hidden (React Activity). Each screen keys its form on `useRouter().bfcacheId`, so a push / replace starts fresh (arrival snackbars, `?email=`, no stale "Sending…") while back / forward restores what was typed.
 
 **Sessions.** The recovery session is a normal Supabase session, so the midnight rule (`session-day.ts`) still applies. It lives only between the link and Update password, and `signOut({ scope: "global" })` ends it together with every other device.
 
@@ -117,9 +121,9 @@ New section **"Forgot & reset password"** on page **Login**, below "Login - Poss
 
 | Slice | Done when |
 |---|---|
-| **PW0** Plan | This file. |
-| **PW1** Figma | Section built; screenshots checked against Login for alignment, spacing and tokens. |
-| **PW2** Code | Screens + actions + route + mock + proxy + template + config.toml. `typecheck`, `lint`, `test`, `g1` green. New e2e `tests/e2e/PW.spec.ts` (mock) covers FP validation, the unknown-email snackbar, network, RP rules/mismatch/success and RP-X. Local Supabase hand check through Inbucket (Mailpit). |
+| **PW0** Plan ✅ | This file. |
+| **PW1** Figma ✅ | Section built; screenshots checked against Login for alignment, spacing and tokens. |
+| **PW2** Code ✅ | Screens + actions + route + mock + proxy + template + config.toml. `typecheck`, `lint`, `test`, `g1` green. New e2e `tests/e2e/PW.spec.ts` (mock) covers FP validation, the unknown-email snackbar, network, RP rules/mismatch/success and RP-X. Local Supabase hand check through Inbucket (Mailpit). |
 | **PW3** Ship | Branch `password-reset` → PR → merged to main → Vercel deploy. Live config applied through the Management API once the user has a Resend key and verified domain. Live hand check: a real reset end to end. DEPLOY.md updated. PRD §4.3 and INTERACTIONS 6.5 updated. |
 
 ## 8. Risks
@@ -130,6 +134,12 @@ New section **"Forgot & reset password"** on page **Login**, below "Login - Poss
 | Email scanners (Outlook Safe Links) "click" the link and use up the token | The link goes to `/auth/confirm`, which verifies with GET. If scanners turn out to break it, switch to a page that verifies on a button press (v1.1). |
 | The Site URL or redirect list is wrong, so links point to localhost | PW3 checks the email link on the live project before announcing. |
 | Recovery session used to browse the app | Accepted: it's a legitimately signed-in owner of the inbox. The update signs out globally. |
+
+## 8b. PW2 verification (2026-11-27)
+
+- `tests/e2e/PW.spec.ts` (mock, 12 tests) + updated `F03.spec.ts`: green when run serially (in parallel the WebGL login page times out under load, as before). `tests/unit/recovery.test.ts`: green.
+- Local Supabase + Mailpit, end to end: unknown email → same snackbar, 0 emails · real email → "Reset your CIR password" arrives · link opened in a fresh browser → form · update → Login snackbar · the logged-in device is signed out · old password refused, new works · used link → `?expired=1` · a normal session on /reset-password → RP-X.
+- Card height eases 526 → 460 over 250 ms on Login → Forgot (measured).
 
 ## 9. Open items
 - The Resend sending domain and from-address are the user's choice (for example `no-reply@<domain>`).
