@@ -80,11 +80,11 @@ test("lane G · leave guard: Keep editing stays; Discard leaves without saving (
   await signIn(page);
   await openEdit(page, "BK-2026-0153");
   await main(page).getByLabel("Client name", { exact: true }).fill("Hendra W.");
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   const g = page.getByRole("alertdialog", { name: "Discard unsaved changes?" });
   await g.getByRole("button", { name: "Keep editing" }).click();
   await expect(page).toHaveURL(/\/edit$/);
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("alertdialog").getByRole("button", { name: "Discard changes" }).click();
   await expect(page).toHaveURL(/\/bookings$/);
   expect(sql("select client_name from bookings where ref = 'BK-2026-0153'")).toBe("Hendra Wijaya");
