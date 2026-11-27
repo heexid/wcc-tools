@@ -229,14 +229,17 @@
 
 /* Hover tilt — product visuals and video posters, desktop only (≥ 1280, a fine pointer that can hover, motion
    allowed). tilt.ts writes the 3D transform inline every frame; these transitions retarget smoothly while tracking and
-   let it settle flat on leave. They outrank the entrance transitions ([data-hero], [data-reveal]), whose delays would
+   glide back flat on leave. They outrank the entrance transitions ([data-hero], [data-reveal]), whose delays would
    otherwise lag the tilt; tilting only starts on hover, after those entrances have run. */
 @media (width >= 80rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .lp-js [data-tilt][data-tilt-state="track"] {
     transition: transform var(--dur-press) var(--ease-out);
   }
+  /* Settling back flat is a physical object coming to rest, so it glides: 600ms on the spring stand-in curve
+     (better-motion). --ease-out over 250ms covered ~75% in the first 50ms and read as a snap. Re-entering mid-glide
+     retargets from the current angle (transitions, not keyframes). */
   .lp-js [data-tilt][data-tilt-state="settle"] {
-    transition: transform var(--dur-modal) var(--ease-out);
+    transition: transform 600ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   /* 06 · Video cards: press scales the whole card (independent `scale`, composes with the tilt) and the play button
