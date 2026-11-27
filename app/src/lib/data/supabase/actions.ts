@@ -5,7 +5,9 @@
 // (./repo.ts) turns them into the prototype's return shapes or a NetworkError.
 import { createHash } from "node:crypto";
 import { BUSINESS_MSG, LOGO_MAX_BYTES, validateBusiness, cleanBusiness } from "@/lib/booking/business";
-import { passwordRules } from "@/lib/data/shared";
+import { newPasswordRules, passwordRules } from "@/lib/data/shared";
+import type { ResetPasswordErrors } from "@/lib/data/repo";
+import { isRecoverySession } from "@/lib/recovery";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseServer } from "@/lib/supabase/server";
 import type { Business } from "@/lib/data/types";
@@ -91,6 +93,57 @@ export async function changePasswordAction(a: { current: string; next: string; c
     await sb.auth.signOut({ scope: "others" }); // "other devices were logged out" (US-13)
     // Best effort: the password HAS changed by now, so a failed "Last changed" stamp must not report a failure.
     await rpc<null>("mark_password_changed", {});
+    return { ok: true, data: null };
+  } catch {
+    return { ok: false, network: true };
+  }
+}
+
+// ── Password reset (PASSWORD-RESET-PLAN) ───────────────────────────────────────────────────────────
+/** Forgot password (US-PW1): asks Supabase Auth to email a reset link. The email's link is the template's
+ *  {{ .SiteURL }}/auth/confirm?token_hash=…&type=recovery (supabase/email/reset-password.html), so no redirectTo.
+ *  Same answer for every address — unknown accounts, rate limits, rejected addresses and Auth's own errors all read as
+ *  "sent" (no account enumeration, PRD §4.4); only a request that never reached Auth is reported (FP-E3). Auth errors
+ *  are logged so a broken mailer shows in the server logs. */
+export async function requestPasswordResetAction(email: string): Promise<Done<null>> {
+  try {
+    const sb = await supabaseServer();
+    const { error } = await sb.auth.resetPasswordForEmail(email.trim());
+    if (error && !error.status) return { ok: false, network: true };
+    if (error && (error.status ?? 0) >= 500) console.error("password reset: Auth answered", error.status, error.code ?? error.message);
+    return { ok: true, data: null };
+  } catch {
+    return { ok: false, network: true };
+  }
+}
+
+/** Create new password (US-PW2): needs the session a reset link made in the last hour (lib/recovery.ts), checks the
+ *  rules again on the server, sets the password, stamps "Last changed", then signs out every session of the account,
+ *  this one included — the user logs in again with the new password. */
+export async function resetPasswordAction(a: { next: string; confirm: string }): Promise<{ ok: true; data: null } | { ok: false; network: true } | { ok: false; expired: true } | { ok: false; errors: ResetPasswordErrors }> {
+  try {
+    const sb = await supabaseServer();
+    const { data: user, error: userError } = await sb.auth.getUser();
+    if (userError && (!userError.status || userError.status >= 500)) return { ok: false, network: true };
+    const { data: s } = await sb.auth.getSession();
+    if (!user?.user || !isRecoverySession(s.session?.access_token)) return { ok: false, expired: true };
+
+    const errors: ResetPasswordErrors = {};
+    const r = newPasswordRules(a.next);
+    if (!r.length || !r.letterAndNumber) errors.next = "rules";
+    if (a.next !== a.confirm) errors.confirm = "mismatch";
+    if (Object.keys(errors).length) return { ok: false, errors };
+
+    const up = await sb.auth.updateUser({ password: a.next });
+    if (up.error) {
+      if (up.error.code === "same_password") return { ok: false, errors: { next: "same" } };
+      if (up.error.code === "weak_password") return { ok: false, errors: { next: "rules" } };
+      if (up.error.status === 401 || up.error.status === 403) return { ok: false, expired: true };
+      return { ok: false, network: true };
+    }
+    // Best effort: the password HAS changed by now, so a failed "Last changed" stamp must not report a failure.
+    await rpc<null>("mark_password_changed", {});
+    await sb.auth.signOut({ scope: "global" }).catch(() => {});
     return { ok: true, data: null };
   } catch {
     return { ok: false, network: true };

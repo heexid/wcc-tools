@@ -17,6 +17,13 @@ export const passwordRules = (current: string, next: string) => ({
   differs: next.length > 0 && next !== current,
 });
 
+/** Reset-password checklist (PASSWORD-RESET-PLAN US-PW2): the same rules without "different from current" — a reset
+ *  doesn't know the current password (Supabase answers `same_password` instead). Shared by the form and the server. */
+export const newPasswordRules = (next: string) => ({
+  length: next.length >= 8,
+  letterAndNumber: /[A-Za-z]/.test(next) && /\d/.test(next),
+});
+
 export const nextInvoiceTypes = (b: { invoiceCount: number }) => allowedInvoiceTypes(b.invoiceCount);
 
 /** What the booking form needs before it can open: every package (incl. archived — an edited booking keeps

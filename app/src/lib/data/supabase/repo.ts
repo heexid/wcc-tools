@@ -16,7 +16,7 @@ import type { Business, Crew, Invoice, InvoiceSnapshot, PaymentInstruction, Pers
 import * as act from "./actions";
 import { countBookingsWith, filterCatalogWith, getKpisWith, listAllBookingsWith, listPackagesWith, rpc } from "./reads";
 
-export { NetworkError, nextInvoiceTypes, passwordRules } from "../shared";
+export { NetworkError, newPasswordRules, nextInvoiceTypes, passwordRules } from "../shared";
 export type * from "../repo";
 
 const today = (): ISODate => isoToLocalDate(now().toISOString());
@@ -143,6 +143,23 @@ export const changePassword: typeof Mock.changePassword = async (a) => {
   }
   if ("errors" in r) return { ok: false as const, errors: r.errors };
   throw new NetworkError("changePassword");
+};
+
+// ── Password reset (PASSWORD-RESET-PLAN) ───────────────────────────────────────────────────────────
+export const requestPasswordReset: typeof Mock.requestPasswordReset = async (email) => {
+  await settled("requestPasswordReset", act.requestPasswordResetAction(email));
+  return { ok: true as const };
+};
+
+export const resetPassword: typeof Mock.resetPassword = async (a) => {
+  const r = await settled("resetPassword", act.resetPasswordAction(a));
+  if (!r.ok) return r;
+  // The server signed out every session; clear this browser's cookies and cached profile too.
+  expectAccountChange();
+  await supabaseBrowser().auth.signOut({ scope: "local" }).catch(() => {});
+  setProfile(null);
+  announceAccountChange();
+  return { ok: true as const };
 };
 
 // ── Packages ────────────────────────────────────────────────────────────────────────────────────

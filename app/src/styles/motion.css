@@ -12,6 +12,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* on-screen movement: tab indicator, reorder */
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); /* side sheet (booking detail panel) */
   --ease-hover: ease; /* colour / background hover */
+  --ease-swap: cubic-bezier(0.2, 0, 0, 1); /* contextual icon cross-fade (better-motion: CSS stand-in for the 0.3 spring) */
 
   /* Durations, by surface */
   --dur-press: 160ms; /* button / tile :active scale */
@@ -23,6 +24,7 @@
   --dur-sheet: 500ms; /* right side sheet travels its own width */
   --dur-collapse: 200ms; /* accordions, progressive disclosure, inline errors */
   --dur-indicator: 250ms; /* tab / segmented-control indicator */
+  --dur-icon-swap: 300ms; /* contextual icon cross-fade (password rule × → ✓) */
   --dur-swap: 150ms; /* in-place view swap (Calendar ↔ Table, Month / Week / Day) — tens/day, so near-imperceptible */
   --stagger-step: 50ms; /* group entrances (rare surfaces only) */
   --stagger-tight: 40ms; /* module entrance cascade (Bookings) — frequent surface, so the whole cascade lands < 500ms */
@@ -39,6 +41,8 @@
   --list-from-y: var(--spacing-8); /* stagger rise, from the animate recipe */
   --cascade-from-blur: var(--spacing-4); /* module entrance: sections come into focus — kept small, these are large surfaces (blur cost, Safari) */
   --page-from-y: var(--spacing-4); /* route-change content rise — tiny: page changes are tens/day */
+  --icon-swap-from-scale: 0.25; /* contextual icon cross-fade (better-motion exact value) */
+  --icon-swap-from-blur: var(--spacing-4);
 }
 
 @theme {
@@ -411,6 +415,7 @@
     --sheet-from-y: 0;
     --list-from-y: 0;
     --page-from-y: 0;
+    --icon-swap-from-scale: 1;
     --stagger-step: 0ms;
     --stagger-tight: 0ms;
   }
@@ -462,4 +467,19 @@
     animation: none;
     opacity: 0.6;
   }
+}
+
+/* Icon swap (password rules × → ✓) — both icons share one grid cell; the one with [data-on] shows. Scale 0.25 → 1,
+   opacity, blur --icon-swap-from-blur → 0 over --dur-icon-swap on --ease-swap. Transitions (not keyframes) so typing back and forth
+   retargets mid-flight. No @starting-style: the first render shows the current icon at rest. Reduced motion → scale
+   neutralised, the opacity/blur cross-fade stays. */
+.motion-icon-swap {
+  transition-property: opacity, scale, filter;
+  transition-duration: var(--dur-icon-swap);
+  transition-timing-function: var(--ease-swap);
+}
+.motion-icon-swap:not([data-on]) {
+  opacity: 0;
+  scale: var(--icon-swap-from-scale);
+  filter: blur(var(--icon-swap-from-blur));
 }

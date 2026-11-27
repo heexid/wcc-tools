@@ -30,6 +30,18 @@ additional_redirect_urls = ["http://127.0.0.1:3000"]
 # No self-signup: accounts are created by an admin (PRD §4.3).
 enable_signup = false
 
+[auth.email]
+# Password reset (PASSWORD-RESET-PLAN): links live 1 hour and work once; one reset email per address per minute.
+otp_expiry = 3600
+max_frequency = "60s"
+
+# CIR-branded reset email; the link goes to /auth/confirm (token_hash). Live: set through the Management API.
+[auth.email.template.recovery]
+subject = "Reset your CIR password"
+content_path = "./supabase/email/reset-password.html"
+
+# Local emails (the reset link) are caught by Mailpit, on by default: http://127.0.0.1:54324
+
 [storage]
 enabled = true
 file_size_limit = "50MiB"
