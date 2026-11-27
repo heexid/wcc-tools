@@ -226,3 +226,28 @@
     }
   }
 }
+
+/* 06 · Video cards — desktop only (≥ 1280, a fine pointer that can hover, motion allowed).
+   The poster tilts toward the pointer: Videos.tsx writes the 3D transform inline every frame; this transition
+   retargets smoothly while tracking and lets it settle flat when the pointer leaves. Press scales the whole card
+   (independent `scale`, so it composes with the tilt) and the play button grows on hover. */
+@media (width >= 80rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lp-video-card {
+    transition: scale var(--dur-press) var(--ease-out);
+  }
+  .lp-video-card:active {
+    scale: var(--press-scale);
+  }
+  .lp-video-poster[data-tilt="track"] {
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+  .lp-video-poster[data-tilt="settle"] {
+    transition: transform var(--dur-modal) var(--ease-out);
+  }
+  .lp-video-play {
+    transition: scale var(--dur-press) var(--ease-out);
+  }
+  .lp-video-card:hover .lp-video-play {
+    scale: 1.08;
+  }
+}

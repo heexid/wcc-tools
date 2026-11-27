@@ -49,36 +49,67 @@ export function Videos() {
         <ul className="mt-48 grid grid-cols-5 gap-24 max-desktop:-mx-(--lp-gutter) max-desktop:flex max-desktop:snap-x max-desktop:snap-mandatory max-desktop:scroll-px-(--lp-gutter) max-desktop:gap-16 max-desktop:overflow-x-auto max-desktop:overscroll-x-contain max-desktop:px-(--lp-gutter) max-desktop:pb-8 max-tablet:gap-12 [scrollbar-width:none]">
           {VIDEOS.map((v) => (
             <li key={v.src} data-reveal className="min-w-0 max-desktop:w-[220px] max-desktop:shrink-0 max-desktop:snap-start max-tablet:w-[240px]">
-              <button
-                type="button"
-                onClick={() => setActive(v)}
-                aria-label={`Play video: ${v.title}, ${v.label}`}
-                className="group flex w-full cursor-pointer flex-col gap-12 rounded-card text-left outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-4"
-              >
-                <span className="relative block aspect-9/16 w-full overflow-hidden rounded-card border border-border-default bg-surface-subtle">
-                  <Image
-                    src={v.poster}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1280px) 240px, 240px"
-                    className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03] motion-reduce:transition-none"
-                  />
-                  {/* Figma "Play": 48 circle, surface/default, bottom-left 16 so it never covers the poster headline */}
-                  <span className="absolute bottom-16 left-16 flex size-48 items-center justify-center rounded-full bg-surface-default shadow-floating transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none">
-                    <Icon name="play" className="size-icon-md" />
-                  </span>
-                </span>
-                <span className="flex flex-col gap-2">
-                  <span className="text-heading-section text-text-primary">{v.title}</span>
-                  <span className="text-body text-text-secondary">{v.duration}</span>
-                </span>
-              </button>
+              <VideoCard video={v} onPlay={() => setActive(v)} />
             </li>
           ))}
         </ul>
       </Container>
       <VideoLightbox video={active} onClose={close} />
     </section>
+  );
+}
+
+// Hover tilt: desktop only (≥ 1280, a fine pointer that can hover) and never under reduced motion.
+const TILT_QUERY = "(min-width: 80rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+const TILT_MAX_DEG = 6;
+
+/** A poster card. On desktop the poster tilts toward the pointer (3D, max 6°) and settles flat when the pointer leaves. */
+function VideoCard({ video: v, onPlay }: { video: Video; onPlay: () => void }) {
+  const poster = useRef<HTMLSpanElement>(null);
+  const frame = useRef(0);
+
+  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const el = poster.current;
+    if (!el || e.pointerType !== "mouse" || !window.matchMedia(TILT_QUERY).matches) return;
+    const { clientX, clientY } = e;
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      const r = el.getBoundingClientRect();
+      const x = (clientX - r.left) / r.width - 0.5; // −0.5 … 0.5
+      const y = (clientY - r.top) / r.height - 0.5;
+      el.dataset.tilt = "track";
+      el.style.transform = `perspective(800px) rotateX(${(-y * 2 * TILT_MAX_DEG).toFixed(2)}deg) rotateY(${(x * 2 * TILT_MAX_DEG).toFixed(2)}deg)`;
+    });
+  };
+  const onPointerLeave = () => {
+    const el = poster.current;
+    cancelAnimationFrame(frame.current);
+    if (!el || !el.style.transform) return;
+    el.dataset.tilt = "settle";
+    el.style.transform = "";
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onPlay}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      aria-label={`Play video: ${v.title}, ${v.label}`}
+      className="group flex w-full cursor-pointer flex-col gap-12 rounded-card text-left outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-4 lp-video-card"
+    >
+      <span ref={poster} className="lp-video-poster relative block aspect-9/16 w-full overflow-hidden rounded-card border border-border-default bg-surface-subtle">
+        <Image src={v.poster} alt="" fill sizes="240px" className="object-cover" />
+        {/* Figma "Play": 48 circle, surface/default, bottom-left 16 so it never covers the poster headline */}
+        <span className="lp-video-play absolute bottom-16 left-16 flex size-48 items-center justify-center rounded-full bg-surface-default shadow-floating">
+          <Icon name="play" className="size-icon-md" />
+        </span>
+      </span>
+      <span className="flex flex-col gap-2">
+        <span className="text-heading-section text-text-primary">{v.title}</span>
+        <span className="text-body text-text-secondary">{v.duration}</span>
+      </span>
+    </button>
   );
 }
 
