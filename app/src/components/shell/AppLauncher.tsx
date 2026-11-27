@@ -16,16 +16,16 @@ import { useLeaveGuard } from "./LeaveGuard";
 // radius card. Current: surface/accent + 2px border/accent + Shadow/Card · Available: surface/default + 1px
 // border/default + Shadow/Card · Hover: surface/subtle + 1px accent/primary · Locked: surface/header, no stroke.
 
-export type ModuleId = "booking" | "packages" | "workspace";
+export type ModuleId = "booking" | "packages" | "crew";
 
 const TILES: readonly { id: ModuleId | "bookmark"; label: string; href: string | null; art: string; name?: string }[] = [
   { id: "booking" as const, label: "Booking", href: "/bookings", art: "bookings" },
   { id: "packages" as const, label: "Package Lib", href: "/packages", art: "package-lib" },
-  { id: "workspace" as const, label: "Workspace & Crew", href: "/workspace", art: "crew" },
+  { id: "crew" as const, label: "Crew", href: "/crew", art: "crew" },
   { id: "bookmark" as const, label: "Coming Soon", href: null, art: "lock", name: "Bookmark — coming soon" },
 ];
 
-/** `current` is the module the page belongs to; leave it out on a standalone screen (Account settings) so no tile is current. */
+/** `current` is the module the page belongs to; leave it out on a standalone screen (Account or Workspace settings) so no tile is current. */
 export function AppLauncher({ current }: { current?: ModuleId }) {
   const [open, setOpen] = useState(false);
   const { mounted, presence } = usePresence(open);
@@ -153,11 +153,7 @@ export function LauncherTiles({
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`/assets/tile-${t.art}.png`} srcSet={`/assets/tile-${t.art}.png 1x, /assets/tile-${t.art}@2x.png 2x`} alt="" className="block size-[calc(var(--spacing-48)+var(--spacing-8))] shrink-0" />
-            {t.id !== "workspace" ? (
-              <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
-            ) : (
-              <span className="text-center text-body text-text-primary">{t.label}</span> // two lines
-            )}
+            <Txt className={cn("text-body whitespace-nowrap", locked ? "text-text-secondary" : "text-text-primary")}>{t.label}</Txt>
           </button>
         );
       })}

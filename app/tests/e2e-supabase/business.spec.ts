@@ -4,17 +4,17 @@ import { join } from "node:path";
 import { resetDb, sql } from "./db";
 import { authCookieName } from "../../src/lib/supabase/cookie";
 
-// P8 · Business information on local Supabase (PRD US-14, Profile lane E): settings row + logo in Storage
+// P8 · Business information on local Supabase (PRD US-14, Workspace Setting flow W1–W6): settings row + logo in Storage
 // `branding/`, and the rule that matters — an OLD invoice's PDF shows the CURRENT business, while its figures and
 // bank details stay the snapshot's. Same selectors and copy as the mock suite (F18-business).
 
 test.beforeAll(() => resetDb());
 test.beforeEach(async ({ page }) => {
-  await page.goto("/login?next=/workspace");
+  await page.goto("/login?next=/workspace-settings");
   await page.getByLabel("Email").fill("bs-moment@email.com");
   await page.getByLabel("Password", { exact: true }).fill("bsmoment26");
   await page.getByRole("button", { name: "Login" }).click();
-  await expect(page).toHaveURL(/\/workspace$/);
+  await expect(page).toHaveURL(/\/workspace-settings$/);
 });
 
 const card = (p: Page) => p.getByRole("region", { name: "Business information" });
@@ -73,7 +73,7 @@ test("E4 · save with a logo → stored in Storage, card shows it, and an old in
 
 test("save fails (network) → inline message, nothing saved; Try again saves", async ({ page }) => {
   let aborted = false;
-  await page.route("**/workspace", async (route) => {
+  await page.route("**/workspace-settings", async (route) => {
     if (!aborted && route.request().method() === "POST" && route.request().headers()["next-action"]) {
       aborted = true;
       return route.abort("internetdisconnected");
@@ -92,7 +92,7 @@ test("save fails (network) → inline message, nothing saved; Try again saves", 
 
 test("crew sees the card but no Edit; Storage refuses a crew's upload", async ({ page, context }) => {
   await context.clearCookies();
-  await page.goto("/login?next=/workspace");
+  await page.goto("/login?next=/workspace-settings");
   await page.getByLabel("Email").fill("crew@bs-moment.test");
   await page.getByLabel("Password", { exact: true }).fill("crewview26");
   await page.getByRole("button", { name: "Login" }).click();

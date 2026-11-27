@@ -558,6 +558,8 @@ export type Database = {
           paid_until: string | null
           slug: string
           status: string
+          subscription_months: number | null
+          subscription_start: string | null
         }
         Insert: {
           created_at?: string
@@ -566,6 +568,8 @@ export type Database = {
           paid_until?: string | null
           slug: string
           status?: string
+          subscription_months?: number | null
+          subscription_start?: string | null
         }
         Update: {
           created_at?: string
@@ -574,6 +578,8 @@ export type Database = {
           paid_until?: string | null
           slug?: string
           status?: string
+          subscription_months?: number | null
+          subscription_start?: string | null
         }
         Relationships: []
       }

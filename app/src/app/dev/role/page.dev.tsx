@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsReadOnly } from "@/lib/role";
-import { setRole, setWorkspaceStatus } from "./setRole";
+import { setRole, setSubscriptionExpired, setWorkspaceStatus } from "./setRole";
 
 // Switches the mock profile between admin and crew (INTERACTIONS 6.4). Persists until /dev/reset.
 export default function RolePage() {
@@ -24,6 +24,12 @@ export default function RolePage() {
         </button>
         <button type="button" onClick={() => setWorkspaceStatus("read_only")} className="rounded-control border border-border-control px-control py-micro text-ui-button">
           Read-only workspace
+        </button>
+        <button type="button" onClick={() => setSubscriptionExpired(true)} className="rounded-control border border-border-control px-control py-micro text-ui-button">
+          Expired subscription
+        </button>
+        <button type="button" onClick={() => setSubscriptionExpired(false)} className="rounded-control border border-border-control px-control py-micro text-ui-button">
+          Paid subscription
         </button>
       </div>
     </main>

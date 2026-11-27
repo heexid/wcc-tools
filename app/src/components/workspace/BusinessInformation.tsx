@@ -18,7 +18,7 @@ import { updateBusiness } from "@/lib/data/repo";
 import type { Business } from "@/lib/data/types";
 import { initials } from "@/lib/format";
 
-// Workspace & Crew → "Business information" (PRD US-14, INTERACTIONS 6.11–6.12; Figma Workspace & Crew → WC1, WC14–WC17, flow lane B).
+// Workspace settings → "Business information" (PRD US-14, INTERACTIONS 6.11–6.12; Figma Workspace Setting → WS1–WS8, WSM1–WSM4, flow W1–W6).
 
 /** Logo tile [Size=56 | 38]: the uploaded image (contained, hairline border, radius control) or, with no logo, the
  *  business-name initials on the brand avatar fill. */
@@ -34,32 +34,24 @@ export function BusinessLogo({ business, size = 56 }: { business: Business; size
   );
 }
 
-/** Desktop card body (Figma WC1 › Details): 56 logo · Business name 180 · Address (fills) · Email 230 · Phone 170, gap
- *  group; label Caption over value Body Strong (gap 2). No business yet = the loading row (WC3). */
-export function BusinessDetails({ business }: { business: Business | null }) {
+/** Loading rows (Figma WS1 layout): the five row labels with skeleton values. */
+export function BusinessRowsLoading() {
   return (
-    <div className="flex items-center gap-group border-t border-border-default pt-base">
-      {business ? <BusinessLogo business={business} /> : <Skeleton className="size-[calc(var(--spacing-64)-var(--spacing-8))] shrink-0 rounded-control" />}
-      <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-group gap-y-base desktop:grid-cols-[calc(var(--spacing-64)*3-var(--spacing-12))_minmax(0,1fr)_calc(var(--spacing-64)*4-var(--spacing-24)-var(--spacing-2))_calc(var(--spacing-64)*3-var(--spacing-24)+var(--spacing-2))]">
-        <Detail label="Business name" value={business?.name} />
-        <Detail label="Address" value={business?.address} />
-        <Detail label="Email" value={business?.email} />
-        <Detail label="Phone" value={business?.phone} />
-      </dl>
-    </div>
+    <>
+      {["Logo", "Business name", "Address", "Email", "Phone"].map((label) => (
+        <Row key={label} label={label}>
+          {label === "Logo" ? (
+            <Skeleton className="size-[calc(var(--spacing-64)-var(--spacing-8))] shrink-0 rounded-pill" />
+          ) : (
+            <Skeleton className="h-16 w-full max-w-[calc(var(--spacing-64)*4)]" />
+          )}
+        </Row>
+      ))}
+    </>
   );
 }
 
-function Detail({ label, value }: { label: string; value?: string }) {
-  return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <dt className="text-caption text-text-secondary">{label}</dt>
-      <dd className="text-body-strong wrap-anywhere whitespace-pre-line text-text-primary">{value ?? <Skeleton className="h-16 w-full max-w-[calc(var(--spacing-64)*2)]" />}</dd>
-    </div>
-  );
-}
-
-/** Mobile card body rows (Figma WM1): label over value, hairline between rows. */
+/** Card rows (Figma WS1 / WSM1): label 160 · value on desktop, label over value below 768; hairline between rows. */
 export function BusinessRows({ business }: { business: Business }) {
   return (
     <>

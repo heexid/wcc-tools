@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => signIn(page));
 
 test.describe("1440", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/workspace");
+    await page.goto("/crew");
     await expect(row(page, "Raka Pratama")).toBeVisible();
   });
 
@@ -38,7 +38,7 @@ test.describe("1440", () => {
       await close();
       await expect(panel(page)).toHaveCount(0);
       await expect(row(page, "Raka Pratama")).toBeFocused();
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/crew$/);
     }
   });
 
@@ -49,11 +49,11 @@ test.describe("1440", () => {
     for (const close of [() => detail.getByRole("button", { name: "Close" }).click(), () => page.keyboard.press("Escape"), () => page.mouse.click(200, 700), () => page.goBack()]) {
       await items(page).nth(1).click();
       await expect(detail).toContainText("Graduation · Kirana");
-      await expect(page).toHaveURL(/\/workspace\?person=crew_rp&booking=/);
-      await expect(page.locator("nav[aria-label=Breadcrumb]")).toContainText("Workspace & Crew");
+      await expect(page).toHaveURL(/\/crew\?person=crew_rp&booking=/);
+      await expect(page.locator("nav[aria-label=Breadcrumb]")).toContainText("Crew");
       await close();
       await expect(detail).toHaveCount(0);
-      await expect(page).toHaveURL(/\/workspace\?person=crew_rp$/);
+      await expect(page).toHaveURL(/\/crew\?person=crew_rp$/);
       await expect(panel(page).getByRole("tab", { name: "Past (5)" })).toHaveAttribute("aria-selected", "true"); // kept
     }
     await page.keyboard.press("Escape");
@@ -62,17 +62,17 @@ test.describe("1440", () => {
   });
 
   test("a link to a person's booking opens both; closing keeps the person", async ({ page }) => {
-    await page.goto("/workspace?person=crew_rp&booking=BK-2026-0142");
+    await page.goto("/crew?person=crew_rp&booking=BK-2026-0142");
     const detail = page.getByRole("dialog", { name: "Booking detail" });
     await expect(detail).toContainText("Wedding · Sari & Dimas");
     await detail.getByRole("button", { name: "Close" }).click();
     await expect(detail).toHaveCount(0);
     await expect(items(page)).toHaveCount(5);
-    await expect(page).toHaveURL(/\/workspace\?person=crew_rp$/);
+    await expect(page).toHaveURL(/\/crew\?person=crew_rp$/);
   });
 
   test("Edit booking leaves for the booking screen", async ({ page }) => {
-    await page.goto("/workspace?person=crew_rp&booking=BK-2026-0142");
+    await page.goto("/crew?person=crew_rp&booking=BK-2026-0142");
     await page.getByRole("dialog", { name: "Booking detail" }).getByRole("button", { name: "Edit booking" }).click();
     await expect(page).toHaveURL(/\/bookings\/[^/]+\/edit$/, { timeout: 15_000 });
   });
@@ -108,21 +108,21 @@ test.describe("1440", () => {
 });
 
 test("unknown person: no panel, toast, clean URL", async ({ page }) => {
-  await page.goto("/workspace?person=nope");
+  await page.goto("/crew?person=nope");
   await expect(page.getByRole("status").filter({ hasText: "This person is no longer in the list." })).toBeVisible();
-  await expect(page).toHaveURL(/\/workspace$/);
+  await expect(page).toHaveURL(/\/crew$/);
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
 test("crew can open a person", async ({ page }) => {
   await page.goto("/dev/role");
   await page.getByRole("button", { name: "Crew" }).click();
-  await page.goto("/workspace?person=crew_rp");
+  await page.goto("/crew?person=crew_rp");
   await expect(items(page)).toHaveCount(5);
 });
 
 test("Past over 20: Show more", async ({ page }) => {
-  await page.goto("/workspace");
+  await page.goto("/crew");
   await expect(row(page, "Raka Pratama")).toBeVisible();
   // 30 more past bookings for Raka in the mock's stored data.
   await page.evaluate(() => {
@@ -136,7 +136,7 @@ test("Past over 20: Show more", async ({ page }) => {
       localStorage.setItem(k, JSON.stringify(o));
     }
   });
-  await page.goto("/workspace?person=crew_rp");
+  await page.goto("/crew?person=crew_rp");
   await panel(page).getByRole("tab", { name: "Past (35)" }).click();
   await expect(panel(page).getByRole("tabpanel").getByRole("button", { name: /Graduation|Wedding/ })).toHaveCount(20);
   await panel(page).getByRole("button", { name: "Show more" }).click();
@@ -147,7 +147,7 @@ test("Past over 20: Show more", async ({ page }) => {
 
 test("390 · bottom sheet, 44 px actions, no overflow at 320", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/workspace");
+  await page.goto("/crew");
   await row(page, "Raka Pratama").or(page.getByRole("listitem").getByRole("button", { name: /Raka Pratama/ })).click();
   const sheet = page.getByRole("dialog", { name: "Bookings" });
   await expect(sheet).toContainText("Lead photographer · 5 bookings in Nov");

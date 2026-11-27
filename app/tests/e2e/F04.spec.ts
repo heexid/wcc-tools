@@ -32,7 +32,7 @@ test.describe("signed in", () => {
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("button", { name: "Package Lib", exact: true })).toBeFocused();
     await page.keyboard.press("ArrowRight");
-    await expect(page.getByRole("button", { name: "Workspace & Crew" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Crew", exact: true })).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(page.getByRole("button", { name: "Booking", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Bookmark — coming soon" })).toBeDisabled();
@@ -83,6 +83,8 @@ test.describe("signed in", () => {
     await profile(page).click();
     const menu = page.getByRole("menu", { name: "Account" });
     await expect(menu.getByRole("menuitem", { name: "Account Setting" })).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(menu.getByRole("menuitem", { name: "Workspace Setting" })).toBeFocused();
     await page.keyboard.press("ArrowDown");
     await expect(menu.getByRole("menuitem", { name: "Log out" })).toBeFocused();
     await page.keyboard.press("ArrowDown");

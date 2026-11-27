@@ -74,7 +74,7 @@ test("4, 5 · the same invoice number downloads each workspace's own PDF; the ot
 
 test("6, 17 · B's logo can't be read, replaced or deleted by A; business edits stay in one workspace", async ({ browser }) => {
   const b = await (await browser.newContext()).newPage();
-  await signIn(b, B, "/workspace");
+  await signIn(b, B, "/workspace-settings");
   const card = b.getByRole("region", { name: "Business information" });
   await card.getByRole("button", { name: "Edit" }).click();
   const dlg = b.getByRole("dialog", { name: "Business information" });
@@ -88,7 +88,7 @@ test("6, 17 · B's logo can't be read, replaced or deleted by A; business edits 
   expect(await storage(b, "GET", `authenticated/branding/${path}`)).toBe(200);
 
   const a = await (await browser.newContext()).newPage();
-  await signIn(a, A, "/workspace");
+  await signIn(a, A, "/workspace-settings");
   await expect(a.getByRole("region", { name: "Business information" })).toContainText("bs.moment");
   const before = sql(`select updated_at from storage.objects where name = '${path}'`);
   expect(await storage(a, "GET", `authenticated/branding/${path}`)).toBeGreaterThanOrEqual(400);
@@ -100,7 +100,7 @@ test("6, 17 · B's logo can't be read, replaced or deleted by A; business edits 
 
 test("16 · a link to B's person shows nothing of B", async ({ page }) => {
   const id = sql(`select id from crew where workspace_id = '${WS_B}'`);
-  await signIn(page, A, `/workspace?person=${id}`);
+  await signIn(page, A, `/crew?person=${id}`);
   await expect(page.getByRole("status").filter({ hasText: "This person is no longer in the list." })).toBeVisible();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("Bee Admin")).toHaveCount(0);
@@ -110,7 +110,7 @@ test("11 · two tabs: A signs out and B signs in on one, nothing of A stays on t
   await signIn(page, A, "/bookings?booking=BK-2026-0142");
   await expect(page.getByRole("dialog", { name: "Booking detail" })).toContainText("Sari Wulandari");
   const other = await context.newPage();
-  await other.goto("/workspace");
+  await other.goto("/crew");
   await other.getByRole("button", { name: /bs\.moment/ }).first().click();
   await other.getByRole("menuitem", { name: "Log out" }).click();
   await other.getByRole("alertdialog").getByRole("button", { name: "Log out" }).click();
@@ -142,7 +142,7 @@ test("9, 18 · a read-only workspace: everything readable, no write buttons, exi
   await expect(d.getByRole("button", { name: "Edit booking" })).toHaveCount(0);
   const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 60_000 }), d.getByRole("button", { name: "Download PDF (INV-2026-0187)" }).click()]);
   expect(pdfText(await dl.path())).toContain("Bee Client");
-  await page.goto("/workspace");
+  await page.goto("/workspace-settings");
   await expect(page.getByRole("region", { name: "Business information" })).toContainText("Studio Bee");
   await expect(page.getByRole("button", { name: "Edit", exact: true })).toHaveCount(0);
   sql(`update workspaces set status = 'active' where id = '${WS_B}'`);

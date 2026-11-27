@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ds/Button";
 import { PanelModal } from "@/components/ds/Dialog";
 import { Avatar, Toast, ToastRegion } from "@/components/ds/Feedback";
@@ -11,6 +11,7 @@ import { cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { cn } from "@/components/ds/cn";
 import { usePresence } from "@/components/ds/usePresence";
 import { PROFILE_EVENT } from "@/components/shell/AppShell";
+import { SETTINGS_MAIN, SETTINGS_PAGE, SettingsCard, SettingsRow } from "./SettingsCard";
 import { LIMITS } from "@/lib/booking/calc";
 import { now } from "@/lib/clock";
 import { changePassword, getProfile, passwordRules, updateDisplayName } from "@/lib/data/repo";
@@ -54,9 +55,9 @@ export function AccountSettings() {
   };
 
   return (
-    <div data-cascade className="flex flex-1 flex-col items-center pt-[calc(var(--spacing-32)+var(--spacing-8))] pb-[calc(var(--spacing-64)+var(--spacing-16))] max-tablet:px-layout-gutter max-tablet:pt-20 max-tablet:pb-group">
+    <div data-cascade className={SETTINGS_PAGE}>
       {/* Mobile (Figma MA1): cards full width (16 margins), gap base; rows stack label over value + action. */}
-      <main className={cn("flex w-[calc(var(--spacing-64)*12-var(--spacing-8))] flex-col gap-section max-tablet:w-full max-tablet:gap-base", entering && cascadeChildren())}>
+      <main className={cn(SETTINGS_MAIN, entering && cascadeChildren())}>
         <div className="flex flex-col gap-micro">
           <h1 tabIndex={-1} className="flex text-heading-page text-text-primary outline-none">
             <Txt>Account settings</Txt>
@@ -64,7 +65,7 @@ export function AccountSettings() {
           <Txt className="text-body text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">Your profile and sign-in details for bs internal tools.</Txt>
         </div>
 
-        <Card title="Profile" caption="How you appear to your team.">
+        <SettingsCard title="Profile" caption="How you appear to your team.">
           <div className="flex items-center gap-12 pb-16">
             <Avatar size={38} initials={initials(profile.displayName)} />
             <span className="flex flex-col">
@@ -72,13 +73,13 @@ export function AccountSettings() {
               <Txt className="text-caption text-text-secondary">{`${role} · ${profile.workspace} workspace`}</Txt>
             </span>
           </div>
-          <Row label="Name" value={profile.displayName} note="Shown in the header and as “Created by” on bookings.">
+          <SettingsRow label="Name" value={profile.displayName} note="Shown in the header and as “Created by” on bookings.">
             <Button variant="secondary" icon="pencil" onClick={() => setModal("name")}>
               Edit name
             </Button>
-          </Row>
-          <Row label="Email" value={profile.email} note="Used to log in. Ask your workspace admin to change it." locked />
-          <Row
+          </SettingsRow>
+          <SettingsRow label="Email" value={profile.email} note="Used to log in. Ask your workspace admin to change it." locked />
+          <SettingsRow
             label="Role"
             value={
               <span className="flex self-start rounded-pill bg-surface-accent px-[calc(var(--spacing-12)-var(--spacing-2))] py-2 text-caption-strong text-text-accent">
@@ -88,15 +89,15 @@ export function AccountSettings() {
             note={ROLE_NOTE[profile.role === "admin" ? "admin" : "crew"]}
             locked
           />
-        </Card>
+        </SettingsCard>
 
-        <Card title="Security" caption="Keep your account safe.">
-          <Row label="Password" value="••••••••••" note={`Last changed ${profile.passwordChangedAt === today ? "today" : formatDate(profile.passwordChangedAt)}`} short>
+        <SettingsCard title="Security" caption="Keep your account safe.">
+          <SettingsRow label="Password" value="••••••••••" note={`Last changed ${profile.passwordChangedAt === today ? "today" : formatDate(profile.passwordChangedAt)}`} short>
             <Button variant="secondary" icon="lock" onClick={() => setModal("password")}>
               Change password
             </Button>
-          </Row>
-        </Card>
+          </SettingsRow>
+        </SettingsCard>
       </main>
 
       <ChangeNameModal open={modal === "name"} current={profile.displayName} onClose={() => setModal(null)} onSaved={(p) => done(p, "Name updated")} />
@@ -115,37 +116,6 @@ export function AccountSettings() {
           <Toast presence={toastPresence.presence}>{toast?.text}</Toast>
         </ToastRegion>
       )}
-    </div>
-  );
-}
-
-function Card({ title, caption, children }: { title: string; caption: string; children: ReactNode }) {
-  return (
-    <section aria-label={title} className="flex flex-col rounded-card border border-border-default bg-surface-default px-24 pt-20 pb-8 max-tablet:px-16">
-      <div className="flex items-start gap-16 pb-12">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <h2 className="flex text-heading-section text-text-primary">
-            <Txt>{title}</Txt>
-          </h2>
-          <Txt className="text-caption text-text-secondary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{caption}</Txt>
-        </div>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-/** `short`: the Password row's value column is 360 (the button sits at the row's end; Figma AC2). */
-function Row({ label, value, note, locked, short, children }: { label: string; value: ReactNode; note: string; locked?: boolean; short?: boolean; children?: ReactNode }) {
-  return (
-    <div className="flex w-full items-center gap-16 border-t border-border-default py-16 max-tablet:flex-wrap max-tablet:gap-x-12 max-tablet:gap-y-6 max-tablet:py-12">
-      <span className="w-[calc(var(--spacing-64)*2+var(--spacing-32))] shrink-0 text-body text-text-secondary max-tablet:w-full">{label}</span>
-      <span className={cn("flex min-w-0 flex-1 flex-col gap-2", short && "max-w-[calc(var(--spacing-64)*6-var(--spacing-24))] max-tablet:max-w-none")}>
-        {typeof value === "string" ? <Txt className="text-body-strong text-text-primary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{value}</Txt> : value}
-        <Txt className="text-caption text-text-tertiary max-tablet:w-auto! max-tablet:shrink max-tablet:whitespace-normal">{note}</Txt>
-      </span>
-      {short && <span className="flex-1 max-tablet:hidden" />}
-      {locked ? <Icon name="lock" label="Locked" className="size-icon-sm shrink-0 text-text-tertiary" /> : children}
     </div>
   );
 }

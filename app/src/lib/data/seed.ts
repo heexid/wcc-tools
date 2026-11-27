@@ -19,7 +19,7 @@ export const at = (local: string) => new Date(`${local.replace(" ", "T")}:00+07:
 /** Saved-data schema version: the store reseeds when localStorage holds another one. Bump on any Db shape change.
  *  2: bookings carry a payment instruction (lane I) · 3: invoice snapshots carry the business + package summary (F15)
  *  · 4: bookings + new snapshots carry eventStart / location / notes (2026-11-21). */
-export const DB_VERSION = 6;
+export const DB_VERSION = 7;
 
 export const DEFAULT_PAYMENT = { receiptName: "Bank BCA", accountNumber: "1234567890", accountName: "bs.moment Studio" };
 
@@ -169,7 +169,7 @@ export function seedDb(): Db {
     crew: [...CREW.map((c) => ({ ...c })), { id: "crew_me", name: "bs.moment", role: "", isActive: true, userId: "user_admin" }],
     bookings: [],
     invoices: [],
-    profile: { id: "user_admin", displayName: "bs.moment", email: "bs-moment@email.com", role: "admin", workspace: "bs.moment", workspaceId: "ws_main", workspaceStatus: "active", passwordChangedAt: "2026-09-12" },
+    profile: { id: "user_admin", displayName: "bs.moment", email: "bs-moment@email.com", role: "admin", workspace: "bs.moment", workspaceId: "ws_main", workspaceStatus: "active", subscription: { months: 6, start: "2026-09-01", paidUntil: "2027-02-28" }, passwordChangedAt: "2026-09-12" },
     password: "bsmoment26",
     counters: { booking: {}, invoice: {} },
     settings: {

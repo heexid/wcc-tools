@@ -19,7 +19,7 @@ export type Package = {
   legacyBookings: number;
 };
 
-/** One row of Workspace & Crew → Admin & crew. `type` is the account type; "none" = no login. */
+/** One row of Crew → Admin & crew. `type` is the account type; "none" = no login. */
 export type Person = { crewId: string; name: string; jobTitle: string; type: "admin" | "crew" | "none"; isYou: boolean; upcomingCount: number };
 
 /** `role` is the job title; `userId` links the entry to a login (only the crew lists carry it, not booking detail). */
@@ -28,7 +28,7 @@ export type Crew = { id: string; name: string; role: string; isActive: boolean; 
 /** Where the client pays (printed on every invoice) — every booking has one (Figma lane I). */
 export type PaymentInstruction = { receiptName: string; accountNumber: string; accountName: string };
 
-/** Business information (Workspace & Crew → Business information, PRD US-14). Printed in the invoice PDF's Brand row. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
+/** Business information (Workspace settings → Business information, PRD US-14). Printed in the invoice PDF's Brand row. `logo` is a PNG / JPEG data URL (≤ 256 px); null = no logo, the PDF shows the name's initials. */
 export type Business = { name: string; address: string; phone: string; email: string; logo?: string | null };
 
 export type BookingItem = { id: string; name: string; price: number; qty: number };
@@ -127,7 +127,17 @@ export type Profile = {
   workspaceId: string;
   /** Anything but "active" is read-only for everyone (a closed workspace gets no profile at all). */
   workspaceStatus: "active" | "read_only";
+  /** Set by the developer by query (Workspace settings shows it). `paidUntil` is the last day with full access; after
+   *  it the database reports the workspace as read_only. Absent from a database before migration 019. */
+  subscription?: Subscription;
   passwordChangedAt: ISODate;
+};
+
+export type Subscription = {
+  /** null = none */
+  months: 1 | 3 | 6 | 12 | null;
+  start: ISODate | null;
+  paidUntil: ISODate | null;
 };
 
 export type Db = {
