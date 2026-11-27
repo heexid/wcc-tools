@@ -297,7 +297,7 @@ Self sign-up, online payment, an owner dashboard, custom domains, accounts in se
 | ✅ | Figma (2026-11-27): page *Workspace Setting* (WS1–WS10, WSM1–WSM4, flow W1–W6); page renamed *Crew*; account menu gets Workspace Setting; launcher tile "Crew" | W6 |
 | ✅ | App: `/workspace-settings` (Business information + Subscription), `/crew`, `/workspace` redirects to `/crew` | W6 |
 | ✅ | Database: migration 019 (subscription columns; an expired *Paid until* is read-only), test 020, in `setup-production.sql` and the seed | W6 |
-| ⬜ | Migration 019 on live (needs a backup and the user's OK) | W6 |
+| ✅ | Migration 019 on live (2026-11-27, user's OK): backup first, one transaction, every row and auth hash unchanged; both workspaces have no *Paid until*, so nothing became read-only | W6 |
 | ⬜ | Re-export the Figma images: account menu and sheet (AC1, MS2), launcher | W6 |
 
 ### 9.1 Summary

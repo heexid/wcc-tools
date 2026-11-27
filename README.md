@@ -129,7 +129,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | W3 | People list, search, type filter, migration 015 | ✅ live 2026-11-25 |
 | W4 | Person panel, links into Booking, mobile sheet | ✅ live 2026-11-25 |
 | W5 | Docs, release | ✅ live 2026-11-25 |
-| W6 | Workspace settings screen (account menu), module renamed Crew (`/crew`), Subscription card, migration 019 | 🟡 2026-11-27: built; migration 019 not on live yet |
+| W6 | Workspace settings screen (account menu), module renamed Crew (`/crew`), Subscription card, migration 019 | 🟡 2026-11-27: built, migration 019 live; app waits for PR #21 |
 
 ### Mobile layouts
 
