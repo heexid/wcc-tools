@@ -59,46 +59,17 @@ export function Videos() {
   );
 }
 
-// Hover tilt: desktop only (≥ 1280, a fine pointer that can hover) and never under reduced motion.
-const TILT_QUERY = "(min-width: 80rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
-const TILT_MAX_DEG = 6;
-
-/** A poster card. On desktop the poster tilts toward the pointer (3D, max 6°) and settles flat when the pointer leaves. */
+/** A poster card. On desktop the poster tilts toward the pointer over the whole card (tilt.ts, wired by LandingMotion). */
 function VideoCard({ video: v, onPlay }: { video: Video; onPlay: () => void }) {
-  const poster = useRef<HTMLSpanElement>(null);
-  const frame = useRef(0);
-
-  const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
-    const el = poster.current;
-    if (!el || e.pointerType !== "mouse" || !window.matchMedia(TILT_QUERY).matches) return;
-    const { clientX, clientY } = e;
-    cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(() => {
-      const r = el.getBoundingClientRect();
-      const x = (clientX - r.left) / r.width - 0.5; // −0.5 … 0.5
-      const y = (clientY - r.top) / r.height - 0.5;
-      el.dataset.tilt = "track";
-      el.style.transform = `perspective(800px) rotateX(${(-y * 2 * TILT_MAX_DEG).toFixed(2)}deg) rotateY(${(x * 2 * TILT_MAX_DEG).toFixed(2)}deg)`;
-    });
-  };
-  const onPointerLeave = () => {
-    const el = poster.current;
-    cancelAnimationFrame(frame.current);
-    if (!el || !el.style.transform) return;
-    el.dataset.tilt = "settle";
-    el.style.transform = "";
-  };
-
   return (
     <button
       type="button"
       onClick={onPlay}
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
+      data-tilt-trigger
       aria-label={`Play video: ${v.title}, ${v.label}`}
       className="group flex w-full cursor-pointer flex-col gap-12 rounded-card text-left outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-4 lp-video-card"
     >
-      <span ref={poster} className="lp-video-poster relative block aspect-9/16 w-full overflow-hidden rounded-card border border-border-default bg-surface-subtle">
+      <span data-tilt className="relative block aspect-9/16 w-full overflow-hidden rounded-card border border-border-default bg-surface-subtle">
         <Image src={v.poster} alt="" fill sizes="240px" className="object-cover" />
         {/* Figma "Play": 48 circle, surface/default, bottom-left 16 so it never covers the poster headline */}
         <span className="lp-video-play absolute bottom-16 left-16 flex size-48 items-center justify-center rounded-full bg-surface-default shadow-floating">
