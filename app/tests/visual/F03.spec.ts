@@ -98,12 +98,7 @@ test("E6 · can't reach the server", async ({ page }) => {
   await expectMatchesFigma(page, "login-e6");
 });
 
-test("E7 · forgot password — contact your admin", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByRole("button", { name: "Forgot password?" }).click();
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-  await expectMatchesFigma(page, "login-e7");
-});
+// E7 (contact your admin) was replaced by the reset flow (PASSWORD-RESET-PLAN); its Figma frame is marked superseded.
 
 // G2 — boxes of the key nodes equal Figma (0 px), in P1 (base) and E3 (alert inserted, card grows).
 for (const [frame, prepare] of [
@@ -120,9 +115,9 @@ for (const [frame, prepare] of [
     await prepare(page);
     const spec = `F03-${frame}`;
     const checks: [string, string][] = [
-      ["section[aria-labelledby=login-title]", "Login card FRAME"],
-      ["form", "Panel FRAME"],
-      ["form > img", "Asset/mascot-large INSTANCE"],
+      ["section[aria-labelledby=auth-title]", "Login card FRAME"],
+      ["[data-auth-panel]", "Panel FRAME"],
+      ["[data-auth-panel] > [data-mascot-state]", "Asset/mascot-large INSTANCE"],
       ["form > div:nth-of-type(1)", "Greeting FRAME"],
       ["form button[type=submit]", "Login button INSTANCE"],
       ["form > div:has(> button:text('Forgot password?'))", "Forgot password FRAME"],

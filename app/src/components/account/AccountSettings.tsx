@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ds/Button";
 import { PanelModal } from "@/components/ds/Dialog";
 import { Avatar, Toast, ToastRegion } from "@/components/ds/Feedback";
-import { Icon } from "@/components/ds/Icon";
 import { InputField } from "@/components/ds/InputField";
+import { PasswordRule } from "@/components/ds/PasswordRule";
 import { Txt } from "@/components/ds/Txt";
 import { cascadeChildren, useEntrance } from "@/components/ds/useEntrance";
 import { cn } from "@/components/ds/cn";
@@ -233,22 +233,11 @@ function ChangePasswordModal({ open, onClose, onSaved }: { open: boolean; onClos
       <InputField label="Current password" required type="password" autoComplete="current-password" value={v.current} onChange={set("current")} error={errors.current} />
       <InputField label="New password" required type="password" autoComplete="new-password" value={v.next} onChange={set("next")} aria-describedby="pw-rules" />
       <ul id="pw-rules" aria-label="Password rules" className="flex flex-col gap-6">
-        <Rule ok={rules.length}>At least 8 characters</Rule>
-        <Rule ok={rules.letterAndNumber}>Contains a letter and a number</Rule>
-        <Rule ok={rules.differs}>Different from your current password</Rule>
+        <PasswordRule ok={rules.length}>At least 8 characters</PasswordRule>
+        <PasswordRule ok={rules.letterAndNumber}>Contains a letter and a number</PasswordRule>
+        <PasswordRule ok={rules.differs}>Different from your current password</PasswordRule>
       </ul>
       <InputField label="Confirm new password" required type="password" autoComplete="new-password" value={v.confirm} onChange={set("confirm")} error={errors.confirm} />
     </PanelModal>
-  );
-}
-
-/** Rule row: 14 icon (met: circle-check status/positive · unmet: circle-x text/tertiary) · Caption (gap 6). */
-function Rule({ ok, children }: { ok: boolean; children: string }) {
-  return (
-    <li className="flex items-center gap-6">
-      <Icon name={ok ? "circle-check" : "circle-x"} className={cn("size-[calc(var(--spacing-12)+var(--spacing-2))]", ok ? "text-status-positive" : "text-text-tertiary")} />
-      <Txt className={cn("text-caption", ok ? "text-text-secondary" : "text-text-tertiary")}>{children}</Txt>
-      <span className="sr-only">{ok ? "(met)" : "(not met)"}</span>
-    </li>
   );
 }

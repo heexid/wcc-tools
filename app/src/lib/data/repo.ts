@@ -9,7 +9,7 @@ import { cleanPayment, validatePayment } from "@/lib/booking/payment";
 import { now } from "@/lib/clock";
 import { addDays, isoToLocalDate, normalizePhone, parseISODate, type ISODate } from "@/lib/format";
 import { buildInvoice, invoicesOf, nextNumber, recompute } from "./ledger";
-import { NetworkError, passwordRules, type Catalog } from "./shared";
+import { NetworkError, newPasswordRules, passwordRules, type Catalog } from "./shared";
 import { getDb, transaction } from "./store";
 import { invalidateAll } from "./cache";
 import type { Booking, BookingStatus, Business, Crew, Db, Invoice, Package, PaymentInstruction, Person, Profile } from "./types";
@@ -19,7 +19,7 @@ import { CREW_LOGINS } from "./seed";
 // Compile-time flag (next.config.ts sets it). Kept as a per-module const on purpose: Next inlines the
 // literal and the bundler drops the guarded branch; an imported flag is not folded across modules.
 const DEV_TOOLS = process.env.NEXT_PUBLIC_DEV_TOOLS === "1";
-type Op = "savePackage" | "saveBooking" | "createInvoice" | "cancelBooking" | "generatePdf" | "login" | "updateProfile" | "updateBusiness" | "changePassword";
+type Op = "savePackage" | "saveBooking" | "createInvoice" | "cancelBooking" | "generatePdf" | "login" | "updateProfile" | "updateBusiness" | "changePassword" | "requestPasswordReset" | "resetPassword";
 const failing = new Set<Op>();
 let latencyMs = DEV_TOOLS ? Number(process.env.NEXT_PUBLIC_LATENCY ?? 0) : 0;
 /** Next call of `op` throws a NetworkError (Package 06, Bookings 23 / 37). */
@@ -34,7 +34,7 @@ if (DEV_TOOLS && typeof window !== "undefined") {
   for (const op of p.getAll("fail")) failing.add(op as Op);
 }
 
-export { NetworkError, nextInvoiceTypes, passwordRules } from "./shared";
+export { NetworkError, newPasswordRules, nextInvoiceTypes, passwordRules } from "./shared";
 
 async function call<T>(op: Op | null, fn: () => T): Promise<T> {
   if (latencyMs) await new Promise((r) => setTimeout(r, latencyMs));
@@ -138,6 +138,37 @@ export async function changePassword(a: { current: string; next: string; confirm
       d.password = a.next;
       d.profile.passwordChangedAt = today();
     });
+    return { ok: true as const };
+  });
+}
+
+// ── Password reset (PASSWORD-RESET-PLAN US-PW1 / US-PW2) ───────────────────────────────
+// The mock sends no email. Every address gets the same answer (no account enumeration), like Supabase's
+// resetPasswordForEmail. The mock's email link is /auth/confirm?token_hash=mock&type=recovery → /reset-password?token=mock.
+export async function requestPasswordReset(email: string): Promise<{ ok: true }> {
+  void email;
+  return call("requestPasswordReset", () => ({ ok: true as const }));
+}
+
+export type ResetPasswordErrors = Partial<{ next: "rules" | "same"; confirm: "mismatch" }>;
+export type ResetPasswordResult = { ok: true } | { ok: false; expired: true } | { ok: false; errors: ResetPasswordErrors };
+
+/** Sets the new password from a reset link, then signs out everywhere (the user logs in again with it). */
+export async function resetPassword(a: { next: string; confirm: string }): Promise<ResetPasswordResult> {
+  return call("resetPassword", () => {
+    const errors: ResetPasswordErrors = {};
+    const r = newPasswordRules(a.next);
+    if (!r.length || !r.letterAndNumber) errors.next = "rules";
+    else if (a.next === getDb().password) errors.next = "same";
+    if (a.next !== a.confirm) errors.confirm = "mismatch";
+    if (Object.keys(errors).length) return { ok: false as const, errors };
+    transaction((d) => {
+      d.password = a.next;
+      d.profile.passwordChangedAt = today();
+    });
+    try {
+      localStorage.removeItem(SESSION);
+    } catch {}
     return { ok: true as const };
   });
 }

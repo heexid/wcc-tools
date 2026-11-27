@@ -11,8 +11,10 @@ import { safeNext } from "@/lib/safe-next";
 import { authenticatedAtFromToken, sessionEndedAtMidnight } from "@/lib/session-day";
 import { authCookieOptions, isAuthCookie } from "@/lib/supabase/cookie";
 
-// "/" = marketing landing, "/get-started" = its CTA target (placeholder) — public like the login page.
-const PUBLIC = new Set(["/", "/login", "/get-started"]);
+// "/" = marketing landing, "/get-started" = its CTA target (placeholder) — public like the login page. Password reset
+// (PASSWORD-RESET-PLAN): /forgot-password, the email link /auth/confirm, and /reset-password (it checks the recovery
+// session itself and shows "link expired" without one).
+const PUBLIC = new Set(["/", "/login", "/get-started", "/forgot-password", "/auth/confirm", "/reset-password"]);
 
 export async function proxy(request: NextRequest) {
   if (process.env.NEXT_PUBLIC_DATA_SOURCE !== "supabase") return NextResponse.next();

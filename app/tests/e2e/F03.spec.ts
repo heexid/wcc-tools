@@ -72,9 +72,9 @@ test("while logging in, fields and button are disabled", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Logging in…" })).toHaveAttribute("aria-busy", "true");
 });
 
-test("Forgot password? shows the contact-your-admin notice (no reset flow)", async ({ page }) => {
+test("Forgot password? opens the reset flow (PASSWORD-RESET-PLAN; replaces E7, flow in PW.spec.ts)", async ({ page }) => {
   await page.getByRole("button", { name: "Forgot password?" }).click();
-  await expect(page.locator("form").getByRole("status")).toContainText("Passwords are managed by your workspace admin");
+  await expect(page).toHaveURL(/\/forgot-password$/);
 });
 
 test("session expired prefills the last email", async ({ page }) => {

@@ -177,7 +177,7 @@ export const FIXTURES: Record<string, Fixture> = {
   "package-07": { frame: "Package 07 · empty (first use)", slice: "F5", patch: (db) => ((db.packages = []), (db.bookings = []), (db.invoices = [])) },
   "package-08": { frame: "Package 08 · search no results", slice: "F5" },
   // Launchpad & Profile, Login — data = seed (profile bs.moment / bs-moment@email.com).
-  "login": { frame: "Login P1–P3, E1–E7", slice: "F3" },
+  "login": { frame: "Login P1–P3, E1–E6 · Forgot & reset password FP/RP", slice: "F3 · PW" },
   "launchpad": { frame: "Launchpad L1–L3, M1–M3", slice: "F4" },
   "profile": { frame: "Profile AC1–AC7, LO1–LO2", slice: "F16" },
 };
