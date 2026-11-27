@@ -86,7 +86,7 @@ Not applicable.
 
 ### Integration points
 - Supabase Auth: `resetPasswordForEmail`, `verifyOtp`, `updateUser`, `signOut`. `enable_signup` stays false.
-- Resend SMTP (`smtp.resend.com:465`, user `resend`, the API key as the password) from a verified sending domain. Sender name "CIR".
+- SMTP sender, sender name "CIR". **Live today: Gmail SMTP** (`smtp.gmail.com:465`, App password), because there is no domain yet. **Target: Resend** (`smtp.resend.com:465`, user `resend`, the API key as the password) from a verified domain (see §9).
 - Live Auth config, through the Management API `PATCH /v1/projects/{ref}/config/auth`: `smtp_*`, `mailer_subjects_recovery`, `mailer_templates_recovery_content`, `site_url`, `uri_allow_list` (+ `/auth/confirm`), `mailer_otp_exp` = 3600. Each change is shown to the user before it's applied.
 
 ### Security and privacy
@@ -94,7 +94,7 @@ Not applicable.
 - The token is single-use with a 1 h expiry, and only `type=recovery` is accepted on `/auth/confirm`. There's no open redirect: the destination is fixed, not taken from the URL.
 - The reset form needs a recovery session. A recovery session that's simply left open expires at midnight WIB like any other session.
 - After a reset, every session of the account is revoked.
-- The Resend API key lives only in Supabase's Auth config. It never goes into the repo, Vercel or chat logs.
+- The SMTP secret (Gmail App password now, Resend API key later) lives only in Supabase's Auth config. It never goes into the repo, Vercel or chat logs.
 - Deactivated accounts can reset, but still can't use CIR (RLS and `is_staff()` are unchanged).
 
 ## 5. Motion (from /find-animation-opportunities, /better-motion, /animate)
@@ -142,5 +142,5 @@ New section **"Forgot & reset password"** on page **Login**, below "Login - Poss
 - Card height eases 526 → 460 over 250 ms on Login → Forgot (measured).
 
 ## 9. Open items
-- The Resend sending domain and from-address are the user's choice (for example `no-reply@<domain>`).
+- **Email sender (2026-11-27): Gmail SMTP for now.** The owner has no domain yet, so live sends from the owner's Gmail through a Google App password (about 500 a day; rate limit set to 30 an hour). **Next update: Resend**, once a domain is bought. It only changes the SMTP settings, not the code or template; the steps are in DEPLOY.md › Password reset emails › "Next: switch to Resend".
 - PNG re-export of the Login visual baselines after the E7 change.

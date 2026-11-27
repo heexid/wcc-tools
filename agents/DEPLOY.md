@@ -50,15 +50,34 @@ Open the site, log in with the account from step 1.4, and you're live. From now 
 
 ### Password reset emails (PASSWORD-RESET-PLAN.md)
 
-**Forgot password?** emails a reset link. Supabase's built-in sender only reaches your own Supabase team and about 2 emails an hour, so real users need your own sender (Resend):
+**Forgot password?** emails a reset link. Supabase's built-in sender only reaches your own Supabase team and about 2 emails an hour, so live uses its own SMTP sender.
 
-1. [resend.com](https://resend.com) → add and verify your domain (DNS records; can take a few hours) → *API Keys* → create a key with sending access.
-2. Supabase → *Authentication → Emails → SMTP Settings* → enable custom SMTP: host `smtp.resend.com`, port `465`, user `resend`, password = the API key, sender `no-reply@<your domain>`, sender name `CIR`.
-3. *Authentication → Emails → Templates → Reset password*: subject `Reset your CIR password`, body = the whole of `supabase/email/reset-password.html`.
-4. *Authentication → URL Configuration*: **Site URL** = your live address (the email link uses it); add `<live address>/auth/confirm` to **Redirect URLs**.
-5. Check: *Forgot password?* with your own email → the email arrives → *Reset password* → set a new password → log in with it.
+**Now (since 2026-11-27): Gmail SMTP.** There's no domain yet, so emails go out from the owner's Gmail through a Google *App password*. That's fine for a few customers: Gmail allows about 500 emails a day, and they come from a personal address.
 
-Until step 1–2 are done, reset a password with SQL (below).
+| Supabase → *Authentication → Emails → SMTP Settings* | Value |
+|---|---|
+| Host / port | `smtp.gmail.com` / `465` |
+| Username, sender email | the owner's Gmail address |
+| Password | a Google App password named "CIR" (myaccount.google.com → *App passwords*, needs 2-Step Verification) |
+| Sender name | `CIR` |
+| Email rate limit (*Rate Limits*) | 30 an hour |
+
+If the App password is revoked or the Google password changes, reset emails stop silently: the form still says "sent", and the Vercel logs show `password reset: Auth answered 5xx`. Create a new App password and paste it in.
+
+**Next: switch to Resend when there's a domain** (about $10 a year at Cloudflare, Porkbun or Namecheap). Nothing in the code or email template changes, only the SMTP settings:
+
+1. [resend.com](https://resend.com) → *Domains* → add the domain → add the DNS records it shows at your registrar → wait for *Verified*.
+2. *API Keys* → create a key with sending access.
+3. Supabase → *SMTP Settings*: host `smtp.resend.com`, port `465`, username `resend`, password = the API key, sender email `no-reply@<your domain>`, sender name `CIR`. Save.
+4. Check: *Forgot password?* with your own email → the email arrives from `no-reply@<your domain>` → *Reset password* works.
+5. Revoke the Gmail App password (Google account → *App passwords*), and update this section and PASSWORD-RESET-PLAN §9.
+6. Optional: point the app at the domain too (Vercel → *Domains*, e.g. `app.<your domain>`). Then update the Supabase **Site URL** and **Redirect URLs** (`<new address>/auth/confirm`) to the new address, or the email links keep pointing at the old one.
+
+**Other settings (already set on live):**
+- *Templates → Reset password*: subject `Reset your CIR password`, body = the whole of `supabase/email/reset-password.html`. After changing the template in the repo, paste it here again.
+- *URL Configuration*: **Site URL** `https://cir-nine.vercel.app`, with `https://`, because the email link is built from it. **Redirect URLs** includes `https://cir-nine.vercel.app/auth/confirm`.
+
+If email sending breaks, reset a password with SQL (below).
 
 ## 4 · Check it works (10 minutes, on the live site)
 
