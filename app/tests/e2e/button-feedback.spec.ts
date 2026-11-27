@@ -27,7 +27,7 @@ test("New booking is disabled and loading until the form opens, and ready again 
   await expect(btn).toBeDisabled();
   await expect(btn).toHaveAttribute("aria-busy", "true");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("New booking");
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page).toHaveURL(/\/bookings$/);
   await expect(btn).toBeEnabled();
 });
@@ -48,7 +48,7 @@ test("Save changes: loading, then Saved + toast, then back to Save changes", asy
   await page.getByRole("button", { name: "Save changes" }).click();
   const saving = page.getByRole("button", { name: "Saving…" });
   await expect(saving).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Cancel", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Back", exact: true })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Saved", exact: true })).toBeVisible();
   await expect(page.getByRole("status").filter({ hasText: /^Changes saved$/ })).toBeVisible();
   await page.screenshot({ path: test.info().outputPath("saved.png") });

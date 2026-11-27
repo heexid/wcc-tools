@@ -81,7 +81,7 @@ test("32 · leave guard — discard this new booking?", async ({ page }) => {
   await open(page);
   await fillSari(page);
   await page.setViewportSize({ width: 1440, height: 1637 });
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page.getByRole("alertdialog", { name: "Discard this new booking?" })).toBeVisible();
   await page.mouse.move(0, 0);
   await expectMatchesFigma(page, "bookings-32", undefined, { masks: [CREATED(1101)] });

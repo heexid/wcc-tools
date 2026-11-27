@@ -626,7 +626,7 @@ function BookingFormReady({ date, initial, catalog }: Props & { catalog: Catalog
         <HeaderDivider />
         <span className="flex gap-tight">
           <Button variant="secondary" loading={leavingPage} disabled={saving} onClick={() => navigate("/bookings")}>
-            Cancel
+            Back
           </Button>
           <Button icon="check" loading={saving} success={showSaved} disabled={belowPaid || leavingPage} onClick={() => onSave()}>
             {saveLabel}

@@ -48,7 +48,7 @@ test("09 · Create invoice #3 — Partial Rp 5.000.000", async ({ page }) => {
 test("12 · unsaved changes guard", async ({ page }) => {
   await openEdit(page, "screen-12");
   await editAsFigma07(page);
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page.getByRole("alertdialog", { name: "Discard unsaved changes?" })).toBeVisible();
   await page.mouse.move(0, 0);
   await expectMatchesFigma(page, "bookings-12", undefined, { masks: [CREATED(1161)] });

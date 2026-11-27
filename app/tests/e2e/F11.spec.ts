@@ -51,7 +51,7 @@ test("lane A · DP 40 % → Confirm saves the booking + INV-2026-0187, Partially
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wedding · Sari & Dimas");
   await expect(page.getByText("Saved just now")).toBeVisible();
   await card.getByRole("button", { name: /PDF/ }).click(); // 2.14 — real PDF in F15
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page).toHaveURL(/\/bookings$/);
 });
 
