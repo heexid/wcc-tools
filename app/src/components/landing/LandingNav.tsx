@@ -13,7 +13,7 @@ import { GET_STARTED_HREF, LOGIN_HREF, SECTION_LINKS } from "./parts";
 
 // Figma LP-D › Navbar (231:80486): 1368 × 58 floating bar, 16 from the top / 36 from the sides, radius 16,
 // surface/default, pad 0/8/0/20. Left: logo (Asset/mascot 32 + "CIR" Heading/Panel) · 48 · links (Text/Body, gap 32).
-// Right (gap 12): Log in · divider (border/strong) · Primary "Start your first booking".
+// Right (gap 8): Secondary "Log in" · Primary "Start your first booking" (Figma 238:94974 / 231:81001).
 // LP-T / LP-M: logo + ghost Icon/menu, which opens "LP-M · Navigation menu (open, fullscreen)" (231:83854): a
 // full-screen surface/default panel that slides down from the top — logo + ghost Icon/x bar, link rows, then the
 // two CTAs pinned to the bottom (safe area).
@@ -64,11 +64,10 @@ export function LandingNav() {
           </ul>
         </div>
 
-        <div className="flex items-center gap-12 max-desktop:hidden">
-          <Link href={LOGIN_HREF} className="lp-link text-body text-text-primary">
+        <div className="flex items-center gap-8 max-desktop:hidden">
+          <ButtonLink href={LOGIN_HREF} variant="secondary">
             Log in
-          </Link>
-          <span aria-hidden className="h-[calc(var(--spacing-20)+var(--spacing-2))] w-px bg-border-strong" />
+          </ButtonLink>
           <ButtonLink href={GET_STARTED_HREF}>Start your first booking</ButtonLink>
         </div>
 
