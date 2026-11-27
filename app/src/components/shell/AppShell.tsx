@@ -30,7 +30,7 @@ import { LeaveGuardProvider, useLeaveGuard } from "./LeaveGuard";
 const MODULES: Record<ModuleId, { name: string; href: string; art: string }> = {
   booking: { name: "Booking", href: "/bookings", art: "bookings" },
   packages: { name: "Packages", href: "/packages", art: "package-lib" },
-  workspace: { name: "Workspace & Crew", href: "/workspace", art: "crew" },
+  crew: { name: "Crew", href: "/crew", art: "crew" },
 };
 
 function Divider() {
@@ -119,7 +119,7 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
               <Txt className="text-body-strong">English</Txt>
             </span>
             <Divider />
-            <AccountMenu name={profile?.displayName ?? ""} role={roleLabel} onAccount={() => navigate("/account")} onLogout={askLogout} />
+            <AccountMenu name={profile?.displayName ?? ""} role={roleLabel} onAccount={() => navigate("/account")} onWorkspace={() => navigate("/workspace-settings")} onLogout={askLogout} />
           </div>
         )}
       </header>
@@ -133,6 +133,7 @@ function Header({ module, page, standalone, editor, onSlot }: { module?: ModuleI
         name={profile?.displayName ?? ""}
         role={roleLabel}
         onAccount={() => navigate("/account")}
+        onWorkspace={() => navigate("/workspace-settings")}
         onLogout={askLogout}
       />
       {mobile ? (

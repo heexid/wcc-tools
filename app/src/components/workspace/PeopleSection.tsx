@@ -23,7 +23,7 @@ import { initials } from "@/lib/format";
 import { useIsReadOnly } from "@/lib/role";
 import { PersonPanel } from "./PersonPanel";
 
-// Figma Workspace & Crew → WC1–WC6 · mobile WM1–WM2; DS People table/Header, People table/Row, Account type tag,
+// Figma Crew → WC1–WC6 · mobile WM1–WM2; DS People table/Header, People table/Row, Account type tag,
 // Mobile/Person card (SHARED-DATABASE-PLAN §9, WC-3). Columns: name fills · type 200 · job title 280 · upcoming 200 ·
 // open 24. A row (its name is the button) opens the person panel, ?person=<crew id>. View only: accounts are managed
 // by query.
@@ -77,7 +77,7 @@ export function PeopleSection() {
     },
     [],
   );
-  // Booking detail, in place over the panel (the page stays Workspace & Crew). Opening adds a history entry, so the
+  // Booking detail, in place over the panel (the page stays Crew). Opening adds a history entry, so the
   // browser's Back returns to the person too.
   const bookingId = params.get("booking");
   const bookingOpen = !!bookingId && (!personId || !!people || failed); // from a link: after the person, so it stacks on top

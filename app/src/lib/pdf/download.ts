@@ -55,7 +55,7 @@ export async function downloadInvoicePdf(invoiceId: string): Promise<string> {
 async function invoicePdf(invoiceId: string): Promise<{ blob: Blob; name: string }> {
   if (process.env.NEXT_PUBLIC_DATA_SOURCE === "supabase") return fetchFromServer(invoiceId);
   const issued = await getInvoiceSnapshot(invoiceId); // op "generatePdf" — ?fail=generatePdf makes it fail once
-  // Brand row + From block always show the CURRENT business information (Workspace & Crew, PRD US-14); every money
+  // Brand row + From block always show the CURRENT business information (Workspace settings, PRD US-14); every money
   // figure and the booking details stay exactly as issued.
   const snapshot = { ...issued, business: await getBusiness() };
   const blob = await renderInvoicePdf(snapshot);

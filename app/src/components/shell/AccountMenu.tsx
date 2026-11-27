@@ -14,9 +14,9 @@ import { useDismiss } from "./useDismiss";
 // the outline is an INSIDE stroke drawn on ::after so the pill keeps its size. No press scale: the shrink-and-back
 // on click read as a shake next to the open state's outline + ring) and Profile AC1 "Account menu open" (PRD US-13, INTERACTIONS 6.6):
 // popover inset, surface/header, 1px border, radius card, Shadow/Floating; panel pad compact, gap micro,
-// 155px Menu items — Account Setting · Log out (danger). Right-aligned 8px under the trigger.
+// 155px Menu items — Account Setting · Workspace Setting · Log out (danger). Right-aligned 8px under the trigger.
 
-export function AccountMenu({ name, role, onAccount, onLogout }: { name: string; role: string; onAccount: () => void; onLogout: () => void }) {
+export function AccountMenu({ name, role, onAccount, onWorkspace, onLogout }: { name: string; role: string; onAccount: () => void; onWorkspace: () => void; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   // Opened from the keyboard (Enter/Space → click with detail 0) → no entrance: keyboard actions never wait on motion.
   const [instant, setInstant] = useState(false);
@@ -79,6 +79,9 @@ export function AccountMenu({ name, role, onAccount, onLogout }: { name: string;
           <div className="flex flex-col gap-micro rounded-control border border-border-default bg-surface-default p-compact">
             <MenuItem icon="settings" onClick={pick(onAccount)} className="w-[calc(var(--spacing-64)*2+var(--spacing-24)+var(--spacing-6)/2)]">
               Account Setting
+            </MenuItem>
+            <MenuItem icon="sliders-horizontal" onClick={pick(onWorkspace)} className="w-[calc(var(--spacing-64)*2+var(--spacing-24)+var(--spacing-6)/2)]">
+              Workspace Setting
             </MenuItem>
             <MenuItem icon="log-out" tone="danger" onClick={pick(onLogout)} className="w-[calc(var(--spacing-64)*2+var(--spacing-24)+var(--spacing-6)/2)]">
               Log out

@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // The module moved from /workspace (Workspace & Crew) to /crew; old links keep working (query, e.g. ?person=, passes through).
+  async redirects() {
+    return [{ source: "/workspace", destination: "/crew", permanent: false }];
+  },
   // A second build (e.g. the Supabase smoke, playwright.supabase.config.ts) can use its own folder.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   pageExtensions: devTools ? ["tsx", "ts", "dev.tsx"] : ["tsx", "ts"],

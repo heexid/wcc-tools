@@ -18,7 +18,7 @@ import { prefetchBooking } from "@/lib/data/prefetch";
 import { addDays, formatDowUpper, initials, isoToLocalDate, parseISODate } from "@/lib/format";
 import { AccountTypeTag, Message } from "./PeopleSection";
 
-// Figma Workspace & Crew → WC8–WC13 (side sheet 560) · mobile WM3–WM4 (bottom sheet) — SHARED-DATABASE-PLAN §9, WC-4.
+// Figma Crew → WC8–WC13 (side sheet 560) · mobile WM3–WM4 (bottom sheet) — SHARED-DATABASE-PLAN §9, WC-4.
 // Header: avatar 38 · name Heading/Section + account type tag · "Job title · n bookings in Nov" · ×; tabs Upcoming /
 // Past. Body: Schedule items under month headings. Footer: See in Booking. Canceled bookings are left out.
 

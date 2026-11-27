@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { signIn } from "../helpers/session";
 
-// W3 · Workspace & Crew → Admin & crew (SHARED-DATABASE-PLAN §9, WC-3; Figma WC1, WC2, WC4, WC6, WM1, WM2).
+// W3 · Crew → Admin & crew (SHARED-DATABASE-PLAN §9, WC-3; Figma WC1, WC2, WC4, WC6, WM1, WM2).
 
 const people = (p: Page) => p.getByRole("region", { name: "Admin & crew" });
 const rows = (p: Page) => people(p).getByRole("row").filter({ has: p.getByRole("cell") });
@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => signIn(page));
 
 test.describe("1440", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/workspace");
+    await page.goto("/crew");
     await expect(rows(page)).toHaveCount(7);
   });
 
@@ -58,20 +58,20 @@ test.describe("1440", () => {
 test("crew sees the same list", async ({ page }) => {
   await page.goto("/dev/role");
   await page.getByRole("button", { name: "Crew" }).click();
-  await page.goto("/workspace");
+  await page.goto("/crew");
   await expect(rows(page)).toHaveCount(7);
   await expect(rows(page).first()).toContainText("bs.moment (You)");
   await expect(rows(page).first()).toContainText("Crew");
 });
 
 test("a canceled booking leaves the count", async ({ page }) => {
-  await page.goto("/workspace");
+  await page.goto("/crew");
   await expect(rows(page).filter({ hasText: "Bima Saputra" })).toContainText("5"); // BK-2026-0146 (25 Nov) is Canceled
 });
 
 test("390 · cards, chips, no results, no overflow at 320", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/workspace");
+  await page.goto("/crew");
   const cards = people(page).getByRole("listitem");
   await expect(cards).toHaveCount(7);
   await expect(cards.nth(4)).toContainText("Lead photographer · 5 upcoming");
@@ -87,7 +87,7 @@ test("390 · cards, chips, no results, no overflow at 320", async ({ page }) => 
 });
 
 test("shrinking the window from 1440 to 800 never overflows", async ({ page }) => {
-  await page.goto("/workspace");
+  await page.goto("/crew");
   await expect(rows(page)).toHaveCount(7);
   await page.setViewportSize({ width: 800, height: 900 });
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBe(800);

@@ -60,8 +60,9 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | Area | What it does | PRD |
 |---|---|---|
 | Login | Email and password. No self-service reset ("ask your workspace admin"). Sessions end at 00:00 WIB every day. A live mascot reacts to the form: its eyes follow the cursor, it watches the caret while you type the email, closes its eyes for the password (peeks when you show it), and looks worried on errors. | §4.3 |
-| App launcher | ⋮⋮ popover to switch between Booking, Package Lib and Workspace & Crew (Bookmark is "Coming soon"). | US-11 |
-| Workspace & Crew | Business information, plus every active admin and crew member with their upcoming bookings. Click a person for Upcoming and Past. View only. | US-14, US-15 |
+| App launcher | ⋮⋮ popover to switch between Booking, Package Lib and Crew (Bookmark is "Coming soon"). | US-11 |
+| Crew | Every active admin and crew member with their upcoming bookings. Click a person for Upcoming and Past. View only. | US-15 |
+| Workspace settings | Account menu → Workspace Setting. Business information (printed on every invoice PDF) and the Subscription (set by the developer; after *Paid until* the workspace is view only). | US-14, US-16 |
 | Package Library | Create, edit, archive and restore packages. Duplicate active names are blocked. Description up to 1000 characters. | US-0 |
 | New / Edit booking | One form. **Client & schedule** first: client, phone (`+62…`), booking name, booking date, optional **event start** (30-minute time select), **location** and **notes** (up to 255 characters each). Then package, items, crew, and **Others**: payment instruction and T&C (up to 255 characters). Live summary. Asks before you leave with unsaved changes. | US-1, US-4 |
 | Invoices | The first invoice is **DP** (% or fixed) or **Full**. Later ones are **Partial** or **Paid**. Each invoice is a frozen snapshot, counts as paid straight away, and is numbered `INV-YYYY-NNNN`. | US-2, US-3, US-5 |
@@ -128,6 +129,7 @@ To deploy, follow [`agents/DEPLOY.md`](agents/DEPLOY.md). For local env values, 
 | W3 | People list, search, type filter, migration 015 | ✅ live 2026-11-25 |
 | W4 | Person panel, links into Booking, mobile sheet | ✅ live 2026-11-25 |
 | W5 | Docs, release | ✅ live 2026-11-25 |
+| W6 | Workspace settings screen (account menu), module renamed Crew (`/crew`), Subscription card, migration 019 | 🟡 2026-11-27: built; migration 019 not on live yet |
 
 ### Mobile layouts
 

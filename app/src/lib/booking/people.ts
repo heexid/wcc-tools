@@ -1,4 +1,4 @@
-// Workspace & Crew → Admin & crew: order, "(You)", search and type filter (SHARED-DATABASE-PLAN §9, WC-3).
+// Crew → Admin & crew: order, "(You)", search and type filter (SHARED-DATABASE-PLAN §9, WC-3).
 import type { Person } from "@/lib/data/types";
 import { formatMonthYear, parseISODate } from "@/lib/format";
 

@@ -21,7 +21,7 @@ test("read-only workspace: an admin reads everything and changes nothing", async
   await page.goto("/packages");
   await expect(page.getByRole("heading", { name: "Package library" })).toBeVisible();
   await expect(page.getByRole("button", { name: /New package|^Edit|Archive/ })).toHaveCount(0);
-  await page.goto("/workspace");
+  await page.goto("/workspace-settings");
   await expect(page.getByRole("region", { name: "Business information" })).toContainText("finance@bs-moment.com");
   await expect(page.getByRole("button", { name: "Edit", exact: true })).toHaveCount(0);
   await page.goto("/account");

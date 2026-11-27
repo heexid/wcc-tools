@@ -89,7 +89,7 @@ Test matrix: new booking → draft, first DP → partially_paid, first Full → 
 - Log out: `<AccountMenu>` → `<ConfirmDialog>` → sign out → redirect to `/login?loggedOut=1` (toast). While it runs, the dialog / sheet is `locked`, Cancel is disabled and the button is `loading` ("Logging out…"). Goes through `useLeaveGuard` first.
 
 ## 8c. Business information (Day 11)
-> Moved to Workspace & Crew (`/workspace`) on 2026-11-25: `SHARED-DATABASE-PLAN.md` §9. The Figma frames AC8–AC10 and lane E are now on page *Workspace & Crew*.
+> Moved to Workspace & Crew (`/workspace`) on 2026-11-25, then to Workspace settings (`/workspace-settings`, account menu) on 2026-11-27: `SHARED-DATABASE-PLAN.md` §9. Figma: page *Workspace Setting*.
 - `/account` gets a third `<Card>` "Business information" (read-only rows + admin-only **Edit**), data from `getBusiness()`; crew role hides the button.
 - `<BusinessModal>` (DS Modal, like `<PaymentInstructionModal>`): `<LogoField>` (hidden `<input type=file accept="image/png,image/jpeg,image/webp">`, ≤ 1 MB, re-encoded to ≤ 256 px on a canvas), name, address (`<TextArea>` max 150), email, phone. Validation lives in `lib/booking/business.ts` (`validateBusiness`, shared with the service layer); `updateBusiness()` = Supabase update on `workspace_settings` (admin only, RLS) + logo upload to Storage `branding/`.
 - Saving never touches invoices. `downloadInvoicePdf()` merges `getBusiness()` into the snapshot before rendering (PRD US-14).

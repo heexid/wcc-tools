@@ -21,7 +21,7 @@ import { useLeaveGuard } from "./LeaveGuard";
 const MODULES: Record<ModuleId, { name: string; href: string; art: string }> = {
   booking: { name: "Booking", href: "/bookings", art: "bookings" },
   packages: { name: "Packages", href: "/packages", art: "package-lib" },
-  workspace: { name: "Workspace & Crew", href: "/workspace", art: "crew" },
+  crew: { name: "Crew", href: "/crew", art: "crew" },
 };
 
 export function MobileTopBar({
@@ -30,6 +30,7 @@ export function MobileTopBar({
   name,
   role,
   onAccount,
+  onWorkspace,
   onLogout,
   className,
 }: {
@@ -39,6 +40,7 @@ export function MobileTopBar({
   name: string;
   role: string;
   onAccount: () => void;
+  onWorkspace: () => void;
   onLogout: () => void;
   className?: string;
 }) {
@@ -112,6 +114,15 @@ export function MobileTopBar({
             }}
           >
             Account Setting
+          </MenuItem>
+          <MenuItem
+            icon="sliders-horizontal"
+            onClick={() => {
+              close();
+              onWorkspace();
+            }}
+          >
+            Workspace Setting
           </MenuItem>
           <MenuItem
             icon="log-out"

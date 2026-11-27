@@ -217,7 +217,7 @@ export async function listCrew(): Promise<Crew[]> {
   return call(null, () => clone(getDb().crew.filter((c) => c.isActive)));
 }
 
-/** Workspace & Crew → Admin & crew: every active person with the number of upcoming bookings (from today, Canceled excluded). */
+/** Crew → Admin & crew: every active person with the number of upcoming bookings (from today, Canceled excluded). */
 export async function listPeople(): Promise<Person[]> {
   return call(null, () => {
     const d = getDb();
@@ -610,7 +610,7 @@ export async function getSettings() {
   return call(null, () => clone(getDb().settings));
 }
 
-/** Business information shown in Workspace & Crew and printed in the invoice PDF's Brand row (PRD US-14). */
+/** Business information shown in Workspace settings and printed in the invoice PDF's Brand row (PRD US-14). */
 export async function getBusiness(): Promise<Business> {
   return call(null, () => clone(getDb().settings.business));
 }
