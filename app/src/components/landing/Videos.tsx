@@ -34,7 +34,7 @@ export function Videos() {
       <Container>
         <div className="flex flex-col items-center text-center">
           <div data-reveal>
-            <Chip icon="sparkles">In action</Chip>
+            <Chip icon="circle-play">In action</Chip>
           </div>
           <h2 id="videos-title" data-reveal className="mt-16 text-marketing-heading text-balance">
             <span className="block text-text-primary">See CIR at work</span>
