@@ -64,8 +64,9 @@ export function Glow({ className, tone = "brand" }: { className?: string; tone?:
   );
 }
 
-/** Product screenshot exported from Figma (public/assets/landing). Decorative copies of real app screens. */
-export function Shot({ src, alt, width, height, className, sizes, eager }: { src: string; alt: string; width: number; height: number; className?: string; sizes: string; eager?: boolean }) {
+/** Product screenshot exported from Figma (public/assets/landing). Decorative copies of real app screens.
+ *  `tilt` makes it tilt toward the pointer on desktop (tilt.ts). */
+export function Shot({ src, alt, width, height, className, sizes, eager, tilt }: { src: string; alt: string; width: number; height: number; className?: string; sizes: string; eager?: boolean; tilt?: boolean }) {
   return (
     <Image
       src={src}
@@ -77,6 +78,7 @@ export function Shot({ src, alt, width, height, className, sizes, eager }: { src
       fetchPriority={eager ? "high" : undefined}
       className={cn("block h-auto max-w-none select-none", className)}
       draggable={false}
+      data-tilt={tilt || undefined}
     />
   );
 }

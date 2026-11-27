@@ -75,6 +75,7 @@ function Hero() {
         <div
           data-hero
           data-hero-window
+          data-tilt
           className="mt-[calc(var(--spacing-64)+var(--spacing-24)+var(--spacing-6))] overflow-hidden rounded-sheet border border-border-default bg-surface-default shadow-floating max-desktop:mt-48 max-tablet:hidden"
         >
           <Shot
@@ -166,7 +167,7 @@ function WhyCir() {
         <div data-reveal className="relative mt-64 h-[590px] overflow-hidden rounded-sheet bg-surface-accent max-desktop:h-[460px] max-tablet:h-[328px]">
           <Glow className="top-[260px] left-[-160px] h-[520px] w-[900px] opacity-60 blur-[90px] max-tablet:top-[140px] max-tablet:left-[-120px] max-tablet:h-[260px] max-tablet:w-[450px]" />
           <Glow tone="accent" className="top-[-200px] left-[760px] h-[420px] w-[700px] opacity-20 blur-[90px] max-desktop:right-[-400px] max-desktop:left-auto max-tablet:top-[-120px] max-tablet:right-[-110px] max-tablet:h-[210px] max-tablet:w-[350px]" />
-          <div data-stage-screen className="absolute top-64 left-1/2 w-[1000px] -translate-x-1/2 overflow-hidden rounded-t-card shadow-floating max-desktop:top-[40px] max-desktop:w-[620px] max-tablet:hidden">
+          <div data-stage-screen data-tilt className="absolute top-64 left-1/2 w-[1000px] -translate-x-1/2 overflow-hidden rounded-t-card shadow-floating max-desktop:top-[40px] max-desktop:w-[620px] max-tablet:hidden">
             <Shot
               src="/assets/landing/new-booking@2x.png"
               alt="New booking form with the live booking summary: Gold Package, three additional items and a total of Rp 12.500.000"
@@ -225,6 +226,7 @@ function BookingForm() {
           <div
             data-reveal
             data-float="summary"
+            data-tilt
             className="absolute top-[40px] left-[336px] z-1 w-[380px] rounded-card border border-border-default bg-surface-default p-[10px] shadow-floating max-desktop:left-[340px] max-tablet:static max-tablet:w-full max-tablet:p-8"
           >
             <Shot
@@ -236,7 +238,7 @@ function BookingForm() {
               className="w-full"
             />
           </div>
-          <div data-reveal data-float="items" className="absolute top-[150px] left-0 w-[360px] max-tablet:static max-tablet:w-full">
+          <div data-reveal data-float="items" data-tilt className="absolute top-[150px] left-0 w-[360px] max-tablet:static max-tablet:w-full">
             <Shot
               src="/assets/landing/items@2x.png"
               alt="Additional items: extra hour, printed album and guest photobooth, each with price, quantity and subtotal"
@@ -292,6 +294,7 @@ function Invoices() {
               height={818}
               sizes="(min-width: 768px) 500px, 310px"
               className="w-[500px] max-tablet:w-[310px]"
+              tilt
             />
           </div>
         </FeatureColumn>
@@ -311,6 +314,7 @@ function Invoices() {
               height={814}
               sizes="(min-width: 768px) 300px, 220px"
               className="relative w-[300px] rounded-control shadow-floating max-tablet:w-[220px]"
+              tilt
             />
           </div>
         </FeatureColumn>
@@ -403,6 +407,7 @@ function Trust() {
             </div>
             <div
               data-float="upcoming"
+              data-tilt
               className="absolute top-[240px] left-1/2 h-[400px] w-[360px] -translate-x-1/2 overflow-hidden rounded-card border border-border-default bg-surface-default p-20 shadow-floating max-tablet:top-[208px] max-tablet:h-[320px] max-tablet:w-[288px] max-tablet:p-16"
             >
               <Shot

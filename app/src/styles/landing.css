@@ -227,22 +227,25 @@
   }
 }
 
-/* 06 · Video cards — desktop only (≥ 1280, a fine pointer that can hover, motion allowed).
-   The poster tilts toward the pointer: Videos.tsx writes the 3D transform inline every frame; this transition
-   retargets smoothly while tracking and lets it settle flat when the pointer leaves. Press scales the whole card
-   (independent `scale`, so it composes with the tilt) and the play button grows on hover. */
+/* Hover tilt — product visuals and video posters, desktop only (≥ 1280, a fine pointer that can hover, motion
+   allowed). tilt.ts writes the 3D transform inline every frame; these transitions retarget smoothly while tracking and
+   let it settle flat on leave. They outrank the entrance transitions ([data-hero], [data-reveal]), whose delays would
+   otherwise lag the tilt; tilting only starts on hover, after those entrances have run. */
 @media (width >= 80rem) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lp-js [data-tilt][data-tilt-state="track"] {
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+  .lp-js [data-tilt][data-tilt-state="settle"] {
+    transition: transform var(--dur-modal) var(--ease-out);
+  }
+
+  /* 06 · Video cards: press scales the whole card (independent `scale`, composes with the tilt) and the play button
+     grows on hover. */
   .lp-video-card {
     transition: scale var(--dur-press) var(--ease-out);
   }
   .lp-video-card:active {
     scale: var(--press-scale);
-  }
-  .lp-video-poster[data-tilt="track"] {
-    transition: transform var(--dur-press) var(--ease-out);
-  }
-  .lp-video-poster[data-tilt="settle"] {
-    transition: transform var(--dur-modal) var(--ease-out);
   }
   .lp-video-play {
     transition: scale var(--dur-press) var(--ease-out);

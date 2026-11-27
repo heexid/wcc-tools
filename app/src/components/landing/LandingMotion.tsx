@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect } from "react";
+import { attachTilt } from "./tilt";
 
 // Landing motion driver (styles in src/styles/landing.css › Motion). Renders nothing.
 //  · Scroll reveal: html.lp-js hides [data-reveal] until it enters the viewport; elements already on screen at
@@ -8,6 +9,7 @@ import { useLayoutEffect } from "react";
 //    --reveal-i 0…4 in DOM order (a short stagger). Each element is revealed once, then unobserved.
 //    "stage" = the final CTA's staged entrance; "group" = one observed box whose [data-reveal-item]s stagger together
 //    (the footer: its bottom bar ends inside the observer's 10% bottom margin, so it could never be seen on its own).
+//  · Tilt: [data-tilt] elements tilt toward the pointer on desktop (tilt.ts).
 //  · Nav: [data-scrolled] on the floating bar once the page has scrolled (shadow fades in).
 export function LandingMotion() {
   useLayoutEffect(() => {
@@ -38,6 +40,9 @@ export function LandingMotion() {
     );
     for (const el of items) if (!el.hasAttribute("data-shown")) reveal.observe(el);
 
+    // Hover tilt on product visuals and video posters (desktop only — see tilt.ts).
+    const untilt = Array.from(document.querySelectorAll<HTMLElement>("[data-tilt]")).map(attachTilt);
+
     const nav = document.querySelector<HTMLElement>("[data-lp-nav]");
     const onScroll = () => nav?.toggleAttribute("data-scrolled", window.scrollY > 8);
     onScroll();
@@ -45,6 +50,7 @@ export function LandingMotion() {
 
     return () => {
       reveal.disconnect();
+      untilt.forEach((off) => off());
       window.removeEventListener("scroll", onScroll);
       root.classList.remove("lp-js");
     };
